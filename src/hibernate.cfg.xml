@@ -54,7 +54,7 @@ Contributor(s):
     <mapping class="com.pchouseshop.model.Company"/>
     <mapping class="com.pchouseshop.model.ProductService"/>
     <mapping class="com.pchouseshop.model.Refurb"/>
-    <mapping class="com.pchouseshop.model.Order"/>
+<!--    <mapping class="com.pchouseshop.model.Order"/>-->
     <mapping class="com.pchouseshop.model.Fault"/>
     <mapping class="com.pchouseshop.model.Person"/>
     <mapping class="com.pchouseshop.model.Customer"/>

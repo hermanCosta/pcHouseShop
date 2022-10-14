@@ -173,7 +173,6 @@ public class LoginView extends javax.swing.JFrame {
             company = companyController.getCompanyController(shopName, password);
 
             if (company != null) {
-                System.out.println("CompanyFound: " + company);
 
                 //new MainMenuView(company).setVisible(true);          
                 new MainMenuView(company).setVisible(true);

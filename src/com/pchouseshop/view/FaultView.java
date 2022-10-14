@@ -109,7 +109,7 @@ public class FaultView extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panel_customers = new javax.swing.JPanel();
+        panel_faults = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         table_view_faults = new javax.swing.JTable();
         txt_search_fault = new javax.swing.JTextField();
@@ -133,8 +133,8 @@ public class FaultView extends javax.swing.JInternalFrame {
         setMinimumSize(new java.awt.Dimension(0, 0));
         setPreferredSize(new java.awt.Dimension(1050, 650));
 
-        panel_customers.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        panel_customers.setPreferredSize(new java.awt.Dimension(1049, 700));
+        panel_faults.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        panel_faults.setPreferredSize(new java.awt.Dimension(1026, 607));
 
         table_view_faults.setAutoCreateRowSorter(true);
         table_view_faults.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
@@ -294,14 +294,14 @@ public class FaultView extends javax.swing.JInternalFrame {
                 .addGap(15, 15, 15))
         );
 
-        javax.swing.GroupLayout panel_customersLayout = new javax.swing.GroupLayout(panel_customers);
-        panel_customers.setLayout(panel_customersLayout);
-        panel_customersLayout.setHorizontalGroup(
-            panel_customersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_customersLayout.createSequentialGroup()
+        javax.swing.GroupLayout panel_faultsLayout = new javax.swing.GroupLayout(panel_faults);
+        panel_faults.setLayout(panel_faultsLayout);
+        panel_faultsLayout.setHorizontalGroup(
+            panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_faultsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_customersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_customersLayout.createSequentialGroup()
+                .addGroup(panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_faultsLayout.createSequentialGroup()
                         .addComponent(lbl_search_icon)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_search_fault, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -310,11 +310,11 @@ public class FaultView extends javax.swing.JInternalFrame {
                     .addComponent(jScrollPane2))
                 .addContainerGap())
         );
-        panel_customersLayout.setVerticalGroup(
-            panel_customersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_customersLayout.createSequentialGroup()
+        panel_faultsLayout.setVerticalGroup(
+            panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_faultsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_customersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lbl_search_icon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txt_search_fault, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -332,14 +332,14 @@ public class FaultView extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 1026, Short.MAX_VALUE)
+                .addComponent(panel_faults, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE)
+                .addComponent(panel_faults, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -438,9 +438,9 @@ public class FaultView extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_fault;
     private javax.swing.JLabel lbl_fault_id;
     private javax.swing.JLabel lbl_search_icon;
-    private javax.swing.JPanel panel_customers;
     private javax.swing.JPanel panel_fault_buttons;
     private javax.swing.JPanel panel_fault_input;
+    private javax.swing.JPanel panel_faults;
     private javax.swing.JTable table_view_faults;
     private javax.swing.JTextField txt_fault_description;
     private javax.swing.JTextField txt_fault_id;

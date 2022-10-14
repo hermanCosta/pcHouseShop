@@ -7,12 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- *
- * @author herman
- */
-
-@Entity(name = "TBL_COMPANY")
+@Entity
 @Table(name = "TBL_COMPANY")
 public class Company implements Serializable {
     @Id

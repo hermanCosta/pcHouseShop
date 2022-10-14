@@ -261,7 +261,6 @@ public class CustomerView extends javax.swing.JInternalFrame {
         });
 
         table_view_customers.setAutoCreateRowSorter(true);
-        table_view_customers.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         table_view_customers.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 

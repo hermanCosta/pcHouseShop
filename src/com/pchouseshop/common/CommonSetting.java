@@ -32,8 +32,8 @@ public class CommonSetting {
     public static JDesktopPane MAIN_MENU_DESKTOP_PANE;
 
     public static void tableSettings(JTable jTable) {
-        jTable.setRowHeight(25);
-        jTable.getTableHeader().setFont(new Font("Lucida Grande", Font.BOLD, 14));
+        jTable.setRowHeight(20);
+        jTable.getTableHeader().setFont(new Font("Lucida Grande", Font.BOLD, 12));
     }
 
     public static void defaultColorPanelAndLabel(JPanel jPanel, JLabel jLabel) {

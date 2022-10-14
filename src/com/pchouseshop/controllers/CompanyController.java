@@ -4,10 +4,6 @@ import com.pchouseshop.dao.CompanyDAO;
 import com.pchouseshop.model.Company;
 import java.util.List;
 
-/**
- *
- * @author herman
- */
 public class CompanyController {
     private final CompanyDAO COMPANY_DAO = new CompanyDAO();
     

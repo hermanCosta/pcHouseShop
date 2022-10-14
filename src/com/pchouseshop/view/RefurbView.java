@@ -185,15 +185,13 @@ public class RefurbView extends javax.swing.JInternalFrame {
             loadRefurbProdListTable();
         }
     }
-    
+
     private boolean checkCustomFields(String pField) {
         boolean hasRecord = false;
 
         if (!pField.trim().isEmpty()) {
             if (pField.contains("##")) {
-                {
-                    hasRecord = true;
-                }
+                hasRecord = true;
             }
         }
         return hasRecord;
@@ -239,7 +237,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
                 break;
         }
     }
-    
+
     private void cleanBasicInfoPanelFields() {
         this.txt_refurb_id.setText("");
         this.txt_brand.setText("");
@@ -361,7 +359,6 @@ public class RefurbView extends javax.swing.JInternalFrame {
         });
 
         table_view_refurbs.setAutoCreateRowSorter(true);
-        table_view_refurbs.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         table_view_refurbs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -475,6 +472,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
             }
         });
 
+        txt_qty.setText("1");
         txt_qty.setMinimumSize(new java.awt.Dimension(12, 20));
         txt_qty.setPreferredSize(new java.awt.Dimension(0, 25));
         txt_qty.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -831,7 +829,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
         btn_clear_fields.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         btn_clear_fields.setForeground(new java.awt.Color(255, 255, 255));
         btn_clear_fields.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_clear.png"))); // NOI18N
-        btn_clear_fields.setText("ClearFields");
+        btn_clear_fields.setText("Clear");
         btn_clear_fields.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_clear_fieldsActionPerformed(evt);
@@ -842,7 +840,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
         btn_gen_label.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         btn_gen_label.setForeground(new java.awt.Color(255, 255, 255));
         btn_gen_label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_print.png"))); // NOI18N
-        btn_gen_label.setText("Gen. Label");
+        btn_gen_label.setText("Print");
         btn_gen_label.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_gen_labelActionPerformed(evt);
@@ -855,16 +853,16 @@ public class RefurbView extends javax.swing.JInternalFrame {
             panel_refurb_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_refurb_buttonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btn_add, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_add)
                 .addGap(18, 18, 18)
-                .addComponent(btn_update, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_update)
                 .addGap(18, 18, 18)
-                .addComponent(btn_delete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_delete)
                 .addGap(18, 18, 18)
-                .addComponent(btn_clear_fields, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_clear_fields)
                 .addGap(18, 18, 18)
-                .addComponent(btn_gen_label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(325, 325, 325))
+                .addComponent(btn_gen_label)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_refurb_buttonsLayout.setVerticalGroup(
             panel_refurb_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

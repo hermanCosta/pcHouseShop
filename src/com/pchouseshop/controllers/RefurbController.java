@@ -27,8 +27,24 @@ public class RefurbController {
     public boolean deleteRefurbProdController(Refurb pRefurbProd) {
         return REFURB_DAO.deleteRefurbProdDAO(pRefurbProd);
     }
-    
+
     public List<Refurb> searchRefurbController(String pSearch) {
         return REFURB_DAO.searchRefurbDAO(pSearch);
+    }
+
+    public List<Refurb> getAllRefurbByCategoryController(int pIdCompany, String pCategory) {
+        return REFURB_DAO.getAllRefurbByCategoryDAO(pIdCompany, pCategory);
+    }
+    
+    public List<Refurb> searchRefurbByCategoryController(int pIdCompany, String pCategory, String pSearch) {
+        return REFURB_DAO.searchRefurbByCategoryDAO(pIdCompany, pCategory, pSearch);
+    }
+    
+    public List<Refurb> getAllCustomRefurbController(int pIdCompany) {
+        return REFURB_DAO.getAllCustomRefurbProdDAO(pIdCompany);
+    }
+    
+    public List<Refurb> searchCustomRefurbConstroller(int pIdCompany, String pSearch) {
+        return REFURB_DAO.searchCustomRefurbDAO(pIdCompany, pSearch);
     }
 }

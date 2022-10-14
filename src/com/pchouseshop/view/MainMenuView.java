@@ -63,11 +63,6 @@ public class MainMenuView extends javax.swing.JFrame {
         menu_create = new javax.swing.JMenu();
         menu_item_new_order = new javax.swing.JMenuItem();
         menu_item_new_sale = new javax.swing.JMenuItem();
-        menu_consult = new javax.swing.JMenu();
-        menu_item_orders = new javax.swing.JMenuItem();
-        menu_item_products = new javax.swing.JMenuItem();
-        menu_item_refurbs = new javax.swing.JMenuItem();
-        menu_item_sales = new javax.swing.JMenuItem();
         menu_reports = new javax.swing.JMenu();
         menu_admin = new javax.swing.JMenu();
         menu_item_customer = new javax.swing.JMenuItem();
@@ -76,11 +71,21 @@ public class MainMenuView extends javax.swing.JFrame {
         menu_item_close_till = new javax.swing.JMenuItem();
         menu_manage = new javax.swing.JMenu();
         menu_item_users = new javax.swing.JMenuItem();
+        menu_consult = new javax.swing.JMenu();
+        menu_item_orders = new javax.swing.JMenuItem();
+        menu_item_products = new javax.swing.JMenuItem();
+        menu_item_sales = new javax.swing.JMenuItem();
+        menu_item_refurbs = new javax.swing.JMenuItem();
+        menu_refurbs = new javax.swing.JMenu();
+        menu_item_computer = new javax.swing.JMenuItem();
+        menu_item_television = new javax.swing.JMenuItem();
+        menu_item_monitor = new javax.swing.JMenuItem();
+        menu_item_console = new javax.swing.JMenuItem();
+        menu_item_custom = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Main Menu");
         setName("Main Menu"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(1280, 700));
 
         desktop_pane_menu.setMaximumSize(new java.awt.Dimension(2147483647, 0));
         desktop_pane_menu.setPreferredSize(new java.awt.Dimension(1050, 649));
@@ -181,36 +186,6 @@ public class MainMenuView extends javax.swing.JFrame {
         menu_create.add(menu_item_new_sale);
 
         menu_bar.add(menu_create);
-
-        menu_consult.setText("Consult");
-
-        menu_item_orders.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, 0));
-        menu_item_orders.setText("Orders");
-        menu_consult.add(menu_item_orders);
-
-        menu_item_products.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F5, 0));
-        menu_item_products.setText("Products");
-        menu_item_products.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menu_item_productsActionPerformed(evt);
-            }
-        });
-        menu_consult.add(menu_item_products);
-
-        menu_item_refurbs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F6, 0));
-        menu_item_refurbs.setText("Refurbs");
-        menu_item_refurbs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menu_item_refurbsActionPerformed(evt);
-            }
-        });
-        menu_consult.add(menu_item_refurbs);
-
-        menu_item_sales.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F7, 0));
-        menu_item_sales.setText("Sales");
-        menu_consult.add(menu_item_sales);
-
-        menu_bar.add(menu_consult);
         menu_bar.add(menu_reports);
 
         menu_admin.setText("Register");
@@ -259,6 +234,85 @@ public class MainMenuView extends javax.swing.JFrame {
 
         menu_bar.add(menu_manage);
 
+        menu_consult.setText("Consult");
+
+        menu_item_orders.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, 0));
+        menu_item_orders.setText("Orders");
+        menu_consult.add(menu_item_orders);
+
+        menu_item_products.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F5, 0));
+        menu_item_products.setText("Products");
+        menu_item_products.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_productsActionPerformed(evt);
+            }
+        });
+        menu_consult.add(menu_item_products);
+
+        menu_item_sales.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F7, 0));
+        menu_item_sales.setText("Sales");
+        menu_consult.add(menu_item_sales);
+
+        menu_item_refurbs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F6, 0));
+        menu_item_refurbs.setText("All Refurbs");
+        menu_item_refurbs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_refurbsActionPerformed(evt);
+            }
+        });
+        menu_consult.add(menu_item_refurbs);
+
+        menu_bar.add(menu_consult);
+
+        menu_refurbs.setText("Refurbs");
+
+        menu_item_computer.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.ALT_MASK));
+        menu_item_computer.setText("Computers");
+        menu_item_computer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_computerActionPerformed(evt);
+            }
+        });
+        menu_refurbs.add(menu_item_computer);
+
+        menu_item_television.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.ALT_MASK));
+        menu_item_television.setText("Televisions");
+        menu_item_television.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_televisionActionPerformed(evt);
+            }
+        });
+        menu_refurbs.add(menu_item_television);
+
+        menu_item_monitor.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.ALT_MASK));
+        menu_item_monitor.setText("Monitors");
+        menu_item_monitor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_monitorActionPerformed(evt);
+            }
+        });
+        menu_refurbs.add(menu_item_monitor);
+
+        menu_item_console.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.ALT_MASK));
+        menu_item_console.setText("Consoles");
+        menu_item_console.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_consoleActionPerformed(evt);
+            }
+        });
+        menu_refurbs.add(menu_item_console);
+
+        menu_item_custom.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_U, java.awt.event.InputEvent.ALT_MASK));
+        menu_item_custom.setText("Custom");
+        menu_item_custom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_customActionPerformed(evt);
+            }
+        });
+        menu_refurbs.add(menu_item_custom);
+
+        menu_bar.add(menu_refurbs);
+
         setJMenuBar(menu_bar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -281,8 +335,6 @@ public class MainMenuView extends javax.swing.JFrame {
                     .addComponent(desktop_pane_menu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(20, 20, 20))
         );
-
-        desktop_pane_menu.getAccessibleContext().setAccessibleParent(null);
 
         setSize(new java.awt.Dimension(1280, 722));
         setLocationRelativeTo(null);
@@ -331,6 +383,41 @@ public class MainMenuView extends javax.swing.JFrame {
         CommonSetting.setMaxInternalFrame(faultsView);
     }//GEN-LAST:event_menu_item_faultActionPerformed
 
+    private void menu_item_computerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_computerActionPerformed
+        RefurbComputerView computerView = new RefurbComputerView();
+        this.desktop_pane_menu.removeAll();
+        this.desktop_pane_menu.add(computerView).setVisible(true);
+        CommonSetting.setMaxInternalFrame(computerView);
+    }//GEN-LAST:event_menu_item_computerActionPerformed
+
+    private void menu_item_televisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_televisionActionPerformed
+        RefurbTelevisionView televisionView = new RefurbTelevisionView();
+        this.desktop_pane_menu.removeAll();
+        this.desktop_pane_menu.add(televisionView).setVisible(true);
+        CommonSetting.setMaxInternalFrame(televisionView);
+    }//GEN-LAST:event_menu_item_televisionActionPerformed
+
+    private void menu_item_monitorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_monitorActionPerformed
+        RefurbMonitorView monitorView = new RefurbMonitorView();
+        this.desktop_pane_menu.removeAll();
+        this.desktop_pane_menu.add(monitorView).setVisible(true);
+        CommonSetting.setMaxInternalFrame(monitorView);
+    }//GEN-LAST:event_menu_item_monitorActionPerformed
+
+    private void menu_item_consoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_consoleActionPerformed
+        RefurbConsoleView consoleView = new RefurbConsoleView();
+        this.desktop_pane_menu.removeAll();
+        this.desktop_pane_menu.add(consoleView).setVisible(true);
+        CommonSetting.setMaxInternalFrame(consoleView);
+    }//GEN-LAST:event_menu_item_consoleActionPerformed
+
+    private void menu_item_customActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_customActionPerformed
+        RefurbCustomView customView = new RefurbCustomView();
+        this.desktop_pane_menu.removeAll();
+        this.desktop_pane_menu.add(customView).setVisible(true);
+        CommonSetting.setMaxInternalFrame(customView);
+    }//GEN-LAST:event_menu_item_customActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane desktop_pane_menu;
     private javax.swing.JLabel lbl_logo;
@@ -343,16 +430,22 @@ public class MainMenuView extends javax.swing.JFrame {
     private javax.swing.JMenu menu_consult;
     private javax.swing.JMenu menu_create;
     private javax.swing.JMenuItem menu_item_close_till;
+    private javax.swing.JMenuItem menu_item_computer;
+    private javax.swing.JMenuItem menu_item_console;
+    private javax.swing.JMenuItem menu_item_custom;
     private javax.swing.JMenuItem menu_item_customer;
     private javax.swing.JMenuItem menu_item_fault;
+    private javax.swing.JMenuItem menu_item_monitor;
     private javax.swing.JMenuItem menu_item_new_order;
     private javax.swing.JMenuItem menu_item_new_sale;
     private javax.swing.JMenuItem menu_item_orders;
     private javax.swing.JMenuItem menu_item_products;
     private javax.swing.JMenuItem menu_item_refurbs;
     private javax.swing.JMenuItem menu_item_sales;
+    private javax.swing.JMenuItem menu_item_television;
     private javax.swing.JMenuItem menu_item_users;
     private javax.swing.JMenu menu_manage;
+    private javax.swing.JMenu menu_refurbs;
     private javax.swing.JMenu menu_reports;
     private javax.swing.JMenu nenu_report;
     private javax.swing.JPanel panel_menu_side;

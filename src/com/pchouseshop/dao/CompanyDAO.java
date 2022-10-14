@@ -11,11 +11,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-/**
- *
- * @author herman
- */
 public class CompanyDAO {
+
     List<Company> _listCompanies = null;
     Session _session = null;
     SessionFactory _sessionFactory = HibernateUtil.getSessionFactory();
@@ -44,7 +41,7 @@ public class CompanyDAO {
         try {
             _session = _sessionFactory.openSession();
             Transaction transaction = _session.beginTransaction();
-            Query query = _session.createQuery("FROM TBL_COMPANY C WHERE C.name = :name AND C.password = :password")
+            Query query = _session.createQuery("FROM Company C WHERE C.name = :name AND C.password = :password")
                     .setParameter("name", name)
                     .setParameter("password", password);
 
