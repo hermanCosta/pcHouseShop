@@ -11,10 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-/**
- *
- * @author herman
- */
 @Entity
 @Table(name = "TBL_CUSTOMER")
 public class Customer implements Serializable {

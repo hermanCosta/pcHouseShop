@@ -30,6 +30,7 @@ public class CommonSetting {
     public static int ID_COMPANY;
     public static Company COMPANY;
     public static JDesktopPane MAIN_MENU_DESKTOP_PANE;
+    public static int DEFAULT_QTY = 1;
 
     public static void tableSettings(JTable jTable) {
         jTable.setRowHeight(20);

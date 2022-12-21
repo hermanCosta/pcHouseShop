@@ -4,10 +4,6 @@ import com.pchouseshop.dao.PersonDAO;
 import com.pchouseshop.model.Person;
 import java.util.List;
 
-/**
- *
- * @author herman
- */
 public class PersonController {
     private final PersonDAO PERSON_DAO = new PersonDAO();
     
@@ -29,5 +25,9 @@ public class PersonController {
     
     public List<Person> searchPerson(String pSearch) {
         return PERSON_DAO.searchPersonDAO(pSearch);
+    }
+    
+    public Person searchPesonByContactNoController(String pContactNo) {
+        return PERSON_DAO.searchPesonByContactNoDAO(pContactNo);
     }
 }

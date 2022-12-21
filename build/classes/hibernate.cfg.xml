@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration">
 <!--
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
@@ -40,23 +40,29 @@ made subject to such option by the copyright holder.
 Contributor(s):
 -->
 <hibernate-configuration>
-  <session-factory>
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/PC_HOUSE_SHOP?zeroDateTimeBehavior=convertToNull</property>
-    <property name="hibernate.connection.username">root</property>
-    <property name="hibernate.connection.password">hellmans</property>
-    <!-- debug -->
-    <property name="show_sql">true</property>
-    <property name="hibernate.id.new_generator_mappings">false</property>
-    <property name="hibernate.hbm2ddl.auto">update</property>
-    <!--mappings-->
-    <mapping class="com.pchouseshop.model.Company"/>
-    <mapping class="com.pchouseshop.model.ProductService"/>
-    <mapping class="com.pchouseshop.model.Refurb"/>
-<!--    <mapping class="com.pchouseshop.model.Order"/>-->
-    <mapping class="com.pchouseshop.model.Fault"/>
-    <mapping class="com.pchouseshop.model.Person"/>
-    <mapping class="com.pchouseshop.model.Customer"/>
-  </session-factory>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/PC_HOUSE_SHOP?zeroDateTimeBehavior=convertToNull</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">hellmans</property>
+        <!-- debug -->
+        <property name="show_sql">true</property>
+        <property name="hibernate.id.new_generator_mappings">false</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <!--mappings-->
+        <mapping class="com.pchouseshop.model.Company"/>
+        <mapping class="com.pchouseshop.model.ProductService"/>
+        <mapping class="com.pchouseshop.model.Refurb"/>
+        <mapping class="com.pchouseshop.model.Fault"/>
+        <mapping class="com.pchouseshop.model.Person"/>
+        <mapping class="com.pchouseshop.model.Customer"/>
+        <mapping class="com.pchouseshop.model.Device"/>
+        <mapping class="com.pchouseshop.model.OrderModel"/>
+        <mapping class="com.pchouseshop.model.Employee"/>
+        <mapping class="com.pchouseshop.model.Deposit"/>
+        <mapping class="com.pchouseshop.model.OrderProdServ"/>
+        <mapping class="com.pchouseshop.model.OrderFault"/>
+        <mapping class="com.pchouseshop.model.OrderNote"/>
+    </session-factory>
 </hibernate-configuration>

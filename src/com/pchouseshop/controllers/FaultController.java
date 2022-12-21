@@ -31,4 +31,8 @@ public class FaultController {
     public Fault getItemFaultController(int pIdFault) {
         return FAULT_DAO.getItemFaultDAO(pIdFault);
     }
+    
+    public List<Fault> orderSearchFaultController(String pSearch) {
+        return FAULT_DAO.orderSearchFaultDAO(pSearch);
+    }
 }

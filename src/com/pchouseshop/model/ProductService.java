@@ -105,6 +105,6 @@ public class ProductService implements Serializable {
 
     @Override
     public String toString() {
-        return "ProductService{" + "idProductService=" + idProductService + ", prodServName=" + prodServName + ", qty=" + qty + ", price=" + price + ", category=" + category + ", note=" + note + ", idCompany=" + idCompany + '}';
+        return prodServName;
     }   
 }

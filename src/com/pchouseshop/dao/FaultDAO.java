@@ -129,4 +129,24 @@ public class FaultDAO {
         
         return itemFault;
     }
+    
+     public List<Fault> orderSearchFaultDAO(String pSearch) {
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM Fault F WHERE F.description LIKE :pSearch")
+                    .setParameter("pSearch", "%"+ pSearch +"%")
+                    .setMaxResults(5);
+
+            _listFault = query.getResultList();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return _listFault;
+    }
 }

@@ -113,7 +113,10 @@ public class ProductServiceDAO {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            Query query = _session.createQuery("FROM ProductService PS WHERE PS.prodServName LIKE :pSearch OR PS.price LIKE :pSearch OR PS.note LIKE :pSearch")
+            Query query = _session.createQuery("FROM ProductService PS "
+                    + "WHERE PS.prodServName LIKE :pSearch "
+                    + "OR PS.price LIKE :pSearch "
+                    + "OR PS.note LIKE :pSearch ORDER BY PS.prodServName")
                     .setParameter("pSearch", "%" + pSearch + "%");
             _listProducts = query.getResultList();
             _transaction.commit();
@@ -125,5 +128,48 @@ public class ProductServiceDAO {
         }
 
         return _listProducts;
+    }
+
+    public List<ProductService> orderSearchProdServDAO(String pSearch) {
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM ProductService PS "
+                    + "WHERE PS.prodServName LIKE :pSearch "
+                    + "OR PS.price LIKE :pSearch "
+                    + "OR PS.note LIKE :pSearch ORDER BY PS.prodServName")
+                    .setParameter("pSearch", "%" + pSearch + "%")
+                    .setMaxResults(5);
+            _listProducts = query.getResultList();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return _listProducts;
+    }
+    
+    public ProductService getItemProdServDAO(int pIdProdServ) {
+        ProductService itemCustomer = null;
+        
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            
+            itemCustomer = (ProductService)_session.get(ProductService.class, pIdProdServ);
+            
+            _transaction.commit();
+
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        
+        return itemCustomer;
     }
 }

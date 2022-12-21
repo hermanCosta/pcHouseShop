@@ -70,9 +70,9 @@ public class FaultView extends javax.swing.JInternalFrame {
 
             return getFault;
         } else {
-            getFault = new Fault(this.txt_fault_description.getText());
+            getFault = new Fault(this.txt_fault_description.getText().toUpperCase());
 
-            int idFault = CommonExtension.setIdExtension(this.txt_fault_id);
+            int idFault = CommonExtension.setIdExtension(this.hdn_txt_fault_id);
             getFault.setIdFault(idFault);
 
             return getFault;
@@ -80,7 +80,7 @@ public class FaultView extends javax.swing.JInternalFrame {
     }
 
     private void setFaultFields(Fault pFault) {
-        this.txt_fault_id.setText(String.valueOf(pFault.getIdFault()));
+        this.hdn_txt_fault_id.setText(String.valueOf(pFault.getIdFault()));
         this.txt_fault_description.setText(pFault.getDescription());
     }
 
@@ -99,8 +99,8 @@ public class FaultView extends javax.swing.JInternalFrame {
         }
     }
 
-    private void cleanFields() {
-        this.txt_fault_id.setText("");
+    private void clearFields() {
+        this.hdn_txt_fault_id.setText("");
         this.txt_search_fault.setText("");
         this.txt_fault_description.setText("");
     }
@@ -115,10 +115,10 @@ public class FaultView extends javax.swing.JInternalFrame {
         txt_search_fault = new javax.swing.JTextField();
         lbl_search_icon = new javax.swing.JLabel();
         panel_fault_input = new javax.swing.JPanel();
-        txt_fault_id = new javax.swing.JTextField();
+        hdn_txt_fault_id = new javax.swing.JTextField();
         lbl_fault = new javax.swing.JLabel();
         txt_fault_description = new javax.swing.JTextField();
-        lbl_fault_id = new javax.swing.JLabel();
+        lbl_first_name_star = new javax.swing.JLabel();
         panel_fault_buttons = new javax.swing.JPanel();
         btn_clear_fields = new javax.swing.JButton();
         btn_update = new javax.swing.JButton();
@@ -166,9 +166,9 @@ public class FaultView extends javax.swing.JInternalFrame {
             table_view_faults.getColumnModel().getColumn(0).setMaxWidth(0);
         }
 
-        txt_search_fault.setFont(new java.awt.Font("sansserif", 0, 16)); // NOI18N
+        txt_search_fault.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
         txt_search_fault.setMinimumSize(new java.awt.Dimension(80, 32));
-        txt_search_fault.setPreferredSize(new java.awt.Dimension(500, 32));
+        txt_search_fault.setPreferredSize(new java.awt.Dimension(500, 30));
         txt_search_fault.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txt_search_faultKeyReleased(evt);
@@ -179,20 +179,20 @@ public class FaultView extends javax.swing.JInternalFrame {
 
         panel_fault_input.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        txt_fault_id.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
-        txt_fault_id.setEnabled(false);
-        txt_fault_id.setMinimumSize(new java.awt.Dimension(80, 32));
-        txt_fault_id.setPreferredSize(new java.awt.Dimension(80, 32));
+        hdn_txt_fault_id.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        hdn_txt_fault_id.setEnabled(false);
+        hdn_txt_fault_id.setMinimumSize(new java.awt.Dimension(80, 32));
+        hdn_txt_fault_id.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        lbl_fault.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_fault.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         lbl_fault.setText("Fault");
 
-        txt_fault_description.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         txt_fault_description.setMinimumSize(new java.awt.Dimension(80, 32));
-        txt_fault_description.setPreferredSize(new java.awt.Dimension(600, 32));
+        txt_fault_description.setPreferredSize(new java.awt.Dimension(600, 25));
 
-        lbl_fault_id.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_fault_id.setText("ID");
+        lbl_first_name_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_first_name_star.setForeground(java.awt.Color.red);
+        lbl_first_name_star.setText("*");
 
         javax.swing.GroupLayout panel_fault_inputLayout = new javax.swing.GroupLayout(panel_fault_input);
         panel_fault_input.setLayout(panel_fault_inputLayout);
@@ -200,25 +200,26 @@ public class FaultView extends javax.swing.JInternalFrame {
             panel_fault_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_fault_inputLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lbl_fault_id)
+                .addGroup(panel_fault_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(hdn_txt_fault_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_first_name_star))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_fault_id, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(34, 34, 34)
                 .addComponent(lbl_fault)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txt_fault_description, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(216, 216, 216))
+                .addContainerGap())
         );
         panel_fault_inputLayout.setVerticalGroup(
             panel_fault_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_fault_inputLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(panel_fault_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_fault_description, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txt_fault_id, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbl_fault)
-                    .addComponent(lbl_fault_id))
-                .addGap(15, 15, 15))
+                .addContainerGap()
+                .addGroup(panel_fault_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_fault_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lbl_fault)
+                        .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txt_fault_description, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(hdn_txt_fault_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panel_fault_buttons.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -227,7 +228,7 @@ public class FaultView extends javax.swing.JInternalFrame {
         btn_clear_fields.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         btn_clear_fields.setForeground(new java.awt.Color(255, 255, 255));
         btn_clear_fields.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_clear.png"))); // NOI18N
-        btn_clear_fields.setText("Clear Fields");
+        btn_clear_fields.setText("Clear");
         btn_clear_fields.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_clear_fieldsActionPerformed(evt);
@@ -298,32 +299,32 @@ public class FaultView extends javax.swing.JInternalFrame {
         panel_faults.setLayout(panel_faultsLayout);
         panel_faultsLayout.setHorizontalGroup(
             panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_faultsLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_faultsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_faultsLayout.createSequentialGroup()
+                .addGroup(panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panel_faultsLayout.createSequentialGroup()
                         .addComponent(lbl_search_icon)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_search_fault, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(panel_fault_input, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panel_fault_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                        .addComponent(txt_search_fault, javax.swing.GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE))
+                    .addComponent(panel_fault_input, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panel_fault_buttons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panel_faultsLayout.setVerticalGroup(
             panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_faultsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl_search_icon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txt_search_fault, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panel_faultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txt_search_fault, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbl_search_icon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(panel_fault_input, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(30, 30, 30)
+                .addComponent(panel_fault_input, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(panel_fault_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(14, 14, 14))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -425,7 +426,7 @@ public class FaultView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btn_deleteActionPerformed
 
     private void btn_clear_fieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clear_fieldsActionPerformed
-        cleanFields();
+        clearFields();
         loadFaultListTable();
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
@@ -434,16 +435,16 @@ public class FaultView extends javax.swing.JInternalFrame {
     private javax.swing.JButton btn_clear_fields;
     private javax.swing.JButton btn_delete;
     private javax.swing.JButton btn_update;
+    private javax.swing.JTextField hdn_txt_fault_id;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbl_fault;
-    private javax.swing.JLabel lbl_fault_id;
+    private javax.swing.JLabel lbl_first_name_star;
     private javax.swing.JLabel lbl_search_icon;
     private javax.swing.JPanel panel_fault_buttons;
     private javax.swing.JPanel panel_fault_input;
     private javax.swing.JPanel panel_faults;
     private javax.swing.JTable table_view_faults;
     private javax.swing.JTextField txt_fault_description;
-    private javax.swing.JTextField txt_fault_id;
     private javax.swing.JTextField txt_search_fault;
     // End of variables declaration//GEN-END:variables
 }

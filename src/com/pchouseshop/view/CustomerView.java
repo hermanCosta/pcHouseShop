@@ -32,7 +32,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         //avoid auto old value by focus loosing
         this.txt_contact.setFocusLostBehavior(JFormattedTextField.PERSIST);
 
-        CommonSetting.tableSettings(table_view_customers);
+        CommonSetting.tableSettings(this.table_view_customers);
 
         this._customerController = new CustomerController();
         this._dtmCustomer = (DefaultTableModel) this.table_view_customers.getModel();
@@ -80,7 +80,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
             getCustomer = new Customer(person, CommonSetting.COMPANY);
 
-            int idCustomer = CommonExtension.setIdExtension(this.txt_customer_id);
+            int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
             getCustomer.setIdCustomer(idCustomer);
 
             return getCustomer;
@@ -89,7 +89,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
     private void setCustomerFields(Customer pCustomer) {
         this.txt_contact.setFormatterFactory(null);
-        this.txt_customer_id.setText(String.valueOf(pCustomer.getIdCustomer()));
+        this.hdn_txt_customer_id.setText(String.valueOf(pCustomer.getIdCustomer()));
         this.txt_first_name.setText(pCustomer.getPerson().getFirstName());
         this.txt_last_name.setText(pCustomer.getPerson().getLastName());
         this.txt_contact.setText(pCustomer.getPerson().getContactNo());
@@ -149,7 +149,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
     }
 
     private void cleanFields() {
-        this.txt_customer_id.setText("");
+        this.hdn_txt_customer_id.setText("");
         this.txt_first_name.setText("");
         this.txt_last_name.setText("");
         this.txt_contact.setText("");
@@ -221,13 +221,15 @@ public class CustomerView extends javax.swing.JInternalFrame {
         txt_contact = new javax.swing.JFormattedTextField();
         txt_last_name = new javax.swing.JTextField();
         lbl_last_name = new javax.swing.JLabel();
-        lbl_customer_id = new javax.swing.JLabel();
         lbl_contact = new javax.swing.JLabel();
-        txt_customer_id = new javax.swing.JTextField();
+        hdn_txt_customer_id = new javax.swing.JTextField();
         txt_first_name = new javax.swing.JTextField();
         btn_copy = new javax.swing.JButton();
         lbl_email = new javax.swing.JLabel();
         txt_email = new javax.swing.JTextField();
+        lbl_first_name_star = new javax.swing.JLabel();
+        lbl_last_name_star = new javax.swing.JLabel();
+        lbl_contact_star = new javax.swing.JLabel();
         panel_customer_buttons = new javax.swing.JPanel();
         btn_add = new javax.swing.JButton();
         btn_update = new javax.swing.JButton();
@@ -238,6 +240,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
+        setTitle("Customer List");
         setMaximumSize(new java.awt.Dimension(0, 0));
         setMinimumSize(new java.awt.Dimension(0, 0));
         setPreferredSize(new java.awt.Dimension(1050, 650));
@@ -249,11 +252,11 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
         lbl_search_icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_search_black.png"))); // NOI18N
 
-        txt_search_customer.setFont(new java.awt.Font("sansserif", 0, 16)); // NOI18N
+        txt_search_customer.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
         txt_search_customer.setFocusTraversalKeysEnabled(false);
         txt_search_customer.setMinimumSize(new java.awt.Dimension(80, 32));
         txt_search_customer.setNextFocusableComponent(txt_first_name);
-        txt_search_customer.setPreferredSize(new java.awt.Dimension(500, 32));
+        txt_search_customer.setPreferredSize(new java.awt.Dimension(500, 30));
         txt_search_customer.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txt_search_customerKeyReleased(evt);
@@ -300,6 +303,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         }
 
         panel_customer_input.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        panel_customer_input.setPreferredSize(new java.awt.Dimension(1000, 141));
 
         btn_international_number.setBackground(new java.awt.Color(0, 0, 0));
         btn_international_number.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_international_number.png"))); // NOI18N
@@ -310,7 +314,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
             }
         });
 
-        lbl_first_name.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_first_name.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         lbl_first_name.setText("First Name");
 
         try {
@@ -318,34 +322,28 @@ public class CustomerView extends javax.swing.JInternalFrame {
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
-        txt_contact.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
         txt_contact.setMinimumSize(new java.awt.Dimension(80, 32));
         txt_contact.setNextFocusableComponent(txt_email);
-        txt_contact.setPreferredSize(new java.awt.Dimension(300, 32));
+        txt_contact.setPreferredSize(new java.awt.Dimension(260, 25));
 
-        txt_last_name.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         txt_last_name.setMinimumSize(new java.awt.Dimension(80, 32));
         txt_last_name.setNextFocusableComponent(txt_contact);
-        txt_last_name.setPreferredSize(new java.awt.Dimension(340, 32));
+        txt_last_name.setPreferredSize(new java.awt.Dimension(300, 25));
 
-        lbl_last_name.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_last_name.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         lbl_last_name.setText("Last Name");
 
-        lbl_customer_id.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_customer_id.setText("ID");
-
-        lbl_contact.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_contact.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         lbl_contact.setText("Contact No.");
 
-        txt_customer_id.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
-        txt_customer_id.setEnabled(false);
-        txt_customer_id.setMinimumSize(new java.awt.Dimension(80, 32));
-        txt_customer_id.setPreferredSize(new java.awt.Dimension(80, 32));
+        hdn_txt_customer_id.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        hdn_txt_customer_id.setEnabled(false);
+        hdn_txt_customer_id.setMinimumSize(new java.awt.Dimension(80, 32));
+        hdn_txt_customer_id.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        txt_first_name.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         txt_first_name.setMinimumSize(new java.awt.Dimension(80, 32));
         txt_first_name.setNextFocusableComponent(txt_last_name);
-        txt_first_name.setPreferredSize(new java.awt.Dimension(320, 32));
+        txt_first_name.setPreferredSize(new java.awt.Dimension(300, 25));
 
         btn_copy.setBackground(new java.awt.Color(0, 0, 0));
         btn_copy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_copy.png"))); // NOI18N
@@ -357,12 +355,23 @@ public class CustomerView extends javax.swing.JInternalFrame {
             }
         });
 
-        lbl_email.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_email.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         lbl_email.setText("Email");
 
-        txt_email.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         txt_email.setMinimumSize(new java.awt.Dimension(80, 32));
-        txt_email.setPreferredSize(new java.awt.Dimension(380, 32));
+        txt_email.setPreferredSize(new java.awt.Dimension(422, 25));
+
+        lbl_first_name_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_first_name_star.setForeground(java.awt.Color.red);
+        lbl_first_name_star.setText("*");
+
+        lbl_last_name_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_last_name_star.setForeground(java.awt.Color.red);
+        lbl_last_name_star.setText("*");
+
+        lbl_contact_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_contact_star.setForeground(java.awt.Color.red);
+        lbl_contact_star.setText("*");
 
         javax.swing.GroupLayout panel_customer_inputLayout = new javax.swing.GroupLayout(panel_customer_input);
         panel_customer_input.setLayout(panel_customer_inputLayout);
@@ -371,62 +380,67 @@ public class CustomerView extends javax.swing.JInternalFrame {
             .addGroup(panel_customer_inputLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl_contact)
                     .addGroup(panel_customer_inputLayout.createSequentialGroup()
-                        .addComponent(lbl_customer_id)
+                        .addComponent(lbl_contact_star)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_customer_id, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_customer_inputLayout.createSequentialGroup()
-                        .addComponent(txt_contact, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
-                        .addGap(43, 43, 43)
-                        .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_customer_inputLayout.createSequentialGroup()
-                        .addComponent(lbl_first_name)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_first_name, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)))
-                .addGap(36, 36, 36)
-                .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(lbl_contact))
                     .addGroup(panel_customer_inputLayout.createSequentialGroup()
                         .addComponent(lbl_email)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panel_customer_inputLayout.createSequentialGroup()
-                        .addComponent(lbl_last_name)
+                        .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                        .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                                .addComponent(lbl_last_name_star)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbl_last_name))
+                            .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                                .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(hdn_txt_customer_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lbl_first_name_star))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbl_first_name)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_last_name, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                                .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(txt_last_name, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(531, Short.MAX_VALUE))
         );
         panel_customer_inputLayout.setVerticalGroup(
             panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_customer_inputLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
+                .addContainerGap()
+                .addComponent(hdn_txt_customer_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_first_name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txt_last_name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txt_customer_id, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbl_first_name)
-                    .addComponent(lbl_customer_id)
-                    .addComponent(lbl_last_name))
+                    .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_first_name_star))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_last_name)
+                    .addComponent(lbl_last_name_star)
+                    .addComponent(txt_last_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_customer_inputLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(lbl_contact)
-                                .addComponent(txt_contact, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(lbl_email)
-                                .addComponent(txt_email, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_customer_inputLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btn_copy, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btn_international_number, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addGap(14, 14, 14))
+                    .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lbl_contact_star)
+                        .addComponent(lbl_contact)
+                        .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_email)
+                    .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         panel_customer_buttons.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -457,7 +471,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         btn_clear_fields.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         btn_clear_fields.setForeground(new java.awt.Color(255, 255, 255));
         btn_clear_fields.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_clear.png"))); // NOI18N
-        btn_clear_fields.setText("Clear Fields");
+        btn_clear_fields.setText("Clear");
         btn_clear_fields.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_clear_fieldsActionPerformed(evt);
@@ -512,10 +526,10 @@ public class CustomerView extends javax.swing.JInternalFrame {
                     .addGroup(panel_customersLayout.createSequentialGroup()
                         .addComponent(lbl_search_icon)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_search_customer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2)
-                    .addComponent(panel_customer_input, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panel_customer_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(txt_search_customer, javax.swing.GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE))
+                    .addComponent(panel_customer_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panel_customer_input, javax.swing.GroupLayout.DEFAULT_SIZE, 1010, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
         panel_customersLayout.setVerticalGroup(
@@ -523,15 +537,15 @@ public class CustomerView extends javax.swing.JInternalFrame {
             .addGroup(panel_customersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_customersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl_search_icon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txt_search_customer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
+                    .addComponent(txt_search_customer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_search_icon, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(panel_customer_input, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(30, 30, 30)
+                .addComponent(panel_customer_input, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(panel_customer_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(14, 14, 14))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -545,9 +559,10 @@ public class CustomerView extends javax.swing.JInternalFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE))
+                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         setBounds(0, 0, 1050, 650);
@@ -591,7 +606,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
             String firstName = this._dtmCustomer.getValueAt(selectedRow, 1).toString();
 
             int confirmDeletion = JOptionPane.showConfirmDialog(this, "Do you really want to delete '"
-                    + firstName, "Delete Customer", JOptionPane.YES_NO_OPTION);
+                    + firstName +" ?", "Delete Customer", JOptionPane.YES_NO_OPTION);
 
             if (confirmDeletion == 0) {
                 boolean isDeleted = _customerController.deleteCustomerController(deleteCustomer.getIdCustomer());
@@ -659,10 +674,10 @@ public class CustomerView extends javax.swing.JInternalFrame {
                 if (idCustomerAdded > 0) {
                     JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " added successfully!");
 
-                    loadCustomerListTable();
+                    getItemCustomer(idCustomerAdded);
                     cleanFields();
                 } else {
-                    JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + "could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -675,19 +690,21 @@ public class CustomerView extends javax.swing.JInternalFrame {
     private javax.swing.JButton btn_delete;
     private javax.swing.JButton btn_international_number;
     private javax.swing.JButton btn_update;
+    private javax.swing.JTextField hdn_txt_customer_id;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbl_contact;
-    private javax.swing.JLabel lbl_customer_id;
+    private javax.swing.JLabel lbl_contact_star;
     private javax.swing.JLabel lbl_email;
     private javax.swing.JLabel lbl_first_name;
+    private javax.swing.JLabel lbl_first_name_star;
     private javax.swing.JLabel lbl_last_name;
+    private javax.swing.JLabel lbl_last_name_star;
     private javax.swing.JLabel lbl_search_icon;
     private javax.swing.JPanel panel_customer_buttons;
     private javax.swing.JPanel panel_customer_input;
     private javax.swing.JPanel panel_customers;
     private javax.swing.JTable table_view_customers;
     private javax.swing.JFormattedTextField txt_contact;
-    private javax.swing.JTextField txt_customer_id;
     private javax.swing.JTextField txt_email;
     private javax.swing.JTextField txt_first_name;
     private javax.swing.JTextField txt_last_name;

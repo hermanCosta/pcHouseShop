@@ -98,7 +98,15 @@ public class PersonDAO {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            Query query = _session.createQuery("FROM Person C WHERE C.firstName LIKE :pSearch OR C.lastName LIKE :pSearch OR C.contactNo LIKE :pSearch OR C.email LIKE :pSearch")
+            Query query = _session.createQuery("FROM Person P "
+                    + "WHERE P.firstName "
+                    + "LIKE :pSearch "
+                    + "OR P.lastName "
+                    + "LIKE :pSearch "
+                    + "OR P.contactNo "
+                    + "LIKE :pSearch "
+                    + "OR P.email "
+                    + "LIKE :pSearch")
                     .setParameter("pSearch", "%"+ pSearch +"%");
 
             _listPerson = query.getResultList();
@@ -111,5 +119,26 @@ public class PersonDAO {
         }
 
         return _listPerson;
+    }
+    
+    public Person searchPesonByContactNoDAO(String pContactNo) {
+        Person person = null;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM Person P "
+                    + "WHERE P.contactNo = :pContactNo")
+                    .setParameter("pContactNo", pContactNo);
+
+            person = (Person) query.uniqueResult();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return person;
     }
 }

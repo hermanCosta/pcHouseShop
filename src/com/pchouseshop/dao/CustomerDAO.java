@@ -144,4 +144,23 @@ public class CustomerDAO {
         
         return itemCustomer;
     }
+    
+    public Customer searchCustomerByContactNoDAO(String pContactNo) {
+        Customer customer = null;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM Customer C WHERE C.person.idPerson = (FROM Person P WHERE P.contactNo = :pContactNo)")
+                    .setParameter("pContactNo", pContactNo);
+
+            customer = (Customer) query.uniqueResult();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        return customer;
+    }
 }

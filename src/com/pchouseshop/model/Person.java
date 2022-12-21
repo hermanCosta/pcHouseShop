@@ -8,10 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- *
- * @author herman
- */
 @Entity
 @Table(name = "TBL_PERSON")
 public class Person implements Serializable {

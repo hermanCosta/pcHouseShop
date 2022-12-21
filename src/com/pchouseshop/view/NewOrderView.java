@@ -8,15 +8,36 @@ package com.pchouseshop.view;
 //import Model.Customer;
 //import Model.Order;
 //import Model.ProductService;
+import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
+import com.pchouseshop.controllers.CustomerController;
+import com.pchouseshop.controllers.DepositController;
+import com.pchouseshop.controllers.EmployeeController;
+import com.pchouseshop.controllers.FaultController;
 import com.pchouseshop.controllers.OrderController;
+import com.pchouseshop.controllers.OrderFaultController;
+import com.pchouseshop.controllers.OrderNoteController;
+import com.pchouseshop.controllers.OrderProdServController;
+import com.pchouseshop.controllers.PersonController;
+import com.pchouseshop.controllers.ProductServiceController;
+import com.pchouseshop.model.Company;
+import com.pchouseshop.model.Customer;
+import com.pchouseshop.model.Deposit;
+import com.pchouseshop.model.Device;
+import com.pchouseshop.model.Employee;
+import com.pchouseshop.model.Fault;
+import com.pchouseshop.model.OrderFault;
+import com.pchouseshop.model.OrderModel;
+import com.pchouseshop.model.OrderNote;
+import com.pchouseshop.model.OrderProdServ;
+import com.pchouseshop.model.Person;
+import com.pchouseshop.model.ProductService;
 import java.awt.event.KeyEvent;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -26,9 +47,13 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -38,7 +63,8 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 
 public class NewOrderView extends javax.swing.JInternalFrame {
 
@@ -71,50 +97,100 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             stringProducts, stringPriceTotal, stringQty, stringUnitPrice, issueDate, status,
             finishDate = "", pickDate = "", refundDate = "";
 
-    double total, deposit, cashDeposit = 0, cardDeposit = 0, due;
+    double cashDeposit = 0, cardDeposit = 0, due;
     boolean isOrderDetails = false;
-    
-    OrderController _orderController = new OrderController();
+
+    private List<ProductService> _listProdServ;
+    private List<Fault> _listFault;
+    private final OrderController _orderController;
+    private final ProductServiceController _productServiceController;
+    private final FaultController _faultController;
+    private final CustomerController _customerController;
+    private final PersonController _personController;
+    private final DepositController _depositController;
+    private final EmployeeController _employeeController;
+    private final OrderProdServController _orderProdServController;
+    private final OrderFaultController _orderFaultController;
+    private final OrderNoteController _orderNoteController;
+    private final DefaultTableModel _dtmProdServ;
+    private final DefaultTableModel _dtmFault;
+    private final DefaultListModel _defaultListModelProdServ;
+    private final DefaultListModel _defaultListModelFault;
 
     public NewOrderView() {
         initComponents();
-       
-         //avoid auto old value by focus loosing
+
+        //avoid auto old value by focus loosing
         txt_contact.setFocusLostBehavior(JFormattedTextField.PERSIST);
-        
+
         CommonSetting.requestTxtFocus(txt_first_name);
         CommonSetting.tableSettings(table_view_faults);
         CommonSetting.tableSettings(table_view_products);
 
         this._orderController = new OrderController();
-        autoID();
-        
-        checkEmailFormat();
-        accessDbColumn(firstNames, "SELECT * FROM customers", "firstName");
-        accessDbColumn(lastNames, "SELECT * FROM customers", "lastName");
-        accessDbColumn(brands, "SELECT deviceBrand FROM orderDetails", "deviceBrand");
-        accessDbColumn(models, "SELECT deviceModel FROM orderDetails", "deviceModel");
-        accessDbColumn(serialNumbers, "SELECT serialNumber FROM orderDetails", "serialNumber");
-        accessDbColumn(faults, "SELECT faultName FROM faults", "faultName");
-        listProductService();
+        this._productServiceController = new ProductServiceController();
+        this._faultController = new FaultController();
+        this._customerController = new CustomerController();
+        this._personController = new PersonController();
+        this._depositController = new DepositController();
+        this._employeeController = new EmployeeController();
+        this._orderProdServController = new OrderProdServController();
+        this._orderFaultController = new OrderFaultController();
+        this._orderNoteController = new OrderNoteController();
+        this._dtmProdServ = (DefaultTableModel) this.table_view_products.getModel();
+        this._dtmFault = (DefaultTableModel) this.table_view_faults.getModel();
+        this._defaultListModelProdServ = new DefaultListModel();
+        this._defaultListModelFault = new DefaultListModel();
+        this.list_prod_serv_search.setModel(_defaultListModelProdServ);
+        this.list_fault_search.setModel(_defaultListModelFault);
+
+        CommonExtension.checkEmailFormat(this.txt_email);
+        generateOrderId();
+
     }
 
-    public void dbConnection() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost/pcHouse", "root", "hellmans");
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, ex, "DB Connection", JOptionPane.ERROR_MESSAGE);
+    private void generateOrderId() {
+        int orderId = _orderController.getLastOrderIdController();
+        this.lbl_auto_order_no.setText(String.format("%06d", orderId++));
+    }
+
+    private void searchFault() {
+        this._defaultListModelFault.removeAllElements();
+
+        if (!this.txt_search_fault.getText().trim().isEmpty()) {
+            this._listFault = _faultController.orderSearchFaultController(this.txt_search_fault.getText());
+            if (!this._listFault.isEmpty()) {
+                _listFault.forEach((fault) -> {
+                    this._defaultListModelFault.addElement(fault);
+                });
+            }
         }
     }
 
-    public final void autoID() {
-        int orderId = _orderController.getLastOrderIdController();
-        lbl_auto_order_no.setText(String.format("%06d", orderId++));
+    private void searchProdServ() {
+        this._defaultListModelProdServ.removeAllElements();
+
+        if (!this.txt_search_prod_serv.getText().trim().isEmpty()) {
+            this._listProdServ = _productServiceController.orderSearchProdServController(this.txt_search_prod_serv.getText());
+            if (!this._listProdServ.isEmpty()) {
+                _listProdServ.forEach((prodServ) -> {
+                    this._defaultListModelProdServ.addElement(prodServ);
+                });
+            }
+        }
     }
 
-    public void autoCompleteFromDb(ArrayList list, String text, JTextField field) {
+    private void getPriceSum() {
+        double sum = 0;
+        for (int i = 0; i < this._dtmProdServ.getRowCount(); i++) {
+            sum += Double.parseDouble(this._dtmProdServ.getValueAt(i, 3).toString());
+        }
+
+        this.txt_total.setText(String.valueOf(sum));
+        this.txt_due.setText(this.txt_total.getText());
+    }
+
+    private void autoCompleteFromDb(ArrayList list, String text, JTextField field) {
         String complete = "";
         int start = text.length();
         int last = text.length();
@@ -134,118 +210,136 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         }
     }
 
-    public void listProductService() {
-        AutoCompleteDecorator.decorate(combo_box_product_service);
+    private void clearFields() {
+        this.hdn_txt_customer_id.setText("");
+        this.txt_first_name.setText("");
+        this.txt_last_name.setText("");
+        this.txt_contact.setText("");
+        this.txt_email.setText("");
+        this.txt_brand.setText("");
+        this.txt_model.setText("");
+        this.txt_serial_number.setText("");
+        this.txt_search_fault.setText("");
+        this.editor_pane_notes.setText("");
+        this.txt_total.setText("");
+        this.txt_deposit.setText("");
+        this.txt_due.setText("");
 
-        try {
-            dbConnection();
+        this._dtmFault.setRowCount(0);
+        this._dtmProdServ.setRowCount(0);
 
-            String query = "SELECT productService FROM products";
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                combo_box_product_service.addItem(rs.getString("productService"));
-            }
-            rs.close();
-            con.close();
-            ps.close();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.txt_first_name.requestFocus();
     }
 
-    public void getPriceSum() {
-        double sum = 0;
-        for (int i = 0; i < table_view_products.getRowCount(); i++) {
-            sum = sum + Double.parseDouble(table_view_products.getValueAt(i, 3).toString());
-        }
+    private OrderModel getOrderFields() {
+        OrderModel getOrderModel = null;
+        Customer customer;
+        Employee employee = this._employeeController.getItemEmployeeController(1);
+        Date date = new Date();
+        Date createdDate = new Timestamp(date.getTime());
 
-        txt_total.setText(Double.toString(sum));
-        txt_due.setText(txt_total.getText()); //set total to the due field
-    }
+        if (this.txt_first_name.getText().trim().isEmpty() || this.txt_last_name.getText().trim().isEmpty()
+                || this.txt_contact.getText().trim().isEmpty() || this.txt_brand.getText().trim().isEmpty()
+                || this.txt_model.getText().trim().isEmpty() || this.txt_serial_number.getText().trim().isEmpty()
+                || this.table_view_products.getRowCount() == 0 || this.table_view_faults.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Please, check Empty fields !", "New Order", JOptionPane.ERROR_MESSAGE);
 
-    public final void accessDbColumn(ArrayList list, String query, String columnName) {
-        try {
-            dbConnection();
+            return getOrderModel;
+        } else {
+            int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
+            if (idCustomer > 0) {
+                customer = this._customerController.getItemCustomerController(idCustomer);
+            } else {
+                Person person = new Person(
+                        this.txt_first_name.getText().toUpperCase(),
+                        this.txt_last_name.getText().toUpperCase(),
+                        this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""),
+                        this.txt_email.getText().toLowerCase());
 
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                list.add(rs.getString(columnName));
-            }
-            
-            rs.close();
-            ps.close();
-            con.close();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void cleanAllFields(JTable table) {
-        //Clean all Fields 
-        lbl_auto_order_no.setText("");
-        txt_first_name.setText("");
-        txt_last_name.setText("");
-        txt_contact.setText("");
-        txt_email.setText("");
-        txt_brand.setText("");
-        txt_model.setText("");
-        txt_serial_number.setText("");
-        txt_fault.setText("");
-        editor_pane_notes.setText("");
-        combo_box_product_service.setSelectedIndex(-1);
-        txt_total.setText("");
-        txt_deposit.setText(Double.toString(0));
-        txt_due.setText("");
-        txt_first_name.requestFocus();
-
-        //Clean table Fields
-        DefaultTableModel dtm = (DefaultTableModel) table.getModel();
-
-        while (dtm.getRowCount() > 0) {
-            dtm.removeRow(0);
-        }
-    }
-
-    public final void checkEmailFormat() {
-        txt_email.setInputVerifier(new InputVerifier() {
-
-            Border originalBorder;
-            String emailFormat = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-            String email = txt_email.getText();
-
-            @Override
-            public boolean verify(JComponent input) {
-                JTextField comp = (JTextField) input;
-                //return !comp.getText().trim().isEmpty();
-                return comp.getText().matches(emailFormat) | comp.getText().trim().isEmpty();
+                customer = new Customer(person, CommonSetting.COMPANY);
             }
 
-            @Override
-            public boolean shouldYieldFocus(JComponent input) {
-                boolean isValid = verify(input);
+            Device device = new Device(this.txt_brand.getText().toUpperCase(),
+                    this.txt_model.getText().toUpperCase(),
+                    this.txt_serial_number.getText().toUpperCase());
 
-                if (!isValid) {
-                    originalBorder = originalBorder == null ? input.getBorder() : originalBorder;
-                    //input.setBorder(BorderFactory.createLineBorder(Color.red, 2));
-                    input.setBorder(new LineBorder(Color.RED));
-                } else {
-                    if (originalBorder != null) {
-                        input.setBorder(originalBorder);
-                        originalBorder = null;
-                    }
-                }
-                return isValid;
-            }
-        });
+            getOrderModel = new OrderModel(customer,
+                    device,
+                    employee,
+                    CommonSetting.COMPANY,
+                    Double.parseDouble(this.txt_total.getText()),
+                    Double.parseDouble(this.txt_due.getText()),
+                    "IN PROGRESS", createdDate, null, null);
+        }
+
+        return getOrderModel;
     }
 
-    public void loadOrderList() {
+    private List<OrderProdServ> getOrderProdServ(OrderModel order) {
+        List<OrderProdServ> listOrderProdServ = new ArrayList<>();
+
+        if (this.table_view_products.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Please, add at least one product|service !", "New Order", JOptionPane.ERROR_MESSAGE);
+
+            return listOrderProdServ;
+        } else {
+
+            for (int i = 0; i < _dtmProdServ.getRowCount(); i++) {
+                ProductService prodServItem = new ProductService();
+                OrderProdServ orderProdServItem = new OrderProdServ();
+
+                prodServItem = _productServiceController.getItemProdServController(Integer.parseInt(_dtmProdServ.getValueAt(i, 0).toString()));
+
+                orderProdServItem.setOrder(order);
+                orderProdServItem.setProdServ(prodServItem);
+                orderProdServItem.setQty(Integer.parseInt(_dtmProdServ.getValueAt(i, 2).toString()));
+                orderProdServItem.setTotal(Double.parseDouble(_dtmProdServ.getValueAt(i, 3).toString()));
+
+                listOrderProdServ.add(orderProdServItem);
+            }
+
+        }
+        return listOrderProdServ;
+    }
+
+    private List<OrderFault> getOrderFault(OrderModel order) {
+        List<OrderFault> listOrderFault = new ArrayList<>();
+
+        if (this.table_view_faults.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Please, add at least one fault !", "New Order", JOptionPane.ERROR_MESSAGE);
+
+            return listOrderFault;
+        } else {
+            for (int i = 0; i < _dtmFault.getRowCount(); i++) {
+                Fault faultItem = new Fault();
+                OrderFault orderFaultItem = new OrderFault();
+
+                faultItem = _faultController.getItemFaultController(Integer.parseInt(_dtmFault.getValueAt(i, 0).toString()));
+
+                orderFaultItem.setOrder(order);
+                orderFaultItem.setFault(faultItem);
+
+                listOrderFault.add(orderFaultItem);
+            }
+        }
+        return listOrderFault;
+    }
+
+    private OrderNote getOrderNote(OrderModel order) {
+        OrderNote orderNote = null;
+        Employee employee = this._employeeController.getItemEmployeeController(1);
+        Date date = new Date();
+        Date createdDate = new Timestamp(date.getTime());
+
+        if (this.editor_pane_notes.getText().trim().isEmpty()) {
+            return orderNote;
+        } else {
+            orderNote = new OrderNote(order, employee, this.editor_pane_notes.getText(), createdDate);
+        }
+        return orderNote;
+    }
+
+    private void loadOrderList() {
         if (txt_first_name.getText().trim().isEmpty() | txt_last_name.getText().trim().isEmpty()
                 | txt_contact.getText().trim().isEmpty() | txt_brand.getText().trim().isEmpty()
                 | txt_model.getText().trim().isEmpty() | txt_serial_number.getText().trim().isEmpty()
@@ -256,7 +350,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             orderNo = lbl_auto_order_no.getText();
             firstName = txt_first_name.getText().toUpperCase();
             lastName = txt_last_name.getText().toUpperCase();
-            contactNo = txt_contact.getText().replace("(","").replace(")", "").replace("-", "").replace(" ", "");
+            contactNo = txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
             email = txt_email.getText();
             deviceBrand = txt_brand.getText().toUpperCase();
             deviceModel = txt_model.getText().toUpperCase();
@@ -264,19 +358,15 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             importantNotes = editor_pane_notes.getText();
 
             if (txt_deposit.getText() == null || txt_deposit.getText().trim().isEmpty()) {
-                deposit = 0;
+                // deposit = 0;
 
             } else {
-                deposit = Double.parseDouble(txt_deposit.getText());
+                // deposit = Double.parseDouble(txt_deposit.getText());
             }
 
             due = Double.parseDouble(txt_due.getText());
-            total = Double.parseDouble(txt_total.getText());
+            //total = Double.parseDouble(txt_total.getText());
             status = "In Progress";
-
-            Date date = new java.util.Date();
-            currentDate = new Timestamp(date.getTime());
-            issueDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(currentDate);
 
             //Empty vector before looping to avoid duplicate values on tableView
             vecFaults.clear();
@@ -310,17 +400,16 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 //                    cardDeposit, due, status, issueDate, finishDate, pickDate, refundDate, Login.fullName);
         }
     }
-    
-    public boolean saveCustomerIntoDb() {
-         boolean isContactNo = false;
-         contactNo = txt_contact.getText().replace("(","").replace(")", "").replace("-", "").replace(" ", "");
-         try {
-            dbConnection();
+
+    private boolean saveCustomerIntoDb() {
+        boolean isContactNo = false;
+        contactNo = txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
+        try {
             String query = "SELECT contactNo, firstName, lastName FROM customers WHERE contactNo = ? ";
             ps = con.prepareStatement(query);
             ps.setString(1, contactNo);
             rs = ps.executeQuery();
-            
+
             if (!rs.isBeforeFirst()) {
 //                customer = new Customer(txt_first_name.getText().toUpperCase(), txt_last_name.getText().toUpperCase(), contactNo, txt_email.getText());
 //                    
@@ -331,69 +420,83 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 //                ps.setString(3, customer.getContactNo());
 //                ps.setString(4, customer.getEmail());
                 ps.executeUpdate();
-            }
-            
-            else  {
+            } else {
                 while (rs.next()) {
                     firstName = rs.getString("firstName");
                     lastName = rs.getString("lastName");
                 }
-            
+
                 if (!firstName.equals(txt_first_name.getText())
-                    && !lastName.equals(txt_last_name.getText())) {
+                        && !lastName.equals(txt_last_name.getText())) {
                     JOptionPane.showMessageDialog(this, "There is another Customer associated with ContactNo " + txt_contact.getText(), "New Customer", JOptionPane.ERROR_MESSAGE);
                     isContactNo = true;
                 }
             }
-         } catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return isContactNo;
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         panel_order_details = new javax.swing.JPanel();
+        panel_input_detail = new javax.swing.JPanel();
         lbl_order_no = new javax.swing.JLabel();
-        lbl_first_name = new javax.swing.JLabel();
-        lbl_last_name = new javax.swing.JLabel();
-        lbl_contact = new javax.swing.JLabel();
-        lbl_email = new javax.swing.JLabel();
-        lbl_brand = new javax.swing.JLabel();
-        lbl_model = new javax.swing.JLabel();
-        lbl_sn = new javax.swing.JLabel();
-        lbl_fault = new javax.swing.JLabel();
         lbl_auto_order_no = new javax.swing.JLabel();
-        lbl_service_product = new javax.swing.JLabel();
-        lbl_price = new javax.swing.JLabel();
-        lbl_deposit = new javax.swing.JLabel();
-        lbl_due = new javax.swing.JLabel();
+        lbl_first_name = new javax.swing.JLabel();
         txt_first_name = new javax.swing.JTextField();
+        lbl_last_name = new javax.swing.JLabel();
         txt_last_name = new javax.swing.JTextField();
-        txt_email = new javax.swing.JTextField();
+        lbl_contact = new javax.swing.JLabel();
         txt_contact = new javax.swing.JFormattedTextField();
-        txt_brand = new javax.swing.JTextField();
-        txt_model = new javax.swing.JTextField();
-        txt_serial_number = new javax.swing.JTextField();
-        txt_deposit = new javax.swing.JTextField();
-        btn_save_order = new javax.swing.JButton();
-        btn_cancel = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        table_view_products = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        table_view_faults = new javax.swing.JTable();
-        txt_due = new javax.swing.JTextField();
-        jScrollPane_notes = new javax.swing.JScrollPane();
-        editor_pane_notes = new javax.swing.JEditorPane();
-        txt_fault = new javax.swing.JTextField();
-        combo_box_product_service = new javax.swing.JComboBox<>();
         btn_international_number = new javax.swing.JButton();
         btn_copy = new javax.swing.JButton();
-        btn_add_product_service = new javax.swing.JButton();
+        lbl_email = new javax.swing.JLabel();
+        txt_email = new javax.swing.JTextField();
+        lbl_brand = new javax.swing.JLabel();
+        txt_brand = new javax.swing.JTextField();
+        lbl_model = new javax.swing.JLabel();
+        txt_model = new javax.swing.JTextField();
+        lbl_sn = new javax.swing.JLabel();
+        txt_serial_number = new javax.swing.JTextField();
+        scroll_pane_notes = new javax.swing.JScrollPane();
+        editor_pane_notes = new javax.swing.JEditorPane();
+        lbl_first_name_star = new javax.swing.JLabel();
+        lbl_last_name_star = new javax.swing.JLabel();
+        lbl_contact_star = new javax.swing.JLabel();
+        lbl_dev_model_star = new javax.swing.JLabel();
+        lbl_serial_number_star = new javax.swing.JLabel();
+        lbl_bad_sectors_star = new javax.swing.JLabel();
+        lbl_bad_sectors = new javax.swing.JLabel();
+        txt_bad_sectors = new javax.swing.JTextField();
+        lbl_dev_brand_star = new javax.swing.JLabel();
+        hdn_txt_customer_id = new javax.swing.JTextField();
+        panel_total_amount = new javax.swing.JPanel();
+        lbl_total = new javax.swing.JLabel();
         txt_total = new javax.swing.JTextField();
+        lbl_deposit = new javax.swing.JLabel();
+        txt_deposit = new javax.swing.JTextField();
+        lbl_due = new javax.swing.JLabel();
+        txt_due = new javax.swing.JTextField();
+        panel_order_buttons = new javax.swing.JPanel();
+        btn_save_order = new javax.swing.JButton();
+        btn_cancel = new javax.swing.JButton();
+        txt_search_fault = new javax.swing.JTextField();
+        lbl_search_fault_icon = new javax.swing.JLabel();
+        layered_pane_list_fault = new javax.swing.JLayeredPane();
+        list_fault_search = new javax.swing.JList<>();
+        scroll_pane_faults = new javax.swing.JScrollPane();
+        table_view_faults = new javax.swing.JTable();
+        txt_search_prod_serv = new javax.swing.JTextField();
+        lbl_search_prod_serv_icon = new javax.swing.JLabel();
+        layered_pane_list_prod_serv = new javax.swing.JLayeredPane();
+        list_prod_serv_search = new javax.swing.JList<>();
+        scroll_pane_products = new javax.swing.JScrollPane();
+        table_view_products = new javax.swing.JTable();
 
         setClosable(true);
         setIconifiable(true);
@@ -403,116 +506,314 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         setPreferredSize(new java.awt.Dimension(1050, 650));
         setSize(new java.awt.Dimension(1050, 650));
 
-        panel_order_details.setPreferredSize(new java.awt.Dimension(1050, 700));
+        panel_order_details.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        panel_order_details.setPreferredSize(new java.awt.Dimension(1026, 607));
 
-        lbl_order_no.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_order_no.setText("Order No.");
+        panel_input_detail.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        lbl_first_name.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_first_name.setText("First Name");
+        lbl_order_no.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_order_no.setText("Order");
 
-        lbl_last_name.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_last_name.setText("Last Name");
-
-        lbl_contact.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_contact.setText("Contact No.");
-
-        lbl_email.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_email.setText("Email");
-
-        lbl_brand.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_brand.setText("Device Brand");
-
-        lbl_model.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_model.setText("Device Model");
-
-        lbl_sn.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_sn.setText("Serial Number");
-
-        lbl_fault.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_fault.setText("Faults");
-
-        lbl_auto_order_no.setFont(new java.awt.Font("Lucida Grande", 1, 20)); // NOI18N
+        lbl_auto_order_no.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
         lbl_auto_order_no.setText("autoGen");
 
-        lbl_service_product.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        lbl_service_product.setText("Service | Product");
+        lbl_first_name.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_first_name.setText("First Name");
 
-        lbl_price.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
-        lbl_price.setText("Total €");
-
-        lbl_deposit.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
-        lbl_deposit.setText("Deposit €");
-
-        lbl_due.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
-        lbl_due.setText("Due €");
-
-        txt_first_name.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
         txt_first_name.setFocusCycleRoot(true);
         txt_first_name.setNextFocusableComponent(txt_last_name);
+        txt_first_name.setPreferredSize(new java.awt.Dimension(339, 25));
         txt_first_name.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_first_nameKeyPressed(evt);
             }
         });
 
-        txt_last_name.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        lbl_last_name.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_last_name.setText("Last Name");
+
         txt_last_name.setNextFocusableComponent(txt_contact);
+        txt_last_name.setPreferredSize(new java.awt.Dimension(342, 25));
         txt_last_name.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_last_nameKeyPressed(evt);
             }
         });
 
-        txt_email.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
-        txt_email.setNextFocusableComponent(txt_brand);
-        txt_email.setPreferredSize(new java.awt.Dimension(63, 20));
+        lbl_contact.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_contact.setText("Contact No.");
 
         try {
             txt_contact.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("(0##) ###-####")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
-        txt_contact.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
         txt_contact.setNextFocusableComponent(txt_email);
+        txt_contact.setPreferredSize(new java.awt.Dimension(224, 25));
         txt_contact.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_contactActionPerformed(evt);
             }
         });
 
-        txt_brand.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        btn_international_number.setBackground(new java.awt.Color(0, 0, 0));
+        btn_international_number.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_international_number.png"))); // NOI18N
+        btn_international_number.setPreferredSize(new java.awt.Dimension(35, 25));
+        btn_international_number.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_international_numberActionPerformed(evt);
+            }
+        });
+
+        btn_copy.setBackground(new java.awt.Color(0, 0, 0));
+        btn_copy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_copy.png"))); // NOI18N
+        btn_copy.setPreferredSize(new java.awt.Dimension(35, 25));
+        btn_copy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_copyActionPerformed(evt);
+            }
+        });
+
+        lbl_email.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_email.setText("Email");
+
+        txt_email.setNextFocusableComponent(txt_brand);
+        txt_email.setPreferredSize(new java.awt.Dimension(388, 25));
+
+        lbl_brand.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_brand.setText("Device Brand");
+
         txt_brand.setMinimumSize(new java.awt.Dimension(63, 20));
         txt_brand.setNextFocusableComponent(txt_model);
-        txt_brand.setPreferredSize(new java.awt.Dimension(63, 20));
+        txt_brand.setPreferredSize(new java.awt.Dimension(322, 25));
         txt_brand.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_brandKeyPressed(evt);
             }
         });
 
-        txt_model.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        lbl_model.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_model.setText("Device Model");
+
         txt_model.setNextFocusableComponent(txt_serial_number);
-        txt_model.setPreferredSize(new java.awt.Dimension(63, 20));
+        txt_model.setPreferredSize(new java.awt.Dimension(320, 25));
         txt_model.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_modelKeyPressed(evt);
             }
         });
 
-        txt_serial_number.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        lbl_sn.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_sn.setText("Serial Number");
+
         txt_serial_number.setNextFocusableComponent(editor_pane_notes);
-        txt_serial_number.setPreferredSize(new java.awt.Dimension(63, 20));
-        txt_serial_number.addKeyListener(new java.awt.event.KeyAdapter() {
+        txt_serial_number.setPreferredSize(new java.awt.Dimension(313, 25));
+
+        scroll_pane_notes.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll_pane_notes.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scroll_pane_notes.setVerifyInputWhenFocusTarget(false);
+
+        editor_pane_notes.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Important Notes", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 0, 14))); // NOI18N
+        editor_pane_notes.setFocusCycleRoot(false);
+        editor_pane_notes.setNextFocusableComponent(txt_search_fault);
+        editor_pane_notes.setPreferredSize(new java.awt.Dimension(403, 58));
+        editor_pane_notes.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_serial_numberKeyPressed(evt);
+                editor_pane_notesKeyPressed(evt);
             }
         });
+        scroll_pane_notes.setViewportView(editor_pane_notes);
 
-        txt_deposit.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_first_name_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_first_name_star.setForeground(java.awt.Color.red);
+        lbl_first_name_star.setText("*");
+
+        lbl_last_name_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_last_name_star.setForeground(java.awt.Color.red);
+        lbl_last_name_star.setText("*");
+
+        lbl_contact_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_contact_star.setForeground(java.awt.Color.red);
+        lbl_contact_star.setText("*");
+
+        lbl_dev_model_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_dev_model_star.setForeground(java.awt.Color.red);
+        lbl_dev_model_star.setText("*");
+
+        lbl_serial_number_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_serial_number_star.setForeground(java.awt.Color.red);
+        lbl_serial_number_star.setText("*");
+
+        lbl_bad_sectors_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_bad_sectors_star.setForeground(java.awt.Color.red);
+        lbl_bad_sectors_star.setText("*");
+
+        lbl_bad_sectors.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_bad_sectors.setText("Bad Sectors");
+
+        txt_bad_sectors.setNextFocusableComponent(editor_pane_notes);
+        txt_bad_sectors.setPreferredSize(new java.awt.Dimension(331, 25));
+
+        lbl_dev_brand_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        lbl_dev_brand_star.setForeground(java.awt.Color.red);
+        lbl_dev_brand_star.setText("*");
+
+        hdn_txt_customer_id.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        hdn_txt_customer_id.setEnabled(false);
+        hdn_txt_customer_id.setMinimumSize(new java.awt.Dimension(80, 32));
+        hdn_txt_customer_id.setPreferredSize(new java.awt.Dimension(0, 0));
+
+        javax.swing.GroupLayout panel_input_detailLayout = new javax.swing.GroupLayout(panel_input_detail);
+        panel_input_detail.setLayout(panel_input_detailLayout);
+        panel_input_detailLayout.setHorizontalGroup(
+            panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_input_detailLayout.createSequentialGroup()
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbl_last_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_contact_star, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_contact)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_last_name)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_last_name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(scroll_pane_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(panel_input_detailLayout.createSequentialGroup()
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(lbl_bad_sectors_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lbl_serial_number_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lbl_dev_model_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lbl_dev_brand_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_brand)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txt_brand, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_model)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_model, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_sn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_serial_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_bad_sectors)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_bad_sectors, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(panel_input_detailLayout.createSequentialGroup()
+                        .addComponent(lbl_email)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_email, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panel_input_detailLayout.createSequentialGroup()
+                        .addComponent(lbl_order_no)
+                        .addGap(7, 7, 7)
+                        .addComponent(lbl_auto_order_no)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(panel_input_detailLayout.createSequentialGroup()
+                        .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lbl_first_name)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panel_input_detailLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(hdn_txt_customer_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(437, Short.MAX_VALUE)))
+        );
+        panel_input_detailLayout.setVerticalGroup(
+            panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_auto_order_no)
+                    .addComponent(lbl_order_no))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_first_name)
+                    .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_last_name)
+                    .addComponent(txt_last_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_last_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lbl_contact)
+                        .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl_contact_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_email))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_brand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_brand)
+                    .addComponent(lbl_dev_brand_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txt_model, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbl_model))
+                    .addComponent(lbl_dev_model_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_serial_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_sn)
+                    .addComponent(lbl_serial_number_star))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_bad_sectors, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_bad_sectors)
+                    .addComponent(lbl_bad_sectors_star))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scroll_pane_notes)
+                .addContainerGap())
+            .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_input_detailLayout.createSequentialGroup()
+                    .addContainerGap(27, Short.MAX_VALUE)
+                    .addComponent(hdn_txt_customer_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(373, Short.MAX_VALUE)))
+        );
+
+        panel_total_amount.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        lbl_total.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lbl_total.setText("Total €");
+        lbl_total.setPreferredSize(null);
+
+        txt_total.setEditable(false);
+        txt_total.setFont(new java.awt.Font("sansserif", 0, 13)); // NOI18N
+        txt_total.setPreferredSize(new java.awt.Dimension(164, 25));
+
+        lbl_deposit.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lbl_deposit.setText("Deposit €");
+        lbl_deposit.setPreferredSize(null);
+
+        txt_deposit.setFont(new java.awt.Font("sansserif", 0, 13)); // NOI18N
         txt_deposit.setForeground(new java.awt.Color(51, 51, 255));
         txt_deposit.setNextFocusableComponent(btn_save_order);
-        txt_deposit.setPreferredSize(new java.awt.Dimension(63, 20));
+        txt_deposit.setPreferredSize(new java.awt.Dimension(146, 25));
         txt_deposit.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_depositKeyPressed(evt);
@@ -522,8 +823,58 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             }
         });
 
+        lbl_due.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lbl_due.setText("Due €");
+        lbl_due.setPreferredSize(null);
+
+        txt_due.setEditable(false);
+        txt_due.setFont(new java.awt.Font("sansserif", 0, 13)); // NOI18N
+        txt_due.setForeground(new java.awt.Color(255, 0, 51));
+        txt_due.setPreferredSize(new java.awt.Dimension(174, 25));
+
+        javax.swing.GroupLayout panel_total_amountLayout = new javax.swing.GroupLayout(panel_total_amount);
+        panel_total_amount.setLayout(panel_total_amountLayout);
+        panel_total_amountLayout.setHorizontalGroup(
+            panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_total_amountLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(panel_total_amountLayout.createSequentialGroup()
+                        .addComponent(lbl_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_total, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panel_total_amountLayout.createSequentialGroup()
+                        .addComponent(lbl_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_deposit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panel_total_amountLayout.createSequentialGroup()
+                        .addComponent(lbl_due, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_due, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panel_total_amountLayout.setVerticalGroup(
+            panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_total_amountLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbl_due, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_due, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        panel_order_buttons.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
         btn_save_order.setBackground(new java.awt.Color(21, 76, 121));
-        btn_save_order.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        btn_save_order.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         btn_save_order.setForeground(new java.awt.Color(255, 255, 255));
         btn_save_order.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_save.png"))); // NOI18N
         btn_save_order.setText("Save");
@@ -534,7 +885,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         });
 
         btn_cancel.setBackground(new java.awt.Color(21, 76, 121));
-        btn_cancel.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        btn_cancel.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         btn_cancel.setForeground(new java.awt.Color(255, 255, 255));
         btn_cancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_cancel.png"))); // NOI18N
         btn_cancel.setText("Cancel");
@@ -545,17 +896,129 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             }
         });
 
-        table_view_products.setFont(new java.awt.Font("Lucida Grande", 0, 16)); // NOI18N
+        javax.swing.GroupLayout panel_order_buttonsLayout = new javax.swing.GroupLayout(panel_order_buttons);
+        panel_order_buttons.setLayout(panel_order_buttonsLayout);
+        panel_order_buttonsLayout.setHorizontalGroup(
+            panel_order_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_order_buttonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btn_save_order)
+                .addGap(18, 18, 18)
+                .addComponent(btn_cancel)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panel_order_buttonsLayout.setVerticalGroup(
+            panel_order_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_order_buttonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_order_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_save_order)
+                    .addComponent(btn_cancel))
+                .addContainerGap())
+        );
+
+        txt_search_fault.setNextFocusableComponent(txt_search_prod_serv);
+        txt_search_fault.setPreferredSize(new java.awt.Dimension(518, 25));
+        txt_search_fault.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txt_search_faultFocusLost(evt);
+            }
+        });
+        txt_search_fault.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_search_faultActionPerformed(evt);
+            }
+        });
+        txt_search_fault.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txt_search_faultKeyReleased(evt);
+            }
+        });
+
+        lbl_search_fault_icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_search_small_left.png"))); // NOI18N
+
+        layered_pane_list_fault.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        list_fault_search.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        list_fault_search.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        list_fault_search.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        list_fault_search.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                list_fault_searchMousePressed(evt);
+            }
+        });
+        layered_pane_list_fault.add(list_fault_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 0, 510, -1));
+
+        table_view_faults.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Fault Description", ""
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        table_view_faults.setShowGrid(false);
+        table_view_faults.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                table_view_faultsMouseClicked(evt);
+            }
+        });
+        scroll_pane_faults.setViewportView(table_view_faults);
+        if (table_view_faults.getColumnModel().getColumnCount() > 0) {
+            table_view_faults.getColumnModel().getColumn(0).setMinWidth(0);
+            table_view_faults.getColumnModel().getColumn(0).setPreferredWidth(0);
+            table_view_faults.getColumnModel().getColumn(0).setMaxWidth(0);
+            table_view_faults.getColumnModel().getColumn(2).setPreferredWidth(30);
+            table_view_faults.getColumnModel().getColumn(2).setMaxWidth(30);
+        }
+
+        layered_pane_list_fault.add(scroll_pane_faults, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 545, 231));
+
+        txt_search_prod_serv.setNextFocusableComponent(txt_deposit);
+        txt_search_prod_serv.setPreferredSize(new java.awt.Dimension(518, 25));
+        txt_search_prod_serv.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txt_search_prod_servFocusLost(evt);
+            }
+        });
+        txt_search_prod_serv.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txt_search_prod_servKeyReleased(evt);
+            }
+        });
+
+        lbl_search_prod_serv_icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_search_small_left.png"))); // NOI18N
+
+        layered_pane_list_prod_serv.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        list_prod_serv_search.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        list_prod_serv_search.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        list_prod_serv_search.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        list_prod_serv_search.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                list_prod_serv_searchMousePressed(evt);
+            }
+        });
+        layered_pane_list_prod_serv.add(list_prod_serv_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 0, 510, -1));
+
         table_view_products.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Product | Service", "Qty", "Unit €", "Total €"
+                "ID", "Product | Service", "Qty", "Unit €", "Total €"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true, false
+                false, false, true, true, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -572,370 +1035,196 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 table_view_productsKeyReleased(evt);
             }
         });
-        jScrollPane2.setViewportView(table_view_products);
+        scroll_pane_products.setViewportView(table_view_products);
         if (table_view_products.getColumnModel().getColumnCount() > 0) {
-            table_view_products.getColumnModel().getColumn(1).setPreferredWidth(40);
-            table_view_products.getColumnModel().getColumn(1).setMaxWidth(60);
-            table_view_products.getColumnModel().getColumn(2).setPreferredWidth(80);
-            table_view_products.getColumnModel().getColumn(2).setMaxWidth(120);
+            table_view_products.getColumnModel().getColumn(0).setMinWidth(0);
+            table_view_products.getColumnModel().getColumn(0).setPreferredWidth(0);
+            table_view_products.getColumnModel().getColumn(0).setMaxWidth(0);
+            table_view_products.getColumnModel().getColumn(2).setPreferredWidth(40);
+            table_view_products.getColumnModel().getColumn(2).setMaxWidth(60);
             table_view_products.getColumnModel().getColumn(3).setPreferredWidth(80);
             table_view_products.getColumnModel().getColumn(3).setMaxWidth(120);
+            table_view_products.getColumnModel().getColumn(4).setPreferredWidth(80);
+            table_view_products.getColumnModel().getColumn(4).setMaxWidth(120);
         }
 
-        table_view_faults.setFont(new java.awt.Font("Lucida Grande", 0, 17)); // NOI18N
-        table_view_faults.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Fault Description"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        table_view_faults.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                table_view_faultsMouseClicked(evt);
-            }
-        });
-        jScrollPane3.setViewportView(table_view_faults);
-
-        txt_due.setEditable(false);
-        txt_due.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        txt_due.setForeground(new java.awt.Color(255, 0, 51));
-
-        jScrollPane_notes.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jScrollPane_notes.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        jScrollPane_notes.setVerifyInputWhenFocusTarget(false);
-
-        editor_pane_notes.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Important Notes", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 1, 16))); // NOI18N
-        editor_pane_notes.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
-        editor_pane_notes.setFocusCycleRoot(false);
-        editor_pane_notes.setNextFocusableComponent(txt_fault);
-        editor_pane_notes.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                editor_pane_notesKeyPressed(evt);
-            }
-        });
-        jScrollPane_notes.setViewportView(editor_pane_notes);
-
-        txt_fault.setFont(new java.awt.Font("Lucida Grande", 0, 15)); // NOI18N
-        txt_fault.setNextFocusableComponent(combo_box_product_service);
-        txt_fault.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_faultActionPerformed(evt);
-            }
-        });
-        txt_fault.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txt_faultKeyReleased(evt);
-            }
-        });
-
-        combo_box_product_service.setEditable(true);
-        combo_box_product_service.setFont(new java.awt.Font("Lucida Grande", 0, 15)); // NOI18N
-        combo_box_product_service.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select or Type" }));
-        combo_box_product_service.setNextFocusableComponent(txt_deposit);
-
-        btn_international_number.setBackground(new java.awt.Color(0, 0, 0));
-        btn_international_number.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_international_number.png"))); // NOI18N
-        btn_international_number.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_international_numberActionPerformed(evt);
-            }
-        });
-
-        btn_copy.setBackground(new java.awt.Color(0, 0, 0));
-        btn_copy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_copy.png"))); // NOI18N
-        btn_copy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_copyActionPerformed(evt);
-            }
-        });
-
-        btn_add_product_service.setBackground(new java.awt.Color(0, 0, 0));
-        btn_add_product_service.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_add_new.png"))); // NOI18N
-        btn_add_product_service.setNextFocusableComponent(txt_deposit);
-        btn_add_product_service.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_add_product_serviceActionPerformed(evt);
-            }
-        });
-
-        txt_total.setEditable(false);
-        txt_total.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        layered_pane_list_prod_serv.add(scroll_pane_products, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 545, 220));
 
         javax.swing.GroupLayout panel_order_detailsLayout = new javax.swing.GroupLayout(panel_order_details);
         panel_order_details.setLayout(panel_order_detailsLayout);
         panel_order_detailsLayout.setHorizontalGroup(
             panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                .addContainerGap(14, Short.MAX_VALUE)
-                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_order_detailsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(panel_order_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(lbl_order_no)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lbl_auto_order_no))
-                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(lbl_email)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, 348, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(lbl_brand)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txt_brand, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panel_order_detailsLayout.createSequentialGroup()
-                            .addComponent(lbl_model)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txt_model, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panel_order_detailsLayout.createSequentialGroup()
-                            .addComponent(lbl_sn)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txt_serial_number, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)))
-                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(lbl_contact)
-                        .addGap(11, 11, 11)
-                        .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_order_detailsLayout.createSequentialGroup()
-                            .addComponent(lbl_first_name)
-                            .addGap(18, 18, 18)
-                            .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_order_detailsLayout.createSequentialGroup()
-                            .addComponent(lbl_last_name)
-                            .addGap(20, 20, 20)
-                            .addComponent(txt_last_name, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                            .addComponent(btn_save_order, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(23, 23, 23)
-                            .addComponent(btn_cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jScrollPane_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 26, Short.MAX_VALUE)
-                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(lbl_due)
-                        .addGap(0, 0, 0)
-                        .addComponent(txt_due, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, Short.MAX_VALUE)
-                        .addComponent(lbl_deposit)
-                        .addGap(0, 0, 0)
-                        .addComponent(txt_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(panel_input_detail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(panel_total_amount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addComponent(lbl_price)
-                        .addGap(0, 0, 0)
-                        .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(lbl_fault)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txt_fault))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(lbl_service_product)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(combo_box_product_service, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_add_product_service, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(18, Short.MAX_VALUE))
+                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(layered_pane_list_fault)
+                            .addGroup(panel_order_detailsLayout.createSequentialGroup()
+                                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
+                                        .addComponent(txt_search_fault, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lbl_search_fault_icon))
+                                    .addComponent(layered_pane_list_prod_serv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
+                                        .addComponent(txt_search_prod_serv, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lbl_search_prod_serv_icon)))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addContainerGap())
         );
         panel_order_detailsLayout.setVerticalGroup(
             panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_order_detailsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_auto_order_no, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_order_no)
-                    .addComponent(lbl_fault)
-                    .addComponent(txt_fault, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_first_name))
-                        .addGap(15, 15, 15)
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lbl_last_name)
-                            .addComponent(txt_last_name, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(15, 15, 15)
                         .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(lbl_contact)
-                                .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btn_international_number, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btn_copy, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(15, 15, 15)
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lbl_email)
-                            .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(15, 15, 15)
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txt_brand, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_brand))
-                        .addGap(15, 15, 15)
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txt_model, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_model))
-                        .addGap(15, 15, 15)
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txt_serial_number, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_sn))
-                        .addGap(15, 15, 15)
-                        .addComponent(jScrollPane_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_search_fault, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_search_fault_icon))
+                        .addGap(0, 0, 0)
+                        .addComponent(layered_pane_list_fault)
+                        .addGap(18, 18, 18)
+                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_search_prod_serv, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_search_prod_serv_icon, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addComponent(layered_pane_list_prod_serv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(combo_box_product_service, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lbl_service_product))
-                            .addComponent(btn_add_product_service))
+                        .addComponent(panel_input_detail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(20, 20, 20)
-                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btn_save_order, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btn_cancel))
-                    .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lbl_deposit)
-                            .addComponent(txt_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_price)
-                            .addComponent(txt_due, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                            .addGap(6, 6, 6)
-                            .addComponent(lbl_due))))
-                .addContainerGap(26, Short.MAX_VALUE))
+                        .addComponent(panel_total_amount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(panel_order_buttons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, 1038, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_save_orderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_save_orderActionPerformed
-        // TODO add your handling code here:
-        loadOrderList();
-        String formatContactNo = txt_contact.getText();
-        
-        if (!saveCustomerIntoDb()) {
-             
-            if (deposit == 0) {
-                int confirmNewOrder = 0; //JOptionPane.showConfirmDialog(this, "Do you want to save this new Order " + order.getOrderNo() + " ?");
-                if (confirmNewOrder == 0) {
+        OrderModel addOrder = getOrderFields();
 
+        boolean isAdded = false;
+        if (addOrder != null) {
+            if (addOrder.getCustomer().getIdCustomer() == 0) {
+                int idCustomerAdded = this._customerController.addCustomerController(addOrder.getCustomer());
 
-                        try {
-                            dbConnection();
-                            String query = "INSERT INTO orderDetails(orderNo, firstName, lastName, contactNo, "
-                                    + "email, deviceBrand, deviceModel, serialNumber, importantNotes, fault, "
-                                    + "productService, qty, unitPrice, priceTotal, total, deposit, cashDeposit, cardDeposit, "
-                                    + "due, status, issueDate, createdBy) VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                if (idCustomerAdded > 0) {
+                    isAdded = true;
+                } else {
+                    JOptionPane.showMessageDialog(this, addOrder.getCustomer().getPerson().getFirstName() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
 
-                            ps = con.prepareStatement(query);
-//                            ps.setString(1, order.getOrderNo());
-//                            ps.setString(2, order.getFirstName());
-//                            ps.setString(3, order.getLastName());
-//                            ps.setString(4, order.getContactNo());
-//                            ps.setString(5, order.getEmail());
-//                            ps.setString(6, order.getBrand());
-//                            ps.setString(7, order.getModel());
-//                            ps.setString(8, order.getSerialNumber());
-//                            ps.setString(9, order.getImportantNotes());
-//                            ps.setString(10, order.getStringFaults());
-//                            ps.setString(11, order.getStringProducts());
-//                            ps.setString(12, order.getStringQty());
-//                            ps.setString(13, order.getUnitPrice());
-//                            ps.setString(14, order.getPriceTotal());
-//                            ps.setDouble(15, order.getTotal());
-//                            ps.setDouble(16, order.getDeposit());
-//                            ps.setDouble(17, order.getCashDeposit());
-//                            ps.setDouble(18, order.getCardDeposit());
-//                            ps.setDouble(19, order.getDue());
-//                            ps.setString(20, order.getStatus());
-//                            ps.setString(21, order.getIssueDate());
-//                            ps.setString(22, order.getUsername());
-                            ps.executeUpdate();
+            int idOrderAdded = this._orderController.addOrderController(addOrder);
+            if (idOrderAdded > 0) {
+                addOrder.setIdOrder(idOrderAdded);
 
-                            String removeSpace = "UPDATE orderDetails SET fault = REPLACE(fault, '  ', ' '), "
-                                    + "productService = REPLACE(productService, '  ', ' '), "
-                                    + "qty = REPLACE(qty, '  ', ' '), "
-                                    + "unitPrice = REPLACE(unitPrice, '  ', ' '), "
-                                    + "total = REPLACE(total, '  ', ' ')";
-                            ps = con.prepareStatement(removeSpace);
-                            ps.executeUpdate();
+                List<OrderFault> listOrderFault = getOrderFault(addOrder);
+                if (listOrderFault != null) {
+                    for (OrderFault faultItem : listOrderFault) {
+                        int idOrderFaultAdded = _orderFaultController.addOrderFaultDAO(faultItem);
+                        System.out.println("Fault Added: " + idOrderAdded);
 
-                            //JOptionPane.showMessageDialog(this, order.getOrderNo() + " Created successfully!");
-
-                            cleanAllFields(table_view_faults);
-                            cleanAllFields(table_view_products);
-                            //Generate new OrderNo.
-                            autoID();
-
-                            String issueDateFormat = new SimpleDateFormat("dd/MM/yyyy").format(currentDate);
-                            //order.setIssueDate(issueDateFormat);
-
-                            //PrintOrder printOrder = new PrintOrder(order, completedOrder, isOrderDetails, formatContactNo);
-                            //printOrder.setVisible(true);
-
-                            ps.close();
-                            con.close();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
+                        if (idOrderFaultAdded > 0) {
+                            isAdded = true;
+                        } else {
+                            System.out.println("Error to add fault!");
+                            return;
                         }
                     }
-                } else {
-                    //DepositPayment depositPayment = new DepositPayment(order, 0, completedOrder, isOrderDetails, formatContactNo);
-                    //depositPayment.setVisible(true);
+                }
+
+                List<OrderProdServ> listOrderProdServ = getOrderProdServ(addOrder);
+                if (listOrderProdServ != null) {
+                    for (OrderProdServ prodServItem : listOrderProdServ) {
+                        int idOrderProdServAdded = _orderProdServController.addOrderProdServController(prodServItem);
+                        System.out.println("ProdServ Added: " + idOrderProdServAdded);
+
+                        if (idOrderProdServAdded > 0) {
+                            isAdded = true;
+                        } else {
+                            System.out.println("Error to add ProdServ");
+                            return;
+                        }
+                    }
+                }
+                
+                OrderNote addOrderNote = getOrderNote(addOrder);
+                if (addOrderNote != null) {
+
+                    int idNoteAdded = _orderNoteController.addOrderNoteController(addOrderNote);
+                    if (idNoteAdded > 0) {
+                        isAdded = true;
+                    } else {
+                        System.out.println("Erro to add notes");
+                        isAdded = false;
+                        return;
+                    }
+                }
+
+                if (!this.txt_deposit.getText().trim().isEmpty()) {
+                    Deposit deposit = new Deposit(addOrder, Double.parseDouble(this.txt_deposit.getText()));
+                    int idDepositAdded = this._depositController.addDepositController(deposit);
+
+                    if (idDepositAdded > 0) {
+                        isAdded = true;
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Deposit could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+            }
+
+            if (isAdded) {
+                JOptionPane.showMessageDialog(this, "Order: " + addOrder.getIdOrder() + " created successfully!");
+                clearFields();
+                generateOrderId();
+            } else {
+                JOptionPane.showMessageDialog(this, "Order could not be saved!", null, JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_save_orderActionPerformed
 
     private void txt_depositKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyReleased
-        //Calculate deposit paid and display due value
-        if (txt_deposit.getText() == null || txt_deposit.getText().trim().isEmpty()) {
-            txt_due.setText(txt_total.getText());
-            deposit = 0;
+        double deposit;
+        double totalPrice;
+        if (!this.txt_deposit.getText().trim().isEmpty()) {
+            totalPrice = Double.parseDouble(this.txt_total.getText());
+            deposit = Double.parseDouble(this.txt_deposit.getText());
+
+            this.txt_due.setText(String.valueOf(totalPrice - deposit));
         } else {
-            double priceTotal = Double.parseDouble(txt_total.getText());
-            deposit = Double.parseDouble(txt_deposit.getText());
-            total = priceTotal - deposit;
-            txt_due.setText(String.valueOf(total));
+            this.txt_due.setText(this.txt_total.getText());
         }
     }//GEN-LAST:event_txt_depositKeyReleased
 
     private void btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
-        int confirmCancelling = JOptionPane.showConfirmDialog(null, "Do you want to cancel this ?", "New Order",
+        int confirmCancelling = JOptionPane.showConfirmDialog(null, "Do you really want to cancel ?", "New Order",
                 JOptionPane.YES_NO_OPTION);
         if (confirmCancelling == 0) {
             //new MainMenu().setVisible(true);
@@ -959,59 +1248,17 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_first_nameKeyPressed
 
-    private void txt_serial_numberKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_serial_numberKeyPressed
-        //Sugest autoComplete serialNumber from Database
-        switch (evt.getKeyCode()) {
-            case KeyEvent.VK_BACK_SPACE:
-                break;
-
-            case KeyEvent.VK_ENTER:
-                txt_serial_number.setText(txt_serial_number.getText());
-                break;
-            default:
-                EventQueue.invokeLater(() -> {
-                    String text = txt_serial_number.getText();
-                    autoCompleteFromDb(serialNumbers, text, txt_serial_number);
-                });
-        }
-    }//GEN-LAST:event_txt_serial_numberKeyPressed
-
     private void txt_depositKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyPressed
         //Accepts number characters only
-        if (Character.isLetter(evt.getKeyChar()))
+        if (Character.isLetter(evt.getKeyChar())) {
             txt_deposit.setEditable(false);
-        else
+        } else {
             txt_deposit.setEditable(true);
+        }
     }//GEN-LAST:event_txt_depositKeyPressed
 
-    private void table_view_productsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_productsMouseClicked
-        //Delete products|Service item of the selected row (Function is called with 2 clicks) 
-        DefaultTableModel dtm = (DefaultTableModel) table_view_products.getModel();
-
-        if (evt.getClickCount() == 2) {
-            int confirmDeletion = JOptionPane.showConfirmDialog(null, "Remove This Item ?", "Remove Product|Service", JOptionPane.YES_NO_OPTION);
-            if (confirmDeletion == 0) {
-                dtm.removeRow(table_view_products.getSelectedRow());
-                // Sum price column and set into total textField
-                getPriceSum();
-            }
-        }
-    }//GEN-LAST:event_table_view_productsMouseClicked
-
-    private void table_view_faultsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_faultsMouseClicked
-        //Delete fault item of the selected row (Function is called with 2 clicks) 
-        DefaultTableModel dtm = (DefaultTableModel) table_view_faults.getModel();
-
-        if (evt.getClickCount() == 2) {
-            int confirmDeletion = JOptionPane.showConfirmDialog(null, "Remove This Item ?", "Remove Faults", JOptionPane.YES_NO_OPTION);
-            if (confirmDeletion == 0) {
-                dtm.removeRow(table_view_faults.getSelectedRow());
-            }
-        }
-    }//GEN-LAST:event_table_view_faultsMouseClicked
-
     private void txt_last_nameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_last_nameKeyPressed
-         //Sugest autoComplete firstNames from Database
+        //Sugest autoComplete firstNames from Database
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_BACK_SPACE:
                 break;
@@ -1045,7 +1292,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_brandKeyPressed
 
     private void txt_modelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_modelKeyPressed
-         //Suggest autoComplete model from Database
+        //Suggest autoComplete model from Database
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_BACK_SPACE:
                 break;
@@ -1061,262 +1308,251 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_modelKeyPressed
 
-    private void txt_faultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_faultActionPerformed
-        DefaultTableModel dtm = (DefaultTableModel) table_view_faults.getModel();
-        ArrayList<String> tableFaultsList = new ArrayList<>();
-        String faultText = txt_fault.getText().replace(" ", "");
-        String tableFault = "";
-        Vector faultsVector = new Vector();
+    private void txt_search_faultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_search_faultActionPerformed
+        if (!this.txt_search_fault.getText().trim().isEmpty() && this._defaultListModelFault.isEmpty()) {
 
-        for (int i = 0; i < dtm.getRowCount(); i++) {
-            tableFault = dtm.getValueAt(i, 0).toString().replace(" ", "");
-            tableFaultsList.add(tableFault);
-        }
-        if (faultText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please add a Fault!", "Faults", JOptionPane.ERROR_MESSAGE);
-        } else if (tableFaultsList.contains(faultText)) {
-            JOptionPane.showMessageDialog(this, "Item '" + faultText + "' already added !", "Faults", JOptionPane.ERROR_MESSAGE);
-            txt_fault.setText("");
-        } else {
-            try {
-                dbConnection();
-                faultText = txt_fault.getText();
+            this._listFault = _faultController.searchFault(this.txt_search_fault.getText());
+            if (this._listFault.isEmpty() || this._listFault == null) {
+                Fault addFault = new Fault(this.txt_search_fault.getText().toUpperCase());
 
-                String queryCheck = "SELECT * FROM faults WHERE faultName = ?";
-                ps = con.prepareStatement(queryCheck);
-                ps.setString(1, faultText);
-                rs = ps.executeQuery();
+                int confirmInsertion = JOptionPane.showConfirmDialog(null, "Do you want to add a new fault ?", "Add New Fault", JOptionPane.YES_NO_OPTION);
+                if (confirmInsertion == 0) {
+                    int idFault = this._faultController.addFaultController(addFault);
+                    if (idFault > 0) {
 
-                if (!rs.isBeforeFirst()) {
-                    int confirmInsertion = JOptionPane.showConfirmDialog(null, "Do you want to add a new fault ?", "Add New Fault", JOptionPane.YES_NO_OPTION);
-                    if (confirmInsertion == 0) {
-                        String query = "INSERT INTO faults (faultName) VALUES(?)";
-                        ps = con.prepareStatement(query);
-                        ps.setString(1, faultText);
-                        ps.executeUpdate();
-
-                        faultsVector.add(faultText);
-                        dtm.addRow(faultsVector);
-                        txt_fault.setText("");
-                    } else {
-                        txt_fault.setText("");
+                        this._dtmFault.addRow(
+                                new Object[]{
+                                    idFault,
+                                    addFault.getDescription()
+                                });
                     }
-                } else {
-                    faultsVector.add(faultText);
-                    dtm.addRow(faultsVector);
-                    txt_fault.setText("");
-                }
 
-                ps.close();
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
+                    this.txt_search_fault.setText("");
+                    this.txt_search_fault.requestFocus();
+                }
             }
         }
-    }//GEN-LAST:event_txt_faultActionPerformed
+    }//GEN-LAST:event_txt_search_faultActionPerformed
 
     private void editor_pane_notesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editor_pane_notesKeyPressed
-        if (evt.isShiftDown() && evt.getKeyCode() == KeyEvent.VK_TAB)
+        if (evt.isShiftDown() && evt.getKeyCode() == KeyEvent.VK_TAB) {
             txt_serial_number.requestFocus();
-        else if (evt.getKeyCode() == KeyEvent.VK_TAB)
-            txt_fault.requestFocus();
-        
+        } else if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+            txt_search_fault.requestFocus();
+        }
+
     }//GEN-LAST:event_editor_pane_notesKeyPressed
 
-    private void txt_faultKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_faultKeyReleased
-         //Sugest autoComplete firstNames from Database
-        switch (evt.getKeyCode()) {
-            case KeyEvent.VK_BACK_SPACE:
-                break;
-
-            case KeyEvent.VK_ENTER:
-                txt_fault.setText(txt_fault.getText());
-                break;
-            default:
-                EventQueue.invokeLater(() -> {
-                    String text = txt_fault.getText();
-                    autoCompleteFromDb(faults, text, txt_fault);
-                });
-        }
-    }//GEN-LAST:event_txt_faultKeyReleased
+    private void txt_search_faultKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_search_faultKeyReleased
+        searchFault();
+    }//GEN-LAST:event_txt_search_faultKeyReleased
 
     private void btn_international_numberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_international_numberActionPerformed
-        txt_contact.setFormatterFactory(null);
-        txt_contact.setText("");
-        txt_contact.requestFocus();
+        if (this.txt_contact.getFormatterFactory() != null) {
+            this.txt_contact.setFormatterFactory(null);
+            this.txt_contact.setText("+");
+            this.txt_contact.requestFocus();
+        } else {
+            this.txt_contact.setText("");
+            try {
+                this.txt_contact.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("(0##) ###-####")));
+            } catch (java.text.ParseException ex) {
+            }
+            this.txt_contact.requestFocus();
+        }
     }//GEN-LAST:event_btn_international_numberActionPerformed
 
     private void btn_copyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_copyActionPerformed
-        StringSelection stringSelection = new StringSelection(txt_contact.getText().replace("(","").replace(")", "").replace("-", "").replace(" ", ""));
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection , null);
-        JOptionPane.showMessageDialog(this, txt_contact.getText() + " Copied to Clipboard");
+        StringSelection stringSelection = new StringSelection(txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
+        if (!this.txt_contact.getText().trim().isEmpty()) {
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+        }
     }//GEN-LAST:event_btn_copyActionPerformed
 
-    private void btn_add_product_serviceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_add_product_serviceActionPerformed
-        // Add selected items to the products table
-        ArrayList<String> productsList = new ArrayList<>();
-        DefaultTableModel dtm = (DefaultTableModel) table_view_products.getModel();
-        String selectedItem = combo_box_product_service.getSelectedItem().toString();
-        String newProdAdd = "", category = "";
-        int qty = 0;
-        double unitPrice = 0;
-        double totalPrice = 0;
-        Vector vector = new Vector();
-        
-        productsList.clear();
-        for (int i = 0; i < dtm.getRowCount(); i++) {
-            productsList.add(dtm.getValueAt(i, 0).toString());
-        }
-
-        if (selectedItem.isEmpty() || selectedItem.matches("Select or Type"))
-            JOptionPane.showMessageDialog(this, "Please select a Product | Service!", "Service | Product", JOptionPane.ERROR_MESSAGE);
-        else if (productsList.contains(selectedItem))
-            JOptionPane.showMessageDialog(this, "Item '" + selectedItem + "' already added !", "Add Computer", JOptionPane.ERROR_MESSAGE);
-        else {
-            try {
-                dbConnection();
-
-                String query = "SELECT * FROM products WHERE productService = ?";
-                ps = con.prepareStatement(query);
-                ps.setString(1, selectedItem);
-                rs = ps.executeQuery();
-
-                if (!rs.isBeforeFirst()) {
-                    JOptionPane.showMessageDialog(this, "Item not Found!", "Service | Product", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    while (rs.next()) {
-                        newProdAdd = rs.getString("productService");
-                        unitPrice = rs.getDouble("price");
-                        category = rs.getString("category");
-                    }
-
-                    if (category.equals("Product")) {
-                        boolean valid = false;
-                        while (!valid) {
-                            try {
-                                qty = Integer.parseInt(JOptionPane.showInputDialog("Enter '" + selectedItem + "' Qty:"));
-                                if (qty > 0) {
-                                    valid = true;
-                                }
-                            } catch (NumberFormatException e) {
-                                JOptionPane.showMessageDialog(this, "Qty must be an Integer!", "Product | Service", JOptionPane.ERROR_MESSAGE);
-                            }
-
-                            totalPrice = unitPrice * qty;
-                            vector.add(newProdAdd);
-                            vector.add(qty);
-                            vector.add(unitPrice);
-                            vector.add(totalPrice);
-                            dtm.addRow(vector);
-                        }
-
-                    } else {
-                            qty = 1;
-                            totalPrice = unitPrice * qty;
-
-                            vector.add(newProdAdd);
-                            vector.add(qty);
-                            vector.add(unitPrice);
-                            vector.add(totalPrice);
-                            dtm.addRow(vector);
-                    }
-
-                    combo_box_product_service.setSelectedIndex(-1);
-                    // Sum price column and set into total textField
-                    getPriceSum();
-                    ps.close();
-                    con.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }//GEN-LAST:event_btn_add_product_serviceActionPerformed
-
     private void txt_contactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_contactActionPerformed
-        try {
-            dbConnection();
+        if (!this.txt_contact.getText().trim().isEmpty()) {
+            Person person = _personController.searchPesonByContactNoController(this.txt_contact.getText());
 
-            String query = "SELECT * FROM customers WHERE contactNo = ? ";
-            ps = con.prepareStatement(query);
-            ps.setString(1, contactNo = txt_contact.getText().replace("(","").replace(")", "").replace("-", "").replace(" ", ""));
-            rs = ps.executeQuery();
+            if (person != null) {
+                Customer customer = _customerController.getCustomerController(person);
 
-            if (!rs.isBeforeFirst()) {
-                JOptionPane.showMessageDialog(this, "Customer not found in the Database", "New Customer", JOptionPane.ERROR_MESSAGE);
+                this.hdn_txt_customer_id.setText(String.valueOf(customer.getIdCustomer()));
+                this.txt_first_name.setText(customer.getPerson().getFirstName());
+                this.txt_last_name.setText(customer.getPerson().getLastName());
+                this.txt_contact.setText(customer.getPerson().getContactNo());
+                this.txt_email.setText(customer.getPerson().getEmail());
+
+                this.txt_brand.requestFocus();
+            } else {
+                this.txt_first_name.requestFocus();
             }
-            else {
-                while (rs.next()) {
-                    txt_first_name.setText(rs.getString("firstName"));
-                    txt_last_name.setText(rs.getString("lastName"));
-                    txt_contact.setText(rs.getString("contactNo"));
-                    txt_email.setText(rs.getString("email"));
-                }
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_txt_contactActionPerformed
 
+    private void table_view_faultsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_faultsMouseClicked
+        if (evt.getClickCount() == 2) {
+            this._dtmFault.removeRow(table_view_faults.getSelectedRow());
+        }
+    }//GEN-LAST:event_table_view_faultsMouseClicked
+
+    private void txt_search_prod_servFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_search_prod_servFocusLost
+        this.txt_search_prod_serv.setText("");
+        this._defaultListModelProdServ.removeAllElements();
+    }//GEN-LAST:event_txt_search_prod_servFocusLost
+
+    private void txt_search_prod_servKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_search_prod_servKeyReleased
+        searchProdServ();
+    }//GEN-LAST:event_txt_search_prod_servKeyReleased
+
+    private void list_prod_serv_searchMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_prod_serv_searchMousePressed
+        if (!this.list_prod_serv_search.isSelectionEmpty()) {
+            ProductService prodServ = (ProductService) this._defaultListModelProdServ.getElementAt(this.list_prod_serv_search.getSelectedIndex());
+            boolean isAdded = false;
+
+            if (this._dtmProdServ.getRowCount() > 0) {
+                for (int i = 0; i < _dtmProdServ.getRowCount(); i++) {
+                    int idProdServ = Integer.valueOf(this._dtmProdServ.getValueAt(i, 0).toString());
+                    if (idProdServ == prodServ.getIdProductService()) {
+                        isAdded = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!isAdded) {
+                this._dtmProdServ.addRow(
+                        new Object[]{
+                            prodServ.getIdProductService(),
+                            prodServ.getProdServName(),
+                            CommonSetting.DEFAULT_QTY,
+                            CommonExtension.getPriceFormat(prodServ.getPrice()),
+                            CommonExtension.getPriceFormat(prodServ.getPrice() * 1)
+                        }
+                );
+
+                this._defaultListModelProdServ.removeAllElements();
+                this.txt_search_prod_serv.setText("");
+                this.txt_search_prod_serv.requestFocus();
+                getPriceSum();
+            }
+        }
+    }//GEN-LAST:event_list_prod_serv_searchMousePressed
+
+    private void table_view_productsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_productsMouseClicked
+        if (evt.getClickCount() == 2) {
+            this._dtmProdServ.removeRow(this.table_view_products.getSelectedRow());
+            // Sum price column and set into total textField
+            getPriceSum();
+        }
+    }//GEN-LAST:event_table_view_productsMouseClicked
+
     private void table_view_productsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_table_view_productsKeyReleased
-        // TODO add your handling code here:
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
-        {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             double sum = 0;
-            for (int i = 0; i < table_view_products.getRowCount(); i++) {
-                double unitPrice = Double.parseDouble(table_view_products.getValueAt(i, 2).toString());
-                int qty = Integer.parseInt(table_view_products.getValueAt(i, 1).toString());
-                
-                table_view_products.setValueAt(unitPrice, i, 2);
+            for (int i = 0; i < this._dtmProdServ.getRowCount(); i++) {
+                double unitPrice = Double.parseDouble(this._dtmProdServ.getValueAt(i, 3).toString());
+                int qty = Integer.parseInt(this._dtmProdServ.getValueAt(i, 2).toString());
+
+                this._dtmProdServ.setValueAt(unitPrice, i, 3);
                 double priceTotal = unitPrice * qty;
-                table_view_products.setValueAt(priceTotal, i, 3);
+                this._dtmProdServ.setValueAt(priceTotal, i, 4);
                 sum += priceTotal;
             }
 
-            txt_total.setText(String.valueOf(sum));
-            txt_due.setText(String.valueOf(txt_total.getText()));
+            this.txt_total.setText(String.valueOf((sum)));
+            this.txt_due.setText(String.valueOf(this.txt_total.getText()));
         }
     }//GEN-LAST:event_table_view_productsKeyReleased
 
+    private void list_fault_searchMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_fault_searchMousePressed
+        if (!this.list_fault_search.isSelectionEmpty()) {
+            Fault fault = (Fault) this._defaultListModelFault.getElementAt(this.list_fault_search.getSelectedIndex());
+            boolean isAdded = false;
+
+            if (this.table_view_faults.getRowCount() > 0) {
+                for (int i = 0; i < this.table_view_faults.getRowCount(); i++) {
+                    int idFault = Integer.valueOf(_dtmFault.getValueAt(i, 0).toString());
+                    if (idFault == fault.getIdFault()) {
+                        isAdded = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!isAdded) {
+                this._dtmFault.addRow(
+                        new Object[]{
+                            fault.getIdFault(),
+                            fault.getDescription()
+                        });
+            }
+
+            this._defaultListModelFault.removeAllElements();
+            this.txt_search_fault.setText("");
+            this.txt_search_fault.requestFocus();
+        }
+    }//GEN-LAST:event_list_fault_searchMousePressed
+
+    private void txt_search_faultFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txt_search_faultFocusLost
+        this.txt_search_fault.setText("");
+        this._defaultListModelFault.removeAllElements();
+    }//GEN-LAST:event_txt_search_faultFocusLost
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_add_product_service;
     private javax.swing.JButton btn_cancel;
     private javax.swing.JButton btn_copy;
     private javax.swing.JButton btn_international_number;
     private javax.swing.JButton btn_save_order;
-    private javax.swing.JComboBox<String> combo_box_product_service;
     private javax.swing.JEditorPane editor_pane_notes;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane_notes;
+    private javax.swing.JTextField hdn_txt_customer_id;
+    private javax.swing.JLayeredPane layered_pane_list_fault;
+    private javax.swing.JLayeredPane layered_pane_list_prod_serv;
     private javax.swing.JLabel lbl_auto_order_no;
+    private javax.swing.JLabel lbl_bad_sectors;
+    private javax.swing.JLabel lbl_bad_sectors_star;
     private javax.swing.JLabel lbl_brand;
     private javax.swing.JLabel lbl_contact;
+    private javax.swing.JLabel lbl_contact_star;
     private javax.swing.JLabel lbl_deposit;
+    private javax.swing.JLabel lbl_dev_brand_star;
+    private javax.swing.JLabel lbl_dev_model_star;
     private javax.swing.JLabel lbl_due;
     private javax.swing.JLabel lbl_email;
-    private javax.swing.JLabel lbl_fault;
     private javax.swing.JLabel lbl_first_name;
+    private javax.swing.JLabel lbl_first_name_star;
     private javax.swing.JLabel lbl_last_name;
+    private javax.swing.JLabel lbl_last_name_star;
     private javax.swing.JLabel lbl_model;
     private javax.swing.JLabel lbl_order_no;
-    private javax.swing.JLabel lbl_price;
-    private javax.swing.JLabel lbl_service_product;
+    private javax.swing.JLabel lbl_search_fault_icon;
+    private javax.swing.JLabel lbl_search_prod_serv_icon;
+    private javax.swing.JLabel lbl_serial_number_star;
     private javax.swing.JLabel lbl_sn;
+    private javax.swing.JLabel lbl_total;
+    private javax.swing.JList<String> list_fault_search;
+    private javax.swing.JList<String> list_prod_serv_search;
+    private javax.swing.JPanel panel_input_detail;
+    private javax.swing.JPanel panel_order_buttons;
     private javax.swing.JPanel panel_order_details;
+    private javax.swing.JPanel panel_total_amount;
+    private javax.swing.JScrollPane scroll_pane_faults;
+    private javax.swing.JScrollPane scroll_pane_notes;
+    private javax.swing.JScrollPane scroll_pane_products;
     private javax.swing.JTable table_view_faults;
     private javax.swing.JTable table_view_products;
+    private javax.swing.JTextField txt_bad_sectors;
     private javax.swing.JTextField txt_brand;
     private javax.swing.JFormattedTextField txt_contact;
     private javax.swing.JTextField txt_deposit;
     private javax.swing.JTextField txt_due;
     private javax.swing.JTextField txt_email;
-    private javax.swing.JTextField txt_fault;
     private javax.swing.JTextField txt_first_name;
     private javax.swing.JTextField txt_last_name;
     private javax.swing.JTextField txt_model;
+    private javax.swing.JTextField txt_search_fault;
+    private javax.swing.JTextField txt_search_prod_serv;
     private javax.swing.JTextField txt_serial_number;
     private javax.swing.JTextField txt_total;
     // End of variables declaration//GEN-END:variables
+
 }

@@ -342,6 +342,7 @@ public class MainMenuView extends javax.swing.JFrame {
 
     private void menu_item_new_orderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_new_orderActionPerformed
         NewOrderView newOrderView = new NewOrderView();
+        //NewOrderViewTeste newOrderView = new NewOrderViewTeste();
         this.desktop_pane_menu.removeAll();
         this.desktop_pane_menu.add(newOrderView).setVisible(true);
         CommonSetting.setMaxInternalFrame(newOrderView);
@@ -366,7 +367,10 @@ public class MainMenuView extends javax.swing.JFrame {
     }//GEN-LAST:event_menu_item_customerActionPerformed
 
     private void menu_item_usersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_usersActionPerformed
-        // TODO add your handling code here:
+        EmployeeView employeeView = new EmployeeView();
+        this.desktop_pane_menu.removeAll();
+        this.desktop_pane_menu.add(employeeView).setVisible(true);
+        CommonSetting.setMaxInternalFrame(employeeView);
     }//GEN-LAST:event_menu_item_usersActionPerformed
 
     private void menu_item_productsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_productsActionPerformed

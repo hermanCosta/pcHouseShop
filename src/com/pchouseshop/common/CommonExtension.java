@@ -1,8 +1,13 @@
 package com.pchouseshop.common;
 
+import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.Locale;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 public class CommonExtension {
 
@@ -82,5 +87,35 @@ public class CommonExtension {
         } else {
             return String.valueOf(intPrice);
         }
+    }
+
+    public static void checkEmailFormat(JTextField jTextField) {
+        jTextField.setInputVerifier(new InputVerifier() {
+
+            Border originalBorder;
+            String emailFormat = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+            @Override
+            public boolean verify(JComponent input) {
+                JTextField comp = (JTextField) input;
+                return comp.getText().matches(emailFormat) | comp.getText().trim().isEmpty();
+            }
+
+            @Override
+            public boolean shouldYieldFocus(JComponent input) {
+                boolean isValid = verify(input);
+
+                if (!isValid) {
+                    originalBorder = originalBorder == null ? input.getBorder() : originalBorder;
+                    input.setBorder(new LineBorder(Color.RED));
+                } else {
+                    if (originalBorder != null) {
+                        input.setBorder(originalBorder);
+                        originalBorder = null;
+                    }
+                }
+                return isValid;
+            }
+        });
     }
 }

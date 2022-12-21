@@ -11,7 +11,7 @@ import java.util.List;
 public class ProductServiceController {
     private final ProductServiceDAO PRODSERV_DAO = new ProductServiceDAO();
     
-    public List<ProductService> getAlLProductController(int pIdCompany) {
+    public List<ProductService> getAllProductController(int pIdCompany) {
         return PRODSERV_DAO.getAllProductsDAO(pIdCompany);
     }
     
@@ -33,5 +33,13 @@ public class ProductServiceController {
     
     public List<ProductService> searchProdServController(String pProdServ) {
         return PRODSERV_DAO.searchProdServDAO(pProdServ);
+    }
+    
+    public List<ProductService> orderSearchProdServController(String pSearch) {
+        return  PRODSERV_DAO.orderSearchProdServDAO(pSearch);
+    }
+    
+    public ProductService getItemProdServController(int pIdProdServ) {
+        return  PRODSERV_DAO.getItemProdServDAO(pIdProdServ);
     }
 }

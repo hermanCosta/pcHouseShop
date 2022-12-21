@@ -33,4 +33,8 @@ public class CustomerController {
     public Customer getItemCustomerController(int pIdCustomer) {
         return CUSTOMER_DAO.getItemCustomerDAO(pIdCustomer);
     }
+    
+    public Customer searchCustomerByContactNoController(String pContactNo) {
+        return CUSTOMER_DAO.searchCustomerByContactNoDAO(pContactNo);
+    }
 }
