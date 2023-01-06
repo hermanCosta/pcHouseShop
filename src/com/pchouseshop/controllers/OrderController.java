@@ -13,4 +13,8 @@ public class OrderController {
     public Integer addOrderController(OrderModel pOrder) {
         return ORDER_DAO.addOrderDAO(pOrder);
     }
+    
+    public OrderModel getItemOrderController(int pIdOrder) {
+        return ORDER_DAO.getItemOrderDAO(pIdOrder);
+    }
 }

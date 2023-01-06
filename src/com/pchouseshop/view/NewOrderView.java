@@ -1,13 +1,5 @@
 package com.pchouseshop.view;
 
-//import Forms.DepositPayment;
-//import Forms.Login;
-//import Forms.PrintOrder;
-//import Forms.MainMenu;
-//import Model.CompletedOrder;
-//import Model.Customer;
-//import Model.Order;
-//import Model.ProductService;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.CustomerController;
@@ -20,7 +12,6 @@ import com.pchouseshop.controllers.OrderNoteController;
 import com.pchouseshop.controllers.OrderProdServController;
 import com.pchouseshop.controllers.PersonController;
 import com.pchouseshop.controllers.ProductServiceController;
-import com.pchouseshop.model.Company;
 import com.pchouseshop.model.Customer;
 import com.pchouseshop.model.Deposit;
 import com.pchouseshop.model.Device;
@@ -33,73 +24,22 @@ import com.pchouseshop.model.OrderProdServ;
 import com.pchouseshop.model.Person;
 import com.pchouseshop.model.ProductService;
 import java.awt.event.KeyEvent;
-import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.InputVerifier;
-import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
 public class NewOrderView extends javax.swing.JInternalFrame {
-
-    ArrayList firstNames = new ArrayList();
-    ArrayList lastNames = new ArrayList();
-    ArrayList faults = new ArrayList();
-    ArrayList brands = new ArrayList();
-    ArrayList models = new ArrayList();
-    ArrayList serialNumbers = new ArrayList();
-
-    Vector vecFaults = new Vector();
-    Vector vecProducts = new Vector();
-    Vector vecQty = new Vector();
-    Vector vecUnitPrice = new Vector();
-    Vector vecPriceTotal = new Vector();
-
-    Connection con;
-    PreparedStatement ps;
-    Statement stmt;
-//    Customer customer;
-//    ProductService productService;
-//    Order order;
-    ResultSet rs;
-    ResultSetMetaData rsmd;
-//    CompletedOrder completedOrder;
-    Timestamp currentDate;
-
-    String orderNo, firstName, lastName, contactNo, email, deviceBrand,
-            deviceModel, serialNumber, importantNotes, stringFaults,
-            stringProducts, stringPriceTotal, stringQty, stringUnitPrice, issueDate, status,
-            finishDate = "", pickDate = "", refundDate = "";
-
-    double cashDeposit = 0, cardDeposit = 0, due;
-    boolean isOrderDetails = false;
-
     private List<ProductService> _listProdServ;
     private List<Fault> _listFault;
     private final OrderController _orderController;
@@ -123,6 +63,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         //avoid auto old value by focus loosing
         txt_contact.setFocusLostBehavior(JFormattedTextField.PERSIST);
 
+        CommonExtension.checkEmailFormat(this.txt_email);
         CommonSetting.requestTxtFocus(txt_first_name);
         CommonSetting.tableSettings(table_view_faults);
         CommonSetting.tableSettings(table_view_products);
@@ -144,14 +85,17 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         this.list_prod_serv_search.setModel(_defaultListModelProdServ);
         this.list_fault_search.setModel(_defaultListModelFault);
 
-        CommonExtension.checkEmailFormat(this.txt_email);
+        
         generateOrderId();
 
     }
 
     private void generateOrderId() {
         int orderId = _orderController.getLastOrderIdController();
-        this.lbl_auto_order_no.setText(String.format("%06d", orderId++));
+        orderId++;
+        String nextId = String.format("%06d", orderId);
+        this.lbl_auto_order_no.setText(String.valueOf(nextId));
+        System.out.println("next ID: " + String.format("%06d", orderId++));
     }
 
     private void searchFault() {
@@ -327,7 +271,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
     private OrderNote getOrderNote(OrderModel order) {
         OrderNote orderNote = null;
-        Employee employee = this._employeeController.getItemEmployeeController(1);
+        Employee employee = this._employeeController.getItemEmployeeController(2);
         Date date = new Date();
         Date createdDate = new Timestamp(date.getTime());
 
@@ -337,106 +281,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             orderNote = new OrderNote(order, employee, this.editor_pane_notes.getText(), createdDate);
         }
         return orderNote;
-    }
-
-    private void loadOrderList() {
-        if (txt_first_name.getText().trim().isEmpty() | txt_last_name.getText().trim().isEmpty()
-                | txt_contact.getText().trim().isEmpty() | txt_brand.getText().trim().isEmpty()
-                | txt_model.getText().trim().isEmpty() | txt_serial_number.getText().trim().isEmpty()
-                | table_view_products.getRowCount() == 0 | table_view_faults.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Please, check Empty fields", "New Order", JOptionPane.ERROR_MESSAGE);
-
-        } else {
-            orderNo = lbl_auto_order_no.getText();
-            firstName = txt_first_name.getText().toUpperCase();
-            lastName = txt_last_name.getText().toUpperCase();
-            contactNo = txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
-            email = txt_email.getText();
-            deviceBrand = txt_brand.getText().toUpperCase();
-            deviceModel = txt_model.getText().toUpperCase();
-            serialNumber = txt_serial_number.getText().toUpperCase();
-            importantNotes = editor_pane_notes.getText();
-
-            if (txt_deposit.getText() == null || txt_deposit.getText().trim().isEmpty()) {
-                // deposit = 0;
-
-            } else {
-                // deposit = Double.parseDouble(txt_deposit.getText());
-            }
-
-            due = Double.parseDouble(txt_due.getText());
-            //total = Double.parseDouble(txt_total.getText());
-            status = "In Progress";
-
-            //Empty vector before looping to avoid duplicate values on tableView
-            vecFaults.clear();
-            vecProducts.clear();
-            vecQty.clear();
-            vecUnitPrice.clear();
-            vecPriceTotal.clear();
-            //pass table items from faults and products table to vector 
-            for (int i = 0; i < table_view_faults.getRowCount(); i++) {
-                vecFaults.add(table_view_faults.getValueAt(i, 0));
-            }
-
-            for (int j = 0; j < table_view_products.getRowCount(); j++) {
-                vecProducts.add(table_view_products.getValueAt(j, 0));
-                vecQty.add(table_view_products.getValueAt(j, 1));
-                vecUnitPrice.add(table_view_products.getValueAt(j, 2));
-                vecPriceTotal.add(table_view_products.getValueAt(j, 3));
-            }
-
-            // pass vector elemnets to a String splitted by a comma,
-            // in order to save into DB
-            stringFaults = vecFaults.toString().replace("[", " ").replace("]", "");
-            stringProducts = vecProducts.toString().replace("[", " ").replace("]", "");
-            stringQty = vecQty.toString().replace("[", " ").replace("]", "");
-            stringUnitPrice = vecUnitPrice.toString().replace("[", " ").replace("]", "");
-            stringPriceTotal = vecPriceTotal.toString().replace("[", " ").replace("]", "");
-
-//            order = new Order(orderNo, firstName, lastName, contactNo, email, deviceBrand,
-//                    deviceModel, serialNumber, importantNotes, stringFaults, stringProducts,
-//                    stringQty, stringUnitPrice, stringPriceTotal, total, deposit, cashDeposit,
-//                    cardDeposit, due, status, issueDate, finishDate, pickDate, refundDate, Login.fullName);
-        }
-    }
-
-    private boolean saveCustomerIntoDb() {
-        boolean isContactNo = false;
-        contactNo = txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
-        try {
-            String query = "SELECT contactNo, firstName, lastName FROM customers WHERE contactNo = ? ";
-            ps = con.prepareStatement(query);
-            ps.setString(1, contactNo);
-            rs = ps.executeQuery();
-
-            if (!rs.isBeforeFirst()) {
-//                customer = new Customer(txt_first_name.getText().toUpperCase(), txt_last_name.getText().toUpperCase(), contactNo, txt_email.getText());
-//                    
-//                String queryInsert = "INSERT INTO customers (firstName, lastName, contactNo, email) VALUES(?, ?, ?, ?)";
-//                ps = con.prepareStatement(queryInsert);
-//                ps.setString(1, customer.getFirstName());
-//                ps.setString(2, customer.getLastName());
-//                ps.setString(3, customer.getContactNo());
-//                ps.setString(4, customer.getEmail());
-                ps.executeUpdate();
-            } else {
-                while (rs.next()) {
-                    firstName = rs.getString("firstName");
-                    lastName = rs.getString("lastName");
-                }
-
-                if (!firstName.equals(txt_first_name.getText())
-                        && !lastName.equals(txt_last_name.getText())) {
-                    JOptionPane.showMessageDialog(this, "There is another Customer associated with ContactNo " + txt_contact.getText(), "New Customer", JOptionPane.ERROR_MESSAGE);
-                    isContactNo = true;
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(NewOrderView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return isContactNo;
     }
 
     @SuppressWarnings("unchecked")
@@ -1153,6 +997,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                         if (idOrderFaultAdded > 0) {
                             isAdded = true;
                         } else {
+                            isAdded = false;
                             System.out.println("Error to add fault!");
                             return;
                         }
@@ -1168,6 +1013,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                         if (idOrderProdServAdded > 0) {
                             isAdded = true;
                         } else {
+                            isAdded = false;
                             System.out.println("Error to add ProdServ");
                             return;
                         }
@@ -1181,8 +1027,8 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                     if (idNoteAdded > 0) {
                         isAdded = true;
                     } else {
-                        System.out.println("Erro to add notes");
                         isAdded = false;
+                        System.out.println("Erro to add notes");
                         return;
                     }
                 }
@@ -1243,7 +1089,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             default:
                 EventQueue.invokeLater(() -> {
                     String text = txt_first_name.getText();
-                    autoCompleteFromDb(firstNames, text, txt_first_name);
+                    //autoCompleteFromDb(firstNames, text, txt_first_name);
                 });
         }
     }//GEN-LAST:event_txt_first_nameKeyPressed
@@ -1269,7 +1115,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             default:
                 EventQueue.invokeLater(() -> {
                     String text = txt_last_name.getText();
-                    autoCompleteFromDb(lastNames, text, txt_last_name);
+                    //autoCompleteFromDb(lastNames, text, txt_last_name);
                 });
         }
     }//GEN-LAST:event_txt_last_nameKeyPressed
@@ -1286,7 +1132,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             default:
                 EventQueue.invokeLater(() -> {
                     String text = txt_brand.getText();
-                    autoCompleteFromDb(brands, text, txt_brand);
+                    //autoCompleteFromDb(brands, text, txt_brand);
                 });
         }
     }//GEN-LAST:event_txt_brandKeyPressed
@@ -1303,7 +1149,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             default:
                 EventQueue.invokeLater(() -> {
                     String text = txt_model.getText();
-                    autoCompleteFromDb(models, text, txt_model);
+                    //autoCompleteFromDb(models, text, txt_model);
                 });
         }
     }//GEN-LAST:event_txt_modelKeyPressed
@@ -1340,7 +1186,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         } else if (evt.getKeyCode() == KeyEvent.VK_TAB) {
             txt_search_fault.requestFocus();
         }
-
     }//GEN-LAST:event_editor_pane_notesKeyPressed
 
     private void txt_search_faultKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_search_faultKeyReleased

@@ -1,6 +1,15 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.controllers.EmployeeController;
+import com.pchouseshop.controllers.OrderController;
+import com.pchouseshop.controllers.OrderFaultController;
+import com.pchouseshop.controllers.OrderNoteController;
+import com.pchouseshop.controllers.OrderProdServController;
+import com.pchouseshop.model.Employee;
+import com.pchouseshop.model.OrderModel;
 import com.pchouseshop.model.OrderNote;
+import java.sql.Timestamp;
+import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -9,10 +18,32 @@ public class NoteView extends javax.swing.JDialog {
     /* For invoking this JDialog in a JInternalFrame
      NoteView noteView = new NoteView(new MainMenuView(CommonSetting.COMPANY), true);
         noteView.setVisible(true);
-    */
+     */
+    private final OrderController _orderController;
+    private final OrderNoteController _orderNoteController;
+    private final EmployeeController _employeeController;
+
     public NoteView(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+
+        this._orderController = new OrderController();
+        this._orderNoteController = new OrderNoteController();
+        this._employeeController = new EmployeeController();
+    }
+
+    private OrderNote getOrderNote(OrderModel order) {
+        OrderNote orderNote = null;
+        Employee employee = this._employeeController.getItemEmployeeController(4);
+        Date date = new Date();
+        Date createdDate = new Timestamp(date.getTime());
+
+        if (this.txt_note_description.getText().trim().isEmpty()) {
+            return orderNote;
+        } else {
+            orderNote = new OrderNote(order, employee, this.txt_note_description.getText(), createdDate);
+        }
+        return orderNote;
     }
 
     private void clearFields() {
@@ -281,6 +312,21 @@ public class NoteView extends javax.swing.JDialog {
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
     private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
+
+        OrderModel order = _orderController.getItemOrderController(7);
+
+        OrderNote addOrderNote = getOrderNote(order);
+        if (addOrderNote != null) {
+
+            int idNoteAdded = _orderNoteController.addOrderNoteController(addOrderNote);
+            if (idNoteAdded > 0) {
+                JOptionPane.showMessageDialog(this, "Note created successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Notes could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
 //        Note addFault = this.getFaultFields();
 //
 //        if (addFault != null) {

@@ -57,4 +57,25 @@ public class OrderDAO {
          
         return idOrderAdded;
     }
+    
+     public OrderModel getItemOrderDAO(int pIdOrder) {
+        OrderModel itemOrder = null;
+        
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            
+            itemOrder = (OrderModel)_session.get(OrderModel.class, pIdOrder);
+            
+            _transaction.commit();
+
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        
+        return itemOrder;
+    }
 }

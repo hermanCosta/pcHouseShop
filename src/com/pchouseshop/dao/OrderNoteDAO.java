@@ -22,6 +22,7 @@ public class OrderNoteDAO {
 
             _transaction.commit();
         } catch (HibernateException e) {
+            System.out.println("Error Hibernate: " + e.getMessage());
         } finally {
             if (_session != null) {
                 _session.close();
