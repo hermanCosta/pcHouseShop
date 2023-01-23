@@ -28,8 +28,12 @@ public class EmployeeController {
     public Employee getEmployeeController(Person pPerson) {
         return EMPLOYEE_DAO.getEmployeeDAO(pPerson);
     }
-    
+
     public Employee getItemEmployeeController(int pIdEmployee) {
         return EMPLOYEE_DAO.getItemEmployeeDAO(pIdEmployee);
+    }
+
+    public Employee getEmployeeByPassDAO(String pPassStr) {
+        return EMPLOYEE_DAO.getEmployeeByPassDAO(pPassStr);
     }
 }

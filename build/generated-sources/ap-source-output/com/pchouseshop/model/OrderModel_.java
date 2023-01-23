@@ -1,5 +1,6 @@
 package com.pchouseshop.model;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
@@ -13,7 +14,7 @@ public abstract class OrderModel_ {
 	public static volatile SingularAttribute<OrderModel, Double> total;
 	public static volatile SingularAttribute<OrderModel, Double> due;
 	public static volatile SingularAttribute<OrderModel, Date> picked;
-	public static volatile SingularAttribute<OrderModel, Date> created;
+	public static volatile SingularAttribute<OrderModel, Timestamp> created;
 	public static volatile SingularAttribute<OrderModel, Company> company;
 	public static volatile SingularAttribute<OrderModel, Date> finished;
 	public static volatile SingularAttribute<OrderModel, Employee> employee;

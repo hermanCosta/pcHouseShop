@@ -40,13 +40,13 @@ public class CompanyDAO {
         Company comp = null;
         try {
             _session = _sessionFactory.openSession();
-            Transaction transaction = _session.beginTransaction();
+            _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM Company C WHERE C.name = :name AND C.password = :password")
                     .setParameter("name", name)
                     .setParameter("password", password);
 
             comp = (Company) query.uniqueResult();
-            transaction.commit();
+            _transaction.commit();
 
         } catch (HibernateException e) {
         } finally {

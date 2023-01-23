@@ -92,10 +92,8 @@ public class EmployeeView extends javax.swing.JInternalFrame {
 
             getEmployee = new Employee(person, this.txt_username.getText().toLowerCase(), this.combo_box_access_level.getSelectedItem().toString().toUpperCase());
 
-            int idEmplyoee = CommonExtension.setIdExtension(this.hdn_txt_employee_id);
-
-            getEmployee.setIdEmplyoee(idEmplyoee);
-            getEmployee.setPassword(this.txt_password.getPassword().toString());
+            getEmployee.setIdEmplyoee(CommonExtension.setIdExtension(this.hdn_txt_employee_id));
+            getEmployee.setPassword(CommonExtension.encryptPassword(this.txt_password));
 
             return getEmployee;
         }

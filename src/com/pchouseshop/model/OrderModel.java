@@ -1,6 +1,7 @@
 package com.pchouseshop.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -49,7 +50,7 @@ public class OrderModel implements Serializable {
     
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "CREATED")
-    private Date created;
+    private Timestamp created;
     
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "FINISHED")
@@ -62,7 +63,7 @@ public class OrderModel implements Serializable {
     public OrderModel() {
     }
 
-    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, String status, Date created, Date finished, Date picked) {
+    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, String status, Timestamp created, Date finished, Date picked) {
         this.customer = customer;
         this.device = device;
         this.employee = employee;
@@ -139,11 +140,11 @@ public class OrderModel implements Serializable {
         this.status = status;
     }
 
-    public Date getCreated() {
+    public Timestamp getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Timestamp created) {
         this.created = created;
     }
 
@@ -162,10 +163,4 @@ public class OrderModel implements Serializable {
     public void setPicked(Date picked) {
         this.picked = picked;
     }
-    
-    
-    
-    
-    
-    
 }

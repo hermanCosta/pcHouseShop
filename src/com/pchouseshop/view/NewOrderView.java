@@ -23,10 +23,10 @@ import com.pchouseshop.model.OrderNote;
 import com.pchouseshop.model.OrderProdServ;
 import com.pchouseshop.model.Person;
 import com.pchouseshop.model.ProductService;
-import java.awt.event.KeyEvent;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,6 +40,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
 public class NewOrderView extends javax.swing.JInternalFrame {
+
     private List<ProductService> _listProdServ;
     private List<Fault> _listFault;
     private final OrderController _orderController;
@@ -85,7 +86,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         this.list_prod_serv_search.setModel(_defaultListModelProdServ);
         this.list_fault_search.setModel(_defaultListModelFault);
 
-        
         generateOrderId();
 
     }
@@ -95,7 +95,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         orderId++;
         String nextId = String.format("%06d", orderId);
         this.lbl_auto_order_no.setText(String.valueOf(nextId));
-        System.out.println("next ID: " + String.format("%06d", orderId++));
+        //System.out.println("next ID: " + String.format("%06d", orderId++));
     }
 
     private void searchFault() {
@@ -178,9 +178,12 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     private OrderModel getOrderFields() {
         OrderModel getOrderModel = null;
         Customer customer;
-        Employee employee = this._employeeController.getItemEmployeeController(1);
-        Date date = new Date();
-        Date createdDate = new Timestamp(date.getTime());
+        String password = CommonExtension.requestUserPassword();
+        Employee employee = _employeeController.getEmployeeByPassDAO(password);
+//        Date date = new Date();
+        Timestamp createdDate = new Timestamp(new Date().getTime());
+//                 SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+//         String createdDate = formatDate.format(new Date());
 
         if (this.txt_first_name.getText().trim().isEmpty() || this.txt_last_name.getText().trim().isEmpty()
                 || this.txt_contact.getText().trim().isEmpty() || this.txt_brand.getText().trim().isEmpty()
@@ -190,30 +193,36 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
             return getOrderModel;
         } else {
-            int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
-            if (idCustomer > 0) {
-                customer = this._customerController.getItemCustomerController(idCustomer);
+            if (employee != null) {
+                int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
+                if (idCustomer > 0) {
+                    customer = this._customerController.getItemCustomerController(idCustomer);
+                } else {
+                    Person person = new Person(
+                            this.txt_first_name.getText().toUpperCase(),
+                            this.txt_last_name.getText().toUpperCase(),
+                            this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""),
+                            this.txt_email.getText().toLowerCase());
+
+                    customer = new Customer(person, CommonSetting.COMPANY);
+                }
+
+                Device device = new Device(this.txt_brand.getText().toUpperCase(),
+                        this.txt_model.getText().toUpperCase(),
+                        this.txt_serial_number.getText().toUpperCase());
+
+                getOrderModel = new OrderModel(
+                        customer,
+                        device,
+                        employee,
+                        CommonSetting.COMPANY,
+                        Double.parseDouble(this.txt_total.getText()),
+                        Double.parseDouble(this.txt_due.getText()),
+                        "IN PROGRESS", createdDate , null, null);
+
             } else {
-                Person person = new Person(
-                        this.txt_first_name.getText().toUpperCase(),
-                        this.txt_last_name.getText().toUpperCase(),
-                        this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""),
-                        this.txt_email.getText().toLowerCase());
-
-                customer = new Customer(person, CommonSetting.COMPANY);
+                JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
             }
-
-            Device device = new Device(this.txt_brand.getText().toUpperCase(),
-                    this.txt_model.getText().toUpperCase(),
-                    this.txt_serial_number.getText().toUpperCase());
-
-            getOrderModel = new OrderModel(customer,
-                    device,
-                    employee,
-                    CommonSetting.COMPANY,
-                    Double.parseDouble(this.txt_total.getText()),
-                    Double.parseDouble(this.txt_due.getText()),
-                    "IN PROGRESS", createdDate, null, null);
         }
 
         return getOrderModel;
@@ -348,7 +357,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         setTitle("New Order");
         setMaximumSize(new java.awt.Dimension(1049, 700));
         setPreferredSize(new java.awt.Dimension(1050, 650));
-        setSize(new java.awt.Dimension(1050, 650));
 
         panel_order_details.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         panel_order_details.setPreferredSize(new java.awt.Dimension(1026, 607));
@@ -497,6 +505,11 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
         txt_bad_sectors.setNextFocusableComponent(editor_pane_notes);
         txt_bad_sectors.setPreferredSize(new java.awt.Dimension(331, 25));
+        txt_bad_sectors.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_bad_sectorsKeyPressed(evt);
+            }
+        });
 
         lbl_dev_brand_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
         lbl_dev_brand_star.setForeground(java.awt.Color.red);
@@ -531,7 +544,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
                                 .addComponent(lbl_last_name)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_last_name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addComponent(txt_last_name, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))))
                     .addComponent(scroll_pane_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(panel_input_detailLayout.createSequentialGroup()
                         .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -809,7 +822,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        table_view_faults.setShowGrid(false);
         table_view_faults.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 table_view_faultsMouseClicked(evt);
@@ -954,14 +966,14 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1019,7 +1031,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                         }
                     }
                 }
-                
+
                 OrderNote addOrderNote = getOrderNote(addOrder);
                 if (addOrderNote != null) {
 
@@ -1070,11 +1082,20 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_depositKeyReleased
 
     private void btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
-        int confirmCancelling = JOptionPane.showConfirmDialog(null, "Do you really want to cancel ?", "New Order",
-                JOptionPane.YES_NO_OPTION);
-        if (confirmCancelling == 0) {
-            //new MainMenu().setVisible(true);
-        }
+        
+         //Date date = new Date();
+         //SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+         //String currentDate = String.valueOf(new Date());
+         
+         Timestamp time = new Timestamp(new Date().getTime());
+        //Date createdDate = new Timestamp(new Date().getTime());
+        System.out.println("CurrentTime: " + time);
+        
+//        int confirmCancelling = JOptionPane.showConfirmDialog(null, "Do you really want to cancel ?", "New Order",
+//                JOptionPane.YES_NO_OPTION);
+//        if (confirmCancelling == 0) {
+//            //new MainMenu().setVisible(true);
+//        }
     }//GEN-LAST:event_btn_cancelActionPerformed
 
     private void txt_first_nameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_first_nameKeyPressed
@@ -1097,9 +1118,9 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     private void txt_depositKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyPressed
         //Accepts number characters only
         if (Character.isLetter(evt.getKeyChar())) {
-            txt_deposit.setEditable(false);
+            this.txt_deposit.setEditable(false);
         } else {
-            txt_deposit.setEditable(true);
+            this.txt_deposit.setEditable(true);
         }
     }//GEN-LAST:event_txt_depositKeyPressed
 
@@ -1110,7 +1131,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 break;
 
             case KeyEvent.VK_ENTER:
-                txt_last_name.setText(txt_last_name.getText());
+                this.txt_last_name.setText(txt_last_name.getText());
                 break;
             default:
                 EventQueue.invokeLater(() -> {
@@ -1342,6 +1363,14 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         this.txt_search_fault.setText("");
         this._defaultListModelFault.removeAllElements();
     }//GEN-LAST:event_txt_search_faultFocusLost
+
+    private void txt_bad_sectorsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_bad_sectorsKeyPressed
+        if (Character.isLetter(evt.getKeyChar())) {
+            this.txt_bad_sectors.setEditable(false);
+        } else {
+            this.txt_bad_sectors.setEditable(true);
+        }
+    }//GEN-LAST:event_txt_bad_sectorsKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;

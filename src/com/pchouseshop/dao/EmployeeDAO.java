@@ -84,11 +84,11 @@ public class EmployeeDAO {
         return true;
     }
 
-    public boolean deleteEmplyoeeDAO(int pId) {
+    public boolean deleteEmplyoeeDAO(int pEmployeeId) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            Employee cust = _session.find(Employee.class, pId);
+            Employee cust = _session.find(Employee.class, pEmployeeId);
 
             _session.delete(cust);
 
@@ -126,14 +126,14 @@ public class EmployeeDAO {
         return employee;
     }
     
-    public Employee getItemEmployeeDAO(int pIdEmployee) {
+    public Employee getItemEmployeeDAO(int pIdEmployeeId) {
         Employee itemEmployee = null;
         
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             
-            itemEmployee = (Employee)_session.get(Employee.class, pIdEmployee);
+            itemEmployee = (Employee)_session.get(Employee.class, pIdEmployeeId);
             
             _transaction.commit();
 
@@ -145,5 +145,24 @@ public class EmployeeDAO {
         }
         
         return itemEmployee;
+    }
+    
+    public Employee getEmployeeByPassDAO(String pPassStr) {
+         Employee employee = null;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM Employee E WHERE E.password = :password")
+                    .setParameter("password", pPassStr);
+
+            employee = (Employee) query.uniqueResult();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        return employee;
     }
 }

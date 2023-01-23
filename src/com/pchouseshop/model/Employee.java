@@ -81,5 +81,4 @@ public class Employee implements Serializable {
     public void setAccessLevel(String accessLevel) {
         this.accessLevel = accessLevel;
     }
-
 }
