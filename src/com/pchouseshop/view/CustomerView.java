@@ -244,7 +244,6 @@ public class CustomerView extends javax.swing.JInternalFrame {
         setMaximumSize(new java.awt.Dimension(0, 0));
         setMinimumSize(new java.awt.Dimension(0, 0));
         setPreferredSize(new java.awt.Dimension(1050, 650));
-        setSize(new java.awt.Dimension(0, 0));
         setVisible(true);
 
         panel_customers.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -253,7 +252,6 @@ public class CustomerView extends javax.swing.JInternalFrame {
         lbl_search_icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_search_black.png"))); // NOI18N
 
         txt_search_customer.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
-        txt_search_customer.setFocusTraversalKeysEnabled(false);
         txt_search_customer.setMinimumSize(new java.awt.Dimension(80, 32));
         txt_search_customer.setNextFocusableComponent(txt_first_name);
         txt_search_customer.setPreferredSize(new java.awt.Dimension(500, 30));
@@ -297,6 +295,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
             table_view_customers.getColumnModel().getColumn(2).setMaxWidth(250);
             table_view_customers.getColumnModel().getColumn(3).setPreferredWidth(200);
             table_view_customers.getColumnModel().getColumn(3).setMaxWidth(200);
+            table_view_customers.getColumnModel().getColumn(4).setHeaderValue("Email");
             table_view_customers.getColumnModel().getColumn(5).setMinWidth(0);
             table_view_customers.getColumnModel().getColumn(5).setPreferredWidth(0);
             table_view_customers.getColumnModel().getColumn(5).setMaxWidth(0);
@@ -528,7 +527,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_search_customer, javax.swing.GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE))
                     .addComponent(panel_customer_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panel_customer_input, javax.swing.GroupLayout.DEFAULT_SIZE, 1010, Short.MAX_VALUE)
+                    .addComponent(panel_customer_input, javax.swing.GroupLayout.DEFAULT_SIZE, 1020, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
@@ -554,14 +553,14 @@ public class CustomerView extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 1026, Short.MAX_VALUE)
+                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE)
+                .addComponent(panel_customers, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
                 .addContainerGap())
         );
 

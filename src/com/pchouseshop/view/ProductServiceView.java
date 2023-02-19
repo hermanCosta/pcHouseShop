@@ -38,7 +38,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                         new Object[]{
                             prodServ.getIdProductService(),
                             prodServ.getProdServName(),
-                            CommonExtension.getPriceFormat(prodServ.getPrice()),
+                            prodServ.getPrice(),
                             prodServ.getQty(),
                             prodServ.getNote(),
                             prodServ.getCategory()

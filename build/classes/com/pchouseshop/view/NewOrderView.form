@@ -75,7 +75,7 @@
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="layered_pane_list_fault" max="32767" attributes="0"/>
+                              <Component id="layered_pane_list_fault" pref="555" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
@@ -157,16 +157,22 @@
                                   <Group type="102" attributes="0">
                                       <Component id="lbl_contact" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txt_contact" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
-                                      <Component id="btn_international_number" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txt_contact" pref="0" max="32767" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="btn_international_number1" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="btn_seacrh_customer" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btn_copy" min="-2" pref="35" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
                                       <Component id="lbl_last_name" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="txt_last_name" pref="345" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      <Component id="txt_first_name" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -181,26 +187,26 @@
                                   <Component id="lbl_dev_brand_star" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <Component id="lbl_brand" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="32767" attributes="0"/>
                                       <Component id="txt_brand" min="-2" pref="322" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="lbl_model" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txt_model" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
                                       <Component id="lbl_sn" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txt_serial_number" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txt_serial_number" max="32767" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
                                       <Component id="lbl_bad_sectors" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txt_bad_sectors" min="-2" max="-2" attributes="0"/>
+                                      <Component id="spn_bad_sectors" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="lbl_model" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txt_model" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -210,17 +216,19 @@
                               <Component id="txt_email" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="lbl_order_no" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
-                              <Component id="lbl_auto_order_no" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="lbl_order_no" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                                      <Component id="lbl_auto_order_no" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="lbl_first_name_star" min="-2" pref="7" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="lbl_first_name" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="lbl_first_name_star" min="-2" pref="7" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="lbl_first_name" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txt_first_name" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -245,8 +253,8 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="txt_first_name" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_first_name" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="lbl_first_name_star" min="-2" pref="14" max="-2" attributes="0"/>
+                          <Component id="lbl_first_name" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -256,47 +264,55 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btn_copy" min="-2" max="-2" attributes="0"/>
-                          <Component id="btn_international_number" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                              <Component id="lbl_contact" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txt_contact" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="btn_copy" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btn_seacrh_customer" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                      <Component id="lbl_contact" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txt_contact" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="lbl_contact_star" alignment="0" min="-2" pref="14" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="txt_email" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lbl_email" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="txt_brand" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lbl_brand" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lbl_dev_brand_star" alignment="3" min="-2" pref="14" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="txt_model" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lbl_model" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="lbl_dev_model_star" alignment="0" min="-2" pref="14" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="txt_serial_number" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lbl_sn" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lbl_serial_number_star" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="lbl_bad_sectors" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lbl_bad_sectors_star" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="spn_bad_sectors" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                              <Component id="scroll_pane_notes" pref="116" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="lbl_contact_star" alignment="0" min="-2" pref="14" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txt_email" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_email" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txt_brand" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_brand" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_dev_brand_star" alignment="3" min="-2" pref="14" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txt_model" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="lbl_model" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="btn_international_number1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="lbl_dev_model_star" alignment="0" min="-2" pref="14" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txt_serial_number" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_sn" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_serial_number_star" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txt_bad_sectors" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_bad_sectors" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lbl_bad_sectors_star" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="scroll_pane_notes" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
@@ -344,9 +360,6 @@
                   <Dimension value="[339, 25]"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_first_nameKeyPressed"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lbl_last_name">
               <Properties>
@@ -365,9 +378,6 @@
                   <Dimension value="[342, 25]"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_last_nameKeyPressed"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lbl_contact">
               <Properties>
@@ -389,24 +399,21 @@
                   <Dimension value="[224, 25]"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txt_contactActionPerformed"/>
-              </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="btn_international_number">
+            <Component class="javax.swing.JButton" name="btn_seacrh_customer">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="0" green="0" red="0" type="rgb"/>
                 </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/Img/icon_international_number.png"/>
+                  <Image iconType="3" name="/Img/icon_search_customer.png"/>
                 </Property>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[35, 25]"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_international_numberActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_seacrh_customerActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btn_copy">
@@ -505,6 +512,9 @@
                   <Dimension value="[313, 25]"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_serial_numberKeyPressed"/>
+              </Events>
             </Component>
             <Container class="javax.swing.JScrollPane" name="scroll_pane_notes">
               <Properties>
@@ -615,19 +625,6 @@
                 <Property name="text" type="java.lang.String" value="Bad Sectors"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="txt_bad_sectors">
-              <Properties>
-                <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="editor_pane_notes"/>
-                </Property>
-                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[331, 25]"/>
-                </Property>
-              </Properties>
-              <Events>
-                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_bad_sectorsKeyPressed"/>
-              </Events>
-            </Component>
             <Component class="javax.swing.JLabel" name="lbl_dev_brand_star">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -652,6 +649,24 @@
                   <Dimension value="[0, 0]"/>
                 </Property>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btn_international_number1">
+              <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="0" green="0" red="0" type="rgb"/>
+                </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/Img/icon_international_number.png"/>
+                </Property>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[35, 25]"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_international_number1ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JSpinner" name="spn_bad_sectors">
             </Component>
           </SubComponents>
         </Container>

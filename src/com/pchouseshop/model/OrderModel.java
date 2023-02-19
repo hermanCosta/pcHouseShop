@@ -1,7 +1,6 @@
 package com.pchouseshop.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -48,22 +47,25 @@ public class OrderModel implements Serializable {
     @Column(name = "STATUS")
     private String status;
     
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "CREATED")
-    private Timestamp created;
+    private Date created;
     
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "FINISHED")
     private Date finished;
     
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "PICKED")
     private Date picked;
+    
+    @Column(name = "BAD_SECTOR")
+    private int bad_sector;
 
     public OrderModel() {
     }
 
-    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, String status, Timestamp created, Date finished, Date picked) {
+    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, String status, Date created, Date finished, Date picked, int bad_sector) {
         this.customer = customer;
         this.device = device;
         this.employee = employee;
@@ -74,6 +76,7 @@ public class OrderModel implements Serializable {
         this.created = created;
         this.finished = finished;
         this.picked = picked;
+        this.bad_sector = bad_sector;
     }
 
     public int getIdOrder() {
@@ -140,11 +143,11 @@ public class OrderModel implements Serializable {
         this.status = status;
     }
 
-    public Timestamp getCreated() {
+    public Date getCreated() {
         return created;
     }
 
-    public void setCreated(Timestamp created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 
@@ -162,5 +165,13 @@ public class OrderModel implements Serializable {
 
     public void setPicked(Date picked) {
         this.picked = picked;
+    }
+
+    public int getBad_sector() {
+        return bad_sector;
+    }
+
+    public void setBad_sector(int bad_sector) {
+        this.bad_sector = bad_sector;
     }
 }

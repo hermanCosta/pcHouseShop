@@ -49,6 +49,7 @@ public class CompanyDAO {
             _transaction.commit();
 
         } catch (HibernateException e) {
+            System.out.println("CompanyDAO: " + e.getMessage());
         } finally {
             if (_session != null) {
                 _session.close();

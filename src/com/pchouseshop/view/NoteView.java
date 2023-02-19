@@ -2,46 +2,46 @@ package com.pchouseshop.view;
 
 import com.pchouseshop.controllers.EmployeeController;
 import com.pchouseshop.controllers.OrderController;
-import com.pchouseshop.controllers.OrderFaultController;
 import com.pchouseshop.controllers.OrderNoteController;
-import com.pchouseshop.controllers.OrderProdServController;
+import com.pchouseshop.model.Customer;
 import com.pchouseshop.model.Employee;
 import com.pchouseshop.model.OrderModel;
 import com.pchouseshop.model.OrderNote;
-import java.sql.Timestamp;
+import com.pchouseshop.model.Person;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class NoteView extends javax.swing.JDialog {
-
+    
     /* For invoking this JDialog in a JInternalFrame
      NoteView noteView = new NoteView(new MainMenuView(CommonSetting.COMPANY), true);
         noteView.setVisible(true);
      */
-    private final OrderController _orderController;
+    
+    private  final OrderController _orderController;
     private final OrderNoteController _orderNoteController;
     private final EmployeeController _employeeController;
+    NewOrderView _NewOrderView;
 
-    public NoteView(java.awt.Frame parent, boolean modal) {
+    public NoteView(NewOrderView newOrderView, java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
 
         this._orderController = new OrderController();
         this._orderNoteController = new OrderNoteController();
         this._employeeController = new EmployeeController();
+        this._NewOrderView = newOrderView;
     }
 
     private OrderNote getOrderNote(OrderModel order) {
         OrderNote orderNote = null;
         Employee employee = this._employeeController.getItemEmployeeController(4);
-        Date date = new Date();
-        Date createdDate = new Timestamp(date.getTime());
 
         if (this.txt_note_description.getText().trim().isEmpty()) {
             return orderNote;
         } else {
-            orderNote = new OrderNote(order, employee, this.txt_note_description.getText(), createdDate);
+            orderNote = new OrderNote(order, employee, this.txt_note_description.getText(), new Date());
         }
         return orderNote;
     }
@@ -73,6 +73,7 @@ public class NoteView extends javax.swing.JDialog {
         btn_delete = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Note View");
         setModal(true);
 
         panel_notes.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -213,11 +214,14 @@ public class NoteView extends javax.swing.JDialog {
             panel_fault_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_fault_buttonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_fault_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_clear_fields, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_add, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panel_fault_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_clear_fields, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(panel_fault_buttonsLayout.createSequentialGroup()
+                        .addGroup(panel_fault_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btn_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btn_add, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout panel_notesLayout = new javax.swing.GroupLayout(panel_notes);
@@ -307,14 +311,24 @@ public class NoteView extends javax.swing.JDialog {
     }//GEN-LAST:event_txt_search_noteActionPerformed
 
     private void btn_clear_fieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clear_fieldsActionPerformed
-        clearFields();
+        //clearFields();
         //loadFaultListTable();
+        
+        Person person = new Person();
+        person.setFirstName("Herman");
+        person.setLastName("Costa");
+        person.setContactNo("(11) 95423-1558");
+        person.setEmail("hermanhgc@gmail.com");
+        Customer customer = new Customer();
+        customer.setPerson(person);
+        this.dispose();
+        
+        _NewOrderView.setCustomerFields(customer);
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
     private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
 
         OrderModel order = _orderController.getItemOrderController(7);
-
         OrderNote addOrderNote = getOrderNote(order);
         if (addOrderNote != null) {
 

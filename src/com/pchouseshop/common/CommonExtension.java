@@ -6,6 +6,7 @@ import java.awt.event.WindowEvent;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Locale;
@@ -172,4 +173,23 @@ public class CommonExtension {
         }
     }
 
+    public static void autoCompleteTextField(ArrayList<String> list, String text, JTextField field) {
+        String complete = "";
+        int start = text.length();
+        int last = text.length();
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).startsWith(text)) {
+                complete = list.get(i);
+                last = complete.length();
+                break;
+            }
+        }
+
+        if (last > start) {
+            field.setText(complete);
+            field.setCaretPosition(last);
+            field.moveCaretPosition(start);
+        }
+    }
 }

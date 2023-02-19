@@ -33,7 +33,7 @@ public class OrderNote implements Serializable {
     @Column(name = "note")
     private String note;
 
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "CREATED")
     private Date created;
 

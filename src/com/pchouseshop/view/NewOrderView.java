@@ -4,13 +4,13 @@ import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.CustomerController;
 import com.pchouseshop.controllers.DepositController;
+import com.pchouseshop.controllers.DeviceController;
 import com.pchouseshop.controllers.EmployeeController;
 import com.pchouseshop.controllers.FaultController;
 import com.pchouseshop.controllers.OrderController;
 import com.pchouseshop.controllers.OrderFaultController;
 import com.pchouseshop.controllers.OrderNoteController;
 import com.pchouseshop.controllers.OrderProdServController;
-import com.pchouseshop.controllers.PersonController;
 import com.pchouseshop.controllers.ProductServiceController;
 import com.pchouseshop.model.Customer;
 import com.pchouseshop.model.Deposit;
@@ -23,6 +23,7 @@ import com.pchouseshop.model.OrderNote;
 import com.pchouseshop.model.OrderProdServ;
 import com.pchouseshop.model.Person;
 import com.pchouseshop.model.ProductService;
+import com.pchouseshop.view.modal.CustomerModal;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -34,7 +35,6 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
@@ -47,12 +47,12 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     private final ProductServiceController _productServiceController;
     private final FaultController _faultController;
     private final CustomerController _customerController;
-    private final PersonController _personController;
     private final DepositController _depositController;
     private final EmployeeController _employeeController;
     private final OrderProdServController _orderProdServController;
     private final OrderFaultController _orderFaultController;
     private final OrderNoteController _orderNoteController;
+    private final DeviceController _deviceController;
     private final DefaultTableModel _dtmProdServ;
     private final DefaultTableModel _dtmFault;
     private final DefaultListModel _defaultListModelProdServ;
@@ -62,7 +62,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         initComponents();
 
         //avoid auto old value by focus loosing
-        txt_contact.setFocusLostBehavior(JFormattedTextField.PERSIST);
+        this.txt_contact.setFocusLostBehavior(JFormattedTextField.PERSIST);
 
         CommonExtension.checkEmailFormat(this.txt_email);
         CommonSetting.requestTxtFocus(txt_first_name);
@@ -73,12 +73,12 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         this._productServiceController = new ProductServiceController();
         this._faultController = new FaultController();
         this._customerController = new CustomerController();
-        this._personController = new PersonController();
         this._depositController = new DepositController();
         this._employeeController = new EmployeeController();
         this._orderProdServController = new OrderProdServController();
         this._orderFaultController = new OrderFaultController();
         this._orderNoteController = new OrderNoteController();
+        this._deviceController = new DeviceController();
         this._dtmProdServ = (DefaultTableModel) this.table_view_products.getModel();
         this._dtmFault = (DefaultTableModel) this.table_view_faults.getModel();
         this._defaultListModelProdServ = new DefaultListModel();
@@ -87,7 +87,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         this.list_fault_search.setModel(_defaultListModelFault);
 
         generateOrderId();
-
     }
 
     private void generateOrderId() {
@@ -96,6 +95,19 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         String nextId = String.format("%06d", orderId);
         this.lbl_auto_order_no.setText(String.valueOf(nextId));
         //System.out.println("next ID: " + String.format("%06d", orderId++));
+    }
+
+    public void setCustomerFields(Customer customer) {
+        if (customer != null) {
+            this.txt_contact.setFormatterFactory(null);
+            this.hdn_txt_customer_id.setText(String.valueOf(customer.getIdCustomer()));
+            this.txt_first_name.setText(customer.getPerson().getFirstName());
+            this.txt_last_name.setText(customer.getPerson().getLastName());
+            this.txt_contact.setText(customer.getPerson().getContactNo());
+            this.txt_email.setText(customer.getPerson().getEmail());
+
+            this.txt_brand.requestFocus();
+        }
     }
 
     private void searchFault() {
@@ -134,26 +146,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         this.txt_due.setText(this.txt_total.getText());
     }
 
-    private void autoCompleteFromDb(ArrayList list, String text, JTextField field) {
-        String complete = "";
-        int start = text.length();
-        int last = text.length();
-
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).toString().startsWith(text)) {
-                complete = list.get(i).toString();
-                last = complete.length();
-                break;
-            }
-        }
-
-        if (last > start) {
-            field.setText(complete);
-            field.setCaretPosition(last);
-            field.moveCaretPosition(start);
-        }
-    }
-
     private void clearFields() {
         this.hdn_txt_customer_id.setText("");
         this.txt_first_name.setText("");
@@ -177,13 +169,9 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
     private OrderModel getOrderFields() {
         OrderModel getOrderModel = null;
-        Customer customer;
-        String password = CommonExtension.requestUserPassword();
-        Employee employee = _employeeController.getEmployeeByPassDAO(password);
-//        Date date = new Date();
-        Timestamp createdDate = new Timestamp(new Date().getTime());
-//                 SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-//         String createdDate = formatDate.format(new Date());
+        Customer customer = null;
+        String password;
+        Employee employee;
 
         if (this.txt_first_name.getText().trim().isEmpty() || this.txt_last_name.getText().trim().isEmpty()
                 || this.txt_contact.getText().trim().isEmpty() || this.txt_brand.getText().trim().isEmpty()
@@ -193,18 +181,44 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
             return getOrderModel;
         } else {
+            password = CommonExtension.requestUserPassword();
+            employee = _employeeController.getEmployeeByPassDAO(password);
             if (employee != null) {
+
                 int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
+
                 if (idCustomer > 0) {
                     customer = this._customerController.getItemCustomerController(idCustomer);
-                } else {
-                    Person person = new Person(
-                            this.txt_first_name.getText().toUpperCase(),
-                            this.txt_last_name.getText().toUpperCase(),
-                            this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""),
-                            this.txt_email.getText().toLowerCase());
+//                    if (customer.getPerson().getFirstName().equals(this.txt_first_name.getText())
+//                            || customer.getPerson().getLastName().equals(this.txt_last_name.getText())
+//                            || customer.getPerson().getContactNo().equals(this.txt_contact.getText())
+//                            || customer.getPerson().getEmail().equals(this.txt_email.getText())) {
+//
+//                        this.hdn_txt_customer_id.setText("");
+//                    }
 
-                    customer = new Customer(person, CommonSetting.COMPANY);
+                } 
+                else {
+
+                    Customer searchCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
+
+                    if (searchCustomer != null) {
+                        JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
+
+                        CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
+                        customerModal.setVisible(true);
+
+                        return getOrderModel;
+                    } else {
+
+                        Person person = new Person(
+                                this.txt_first_name.getText().toUpperCase(),
+                                this.txt_last_name.getText().toUpperCase(),
+                                this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""),
+                                this.txt_email.getText().toLowerCase());
+
+                        customer = new Customer(person, CommonSetting.COMPANY);
+                    }
                 }
 
                 Device device = new Device(this.txt_brand.getText().toUpperCase(),
@@ -218,7 +232,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                         CommonSetting.COMPANY,
                         Double.parseDouble(this.txt_total.getText()),
                         Double.parseDouble(this.txt_due.getText()),
-                        "IN PROGRESS", createdDate , null, null);
+                        "IN PROGRESS", new Date(), null, null, (int) this.spn_bad_sectors.getValue());
 
             } else {
                 JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
@@ -306,7 +320,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         txt_last_name = new javax.swing.JTextField();
         lbl_contact = new javax.swing.JLabel();
         txt_contact = new javax.swing.JFormattedTextField();
-        btn_international_number = new javax.swing.JButton();
+        btn_seacrh_customer = new javax.swing.JButton();
         btn_copy = new javax.swing.JButton();
         lbl_email = new javax.swing.JLabel();
         txt_email = new javax.swing.JTextField();
@@ -325,9 +339,10 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         lbl_serial_number_star = new javax.swing.JLabel();
         lbl_bad_sectors_star = new javax.swing.JLabel();
         lbl_bad_sectors = new javax.swing.JLabel();
-        txt_bad_sectors = new javax.swing.JTextField();
         lbl_dev_brand_star = new javax.swing.JLabel();
         hdn_txt_customer_id = new javax.swing.JTextField();
+        btn_international_number1 = new javax.swing.JButton();
+        spn_bad_sectors = new javax.swing.JSpinner();
         panel_total_amount = new javax.swing.JPanel();
         lbl_total = new javax.swing.JLabel();
         txt_total = new javax.swing.JTextField();
@@ -375,22 +390,12 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         txt_first_name.setFocusCycleRoot(true);
         txt_first_name.setNextFocusableComponent(txt_last_name);
         txt_first_name.setPreferredSize(new java.awt.Dimension(339, 25));
-        txt_first_name.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_first_nameKeyPressed(evt);
-            }
-        });
 
         lbl_last_name.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         lbl_last_name.setText("Last Name");
 
         txt_last_name.setNextFocusableComponent(txt_contact);
         txt_last_name.setPreferredSize(new java.awt.Dimension(342, 25));
-        txt_last_name.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_last_nameKeyPressed(evt);
-            }
-        });
 
         lbl_contact.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         lbl_contact.setText("Contact No.");
@@ -402,18 +407,13 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         }
         txt_contact.setNextFocusableComponent(txt_email);
         txt_contact.setPreferredSize(new java.awt.Dimension(224, 25));
-        txt_contact.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_contactActionPerformed(evt);
-            }
-        });
 
-        btn_international_number.setBackground(new java.awt.Color(0, 0, 0));
-        btn_international_number.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_international_number.png"))); // NOI18N
-        btn_international_number.setPreferredSize(new java.awt.Dimension(35, 25));
-        btn_international_number.addActionListener(new java.awt.event.ActionListener() {
+        btn_seacrh_customer.setBackground(new java.awt.Color(0, 0, 0));
+        btn_seacrh_customer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_search_customer.png"))); // NOI18N
+        btn_seacrh_customer.setPreferredSize(new java.awt.Dimension(35, 25));
+        btn_seacrh_customer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_international_numberActionPerformed(evt);
+                btn_seacrh_customerActionPerformed(evt);
             }
         });
 
@@ -460,6 +460,11 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
         txt_serial_number.setNextFocusableComponent(editor_pane_notes);
         txt_serial_number.setPreferredSize(new java.awt.Dimension(313, 25));
+        txt_serial_number.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_serial_numberKeyPressed(evt);
+            }
+        });
 
         scroll_pane_notes.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll_pane_notes.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -503,14 +508,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         lbl_bad_sectors.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         lbl_bad_sectors.setText("Bad Sectors");
 
-        txt_bad_sectors.setNextFocusableComponent(editor_pane_notes);
-        txt_bad_sectors.setPreferredSize(new java.awt.Dimension(331, 25));
-        txt_bad_sectors.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_bad_sectorsKeyPressed(evt);
-            }
-        });
-
         lbl_dev_brand_star.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
         lbl_dev_brand_star.setForeground(java.awt.Color.red);
         lbl_dev_brand_star.setText("*");
@@ -519,6 +516,15 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         hdn_txt_customer_id.setEnabled(false);
         hdn_txt_customer_id.setMinimumSize(new java.awt.Dimension(80, 32));
         hdn_txt_customer_id.setPreferredSize(new java.awt.Dimension(0, 0));
+
+        btn_international_number1.setBackground(new java.awt.Color(0, 0, 0));
+        btn_international_number1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_international_number.png"))); // NOI18N
+        btn_international_number1.setPreferredSize(new java.awt.Dimension(35, 25));
+        btn_international_number1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_international_number1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panel_input_detailLayout = new javax.swing.GroupLayout(panel_input_detail);
         panel_input_detail.setLayout(panel_input_detailLayout);
@@ -536,15 +542,20 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
                                 .addComponent(lbl_contact)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btn_international_number1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_seacrh_customer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
                                 .addComponent(lbl_last_name)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_last_name, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))))
+                                .addComponent(txt_last_name, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(scroll_pane_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(panel_input_detailLayout.createSequentialGroup()
                         .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -554,38 +565,38 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                                 .addComponent(lbl_dev_model_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(lbl_dev_brand_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
                                 .addComponent(lbl_brand)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(txt_brand, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
-                                .addComponent(lbl_model)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_model, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panel_input_detailLayout.createSequentialGroup()
                                 .addComponent(lbl_sn)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_serial_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txt_serial_number, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
                                 .addComponent(lbl_bad_sectors)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_bad_sectors, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(spn_bad_sectors))
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_model)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_model, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(panel_input_detailLayout.createSequentialGroup()
                         .addComponent(lbl_email)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_email, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(panel_input_detailLayout.createSequentialGroup()
-                        .addComponent(lbl_order_no)
-                        .addGap(7, 7, 7)
-                        .addComponent(lbl_auto_order_no)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panel_input_detailLayout.createSequentialGroup()
-                        .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lbl_first_name)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_order_no)
+                                .addGap(7, 7, 7)
+                                .addComponent(lbl_auto_order_no))
+                            .addGroup(panel_input_detailLayout.createSequentialGroup()
+                                .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lbl_first_name)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panel_input_detailLayout.createSequentialGroup()
@@ -603,8 +614,8 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_first_name)
-                    .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_first_name))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lbl_last_name)
@@ -612,39 +623,44 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                     .addComponent(lbl_last_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_international_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(lbl_contact)
-                        .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbl_contact_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_email))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_brand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_brand)
-                    .addComponent(lbl_dev_brand_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txt_model, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lbl_model))
-                    .addComponent(lbl_dev_model_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_serial_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_sn)
-                    .addComponent(lbl_serial_number_star))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_bad_sectors, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_bad_sectors)
-                    .addComponent(lbl_bad_sectors_star))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroll_pane_notes)
+                    .addGroup(panel_input_detailLayout.createSequentialGroup()
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btn_copy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btn_seacrh_customer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(lbl_contact)
+                                .addComponent(txt_contact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lbl_contact_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_email))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_brand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_brand)
+                            .addComponent(lbl_dev_brand_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(txt_model, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lbl_model))
+                            .addComponent(lbl_dev_model_star, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_serial_number, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_sn)
+                            .addComponent(lbl_serial_number_star))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbl_bad_sectors)
+                            .addComponent(lbl_bad_sectors_star)
+                            .addComponent(spn_bad_sectors, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(7, 7, 7)
+                        .addComponent(scroll_pane_notes, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE))
+                    .addGroup(panel_input_detailLayout.createSequentialGroup()
+                        .addComponent(btn_international_number1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_input_detailLayout.createSequentialGroup()
@@ -920,7 +936,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                             .addComponent(panel_total_amount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(layered_pane_list_fault)
+                            .addComponent(layered_pane_list_fault, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
                             .addGroup(panel_order_detailsLayout.createSequentialGroup()
                                 .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(panel_order_detailsLayout.createSequentialGroup()
@@ -985,15 +1001,11 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
         boolean isAdded = false;
         if (addOrder != null) {
-            if (addOrder.getCustomer().getIdCustomer() == 0) {
-                int idCustomerAdded = this._customerController.addCustomerController(addOrder.getCustomer());
 
-                if (idCustomerAdded > 0) {
-                    isAdded = true;
-                } else {
-                    JOptionPane.showMessageDialog(this, addOrder.getCustomer().getPerson().getFirstName() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+            Device device = _deviceController.searchDeviceBySerialNumberController(addOrder.getDevice().getSerialNumber());
+            if (device != null) {
+                addOrder.setDevice(device);
+                isAdded = true;
             }
 
             int idOrderAdded = this._orderController.addOrderController(addOrder);
@@ -1082,38 +1094,24 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_depositKeyReleased
 
     private void btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
-        
-         //Date date = new Date();
-         //SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-         //String currentDate = String.valueOf(new Date());
-         
-         Timestamp time = new Timestamp(new Date().getTime());
-        //Date createdDate = new Timestamp(new Date().getTime());
-        System.out.println("CurrentTime: " + time);
-        
+
+        Customer searchCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
+        if (searchCustomer != null) {
+            JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
+
+            CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
+            customerModal.setVisible(true);
+
+        }
+
+        //NoteView noteView = new NoteView(this, true);
+        //noteView.setVisible(true);
 //        int confirmCancelling = JOptionPane.showConfirmDialog(null, "Do you really want to cancel ?", "New Order",
 //                JOptionPane.YES_NO_OPTION);
 //        if (confirmCancelling == 0) {
 //            //new MainMenu().setVisible(true);
 //        }
     }//GEN-LAST:event_btn_cancelActionPerformed
-
-    private void txt_first_nameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_first_nameKeyPressed
-        //Sugest autoComplete firstNames from Database
-        switch (evt.getKeyCode()) {
-            case KeyEvent.VK_BACK_SPACE:
-                break;
-
-            case KeyEvent.VK_ENTER:
-                txt_first_name.setText(txt_first_name.getText());
-                break;
-            default:
-                EventQueue.invokeLater(() -> {
-                    String text = txt_first_name.getText();
-                    //autoCompleteFromDb(firstNames, text, txt_first_name);
-                });
-        }
-    }//GEN-LAST:event_txt_first_nameKeyPressed
 
     private void txt_depositKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyPressed
         //Accepts number characters only
@@ -1124,53 +1122,39 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_depositKeyPressed
 
-    private void txt_last_nameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_last_nameKeyPressed
-        //Sugest autoComplete firstNames from Database
-        switch (evt.getKeyCode()) {
-            case KeyEvent.VK_BACK_SPACE:
-                break;
-
-            case KeyEvent.VK_ENTER:
-                this.txt_last_name.setText(txt_last_name.getText());
-                break;
-            default:
-                EventQueue.invokeLater(() -> {
-                    String text = txt_last_name.getText();
-                    //autoCompleteFromDb(lastNames, text, txt_last_name);
-                });
-        }
-    }//GEN-LAST:event_txt_last_nameKeyPressed
-
     private void txt_brandKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_brandKeyPressed
         //Suggest autoComplete brand from Database
-        switch (evt.getKeyCode()) {
-            case KeyEvent.VK_BACK_SPACE:
-                break;
+        ArrayList<String> listBrand = _deviceController.searchBrandController(this.txt_brand.getText().toUpperCase());
 
-            case KeyEvent.VK_ENTER:
-                txt_brand.setText(txt_brand.getText());
-                break;
-            default:
-                EventQueue.invokeLater(() -> {
-                    String text = txt_brand.getText();
-                    //autoCompleteFromDb(brands, text, txt_brand);
-                });
+        if (listBrand != null) {
+            switch (evt.getKeyCode()) {
+                case KeyEvent.VK_BACK_SPACE:
+                    break;
+
+                case KeyEvent.VK_ENTER:
+                    txt_brand.setText(this.txt_brand.getText());
+                    break;
+                default:
+                    EventQueue.invokeLater(() -> {
+                        CommonExtension.autoCompleteTextField(listBrand, this.txt_brand.getText(), this.txt_brand);
+                    });
+            }
         }
     }//GEN-LAST:event_txt_brandKeyPressed
 
     private void txt_modelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_modelKeyPressed
         //Suggest autoComplete model from Database
+        ArrayList<String> listModel = _deviceController.searchModelController(this.txt_brand.getText().toUpperCase(), this.txt_model.getText().toUpperCase());
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_BACK_SPACE:
                 break;
 
             case KeyEvent.VK_ENTER:
-                txt_model.setText(txt_model.getText());
+                txt_model.setText(this.txt_model.getText());
                 break;
             default:
                 EventQueue.invokeLater(() -> {
-                    String text = txt_model.getText();
-                    //autoCompleteFromDb(models, text, txt_model);
+                    CommonExtension.autoCompleteTextField(listModel, this.txt_model.getText(), this.txt_model);
                 });
         }
     }//GEN-LAST:event_txt_modelKeyPressed
@@ -1213,20 +1197,10 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         searchFault();
     }//GEN-LAST:event_txt_search_faultKeyReleased
 
-    private void btn_international_numberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_international_numberActionPerformed
-        if (this.txt_contact.getFormatterFactory() != null) {
-            this.txt_contact.setFormatterFactory(null);
-            this.txt_contact.setText("+");
-            this.txt_contact.requestFocus();
-        } else {
-            this.txt_contact.setText("");
-            try {
-                this.txt_contact.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("(0##) ###-####")));
-            } catch (java.text.ParseException ex) {
-            }
-            this.txt_contact.requestFocus();
-        }
-    }//GEN-LAST:event_btn_international_numberActionPerformed
+    private void btn_seacrh_customerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seacrh_customerActionPerformed
+        CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, null);
+        customerModal.setVisible(true);
+    }//GEN-LAST:event_btn_seacrh_customerActionPerformed
 
     private void btn_copyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_copyActionPerformed
         StringSelection stringSelection = new StringSelection(txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
@@ -1234,26 +1208,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
         }
     }//GEN-LAST:event_btn_copyActionPerformed
-
-    private void txt_contactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_contactActionPerformed
-        if (!this.txt_contact.getText().trim().isEmpty()) {
-            Person person = _personController.searchPesonByContactNoController(this.txt_contact.getText());
-
-            if (person != null) {
-                Customer customer = _customerController.getCustomerController(person);
-
-                this.hdn_txt_customer_id.setText(String.valueOf(customer.getIdCustomer()));
-                this.txt_first_name.setText(customer.getPerson().getFirstName());
-                this.txt_last_name.setText(customer.getPerson().getLastName());
-                this.txt_contact.setText(customer.getPerson().getContactNo());
-                this.txt_email.setText(customer.getPerson().getEmail());
-
-                this.txt_brand.requestFocus();
-            } else {
-                this.txt_first_name.requestFocus();
-            }
-        }
-    }//GEN-LAST:event_txt_contactActionPerformed
 
     private void table_view_faultsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_faultsMouseClicked
         if (evt.getClickCount() == 2) {
@@ -1364,19 +1318,44 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         this._defaultListModelFault.removeAllElements();
     }//GEN-LAST:event_txt_search_faultFocusLost
 
-    private void txt_bad_sectorsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_bad_sectorsKeyPressed
-        if (Character.isLetter(evt.getKeyChar())) {
-            this.txt_bad_sectors.setEditable(false);
+    private void btn_international_number1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_international_number1ActionPerformed
+        if (this.txt_contact.getFormatterFactory() != null) {
+            this.txt_contact.setFormatterFactory(null);
+            this.txt_contact.setText("+");
+            this.txt_contact.requestFocus();
         } else {
-            this.txt_bad_sectors.setEditable(true);
+            this.txt_contact.setText("");
+            try {
+                this.txt_contact.setFormatterFactory(new DefaultFormatterFactory(new MaskFormatter("(0##) ###-####")));
+            } catch (java.text.ParseException ex) {
+            }
+            this.txt_contact.requestFocus();
         }
-    }//GEN-LAST:event_txt_bad_sectorsKeyPressed
+    }//GEN-LAST:event_btn_international_number1ActionPerformed
+
+    private void txt_serial_numberKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_serial_numberKeyPressed
+        //Suggest autoComplete model from Database
+        ArrayList<String> listSerialNumber = _deviceController.searchSerialNumberController(this.txt_brand.getText().toUpperCase(), this.txt_serial_number.getText().toUpperCase());
+        switch (evt.getKeyCode()) {
+            case KeyEvent.VK_BACK_SPACE:
+                break;
+
+            case KeyEvent.VK_ENTER:
+                this.txt_serial_number.setText(this.txt_serial_number.getText());
+                break;
+            default:
+                EventQueue.invokeLater(() -> {
+                    CommonExtension.autoCompleteTextField(listSerialNumber, this.txt_serial_number.getText(), this.txt_serial_number);
+                });
+        }
+    }//GEN-LAST:event_txt_serial_numberKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
     private javax.swing.JButton btn_copy;
-    private javax.swing.JButton btn_international_number;
+    private javax.swing.JButton btn_international_number1;
     private javax.swing.JButton btn_save_order;
+    private javax.swing.JButton btn_seacrh_customer;
     private javax.swing.JEditorPane editor_pane_notes;
     private javax.swing.JTextField hdn_txt_customer_id;
     private javax.swing.JLayeredPane layered_pane_list_fault;
@@ -1412,9 +1391,9 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane scroll_pane_faults;
     private javax.swing.JScrollPane scroll_pane_notes;
     private javax.swing.JScrollPane scroll_pane_products;
+    private javax.swing.JSpinner spn_bad_sectors;
     private javax.swing.JTable table_view_faults;
     private javax.swing.JTable table_view_products;
-    private javax.swing.JTextField txt_bad_sectors;
     private javax.swing.JTextField txt_brand;
     private javax.swing.JFormattedTextField txt_contact;
     private javax.swing.JTextField txt_deposit;

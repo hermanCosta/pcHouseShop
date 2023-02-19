@@ -26,6 +26,8 @@ public class HibernateUtil {
                 sessionFactory = metadata.getSessionFactoryBuilder().build();
 
             } catch (Exception e) {
+                System.out.println("Session factory ERROR: ");
+                e.printStackTrace();
                 if (registry != null) {
                     StandardServiceRegistryBuilder.destroy(registry);
                 }

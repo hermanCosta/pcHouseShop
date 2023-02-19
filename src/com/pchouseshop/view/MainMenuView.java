@@ -20,7 +20,7 @@ public class MainMenuView extends javax.swing.JFrame {
         CommonSetting.MAIN_MENU_DESKTOP_PANE = this.desktop_pane_menu;
         CommonSetting.ID_COMPANY = this._company.getIdCompany();
         CommonSetting.COMPANY = company;
-
+        
         //makeFrameFullSize(this);
         loadHeaderDetails();
     }
@@ -28,6 +28,10 @@ public class MainMenuView extends javax.swing.JFrame {
     private static void makeFrameFullSize(JFrame aFrame) {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         aFrame.setSize(screenSize.width, screenSize.height);
+    }
+
+    MainMenuView() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public void loadHeaderDetails() {
@@ -341,6 +345,7 @@ public class MainMenuView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void menu_item_new_orderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_new_orderActionPerformed
+       //Customer customer = null;
         NewOrderView newOrderView = new NewOrderView();
         //NewOrderViewTeste newOrderView = new NewOrderViewTeste();
         this.desktop_pane_menu.removeAll();

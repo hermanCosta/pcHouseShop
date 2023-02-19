@@ -140,6 +140,7 @@ public class CustomerDAO {
             if (_session != null) {
                 _session.close();
             }
+            
         }
         
         return itemCustomer;
@@ -150,7 +151,7 @@ public class CustomerDAO {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            Query query = _session.createQuery("FROM Customer C WHERE C.person.idPerson = (FROM Person P WHERE P.contactNo = :pContactNo)")
+            Query query = _session.createQuery("FROM Customer C WHERE C.person.idPerson = (SELECT DISTINCT P.idPerson FROM Person P WHERE P.contactNo = :pContactNo)")
                     .setParameter("pContactNo", pContactNo);
 
             customer = (Customer) query.uniqueResult();
