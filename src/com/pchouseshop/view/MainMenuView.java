@@ -242,6 +242,11 @@ public class MainMenuView extends javax.swing.JFrame {
 
         menu_item_orders.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, 0));
         menu_item_orders.setText("Orders");
+        menu_item_orders.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menu_item_ordersActionPerformed(evt);
+            }
+        });
         menu_consult.add(menu_item_orders);
 
         menu_item_products.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F5, 0));
@@ -325,7 +330,7 @@ public class MainMenuView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(desktop_pane_menu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(desktop_pane_menu, javax.swing.GroupLayout.DEFAULT_SIZE, 1034, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panel_menu_side, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -335,8 +340,8 @@ public class MainMenuView extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panel_menu_side, javax.swing.GroupLayout.DEFAULT_SIZE, 649, Short.MAX_VALUE)
-                    .addComponent(desktop_pane_menu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(panel_menu_side, javax.swing.GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
+                    .addComponent(desktop_pane_menu, javax.swing.GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE))
                 .addGap(20, 20, 20))
         );
 
@@ -426,6 +431,13 @@ public class MainMenuView extends javax.swing.JFrame {
         this.desktop_pane_menu.add(customView).setVisible(true);
         CommonSetting.setMaxInternalFrame(customView);
     }//GEN-LAST:event_menu_item_customActionPerformed
+
+    private void menu_item_ordersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menu_item_ordersActionPerformed
+        OrderListView orderView = new OrderListView();
+        this.desktop_pane_menu.removeAll();
+        this.desktop_pane_menu.add(orderView).setVisible(true);
+        CommonSetting.setMaxInternalFrame(orderView);
+    }//GEN-LAST:event_menu_item_ordersActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane desktop_pane_menu;

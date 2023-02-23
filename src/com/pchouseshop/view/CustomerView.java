@@ -78,6 +78,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
                     this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""),
                     this.txt_email.getText().toLowerCase());
 
+            person.setIdPerson(CommonExtension.setIdExtension(this.hdn_txt_person_id));
             getCustomer = new Customer(person, CommonSetting.COMPANY);
 
             int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
@@ -90,6 +91,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
     private void setCustomerFields(Customer pCustomer) {
         this.txt_contact.setFormatterFactory(null);
         this.hdn_txt_customer_id.setText(String.valueOf(pCustomer.getIdCustomer()));
+        this.hdn_txt_person_id.setText(String.valueOf(pCustomer.getPerson().getIdPerson()));
         this.txt_first_name.setText(pCustomer.getPerson().getFirstName());
         this.txt_last_name.setText(pCustomer.getPerson().getLastName());
         this.txt_contact.setText(pCustomer.getPerson().getContactNo());
@@ -150,6 +152,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
     private void cleanFields() {
         this.hdn_txt_customer_id.setText("");
+        this.hdn_txt_person_id.setText("");
         this.txt_first_name.setText("");
         this.txt_last_name.setText("");
         this.txt_contact.setText("");
@@ -230,6 +233,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         lbl_first_name_star = new javax.swing.JLabel();
         lbl_last_name_star = new javax.swing.JLabel();
         lbl_contact_star = new javax.swing.JLabel();
+        hdn_txt_person_id = new javax.swing.JTextField();
         panel_customer_buttons = new javax.swing.JPanel();
         btn_add = new javax.swing.JButton();
         btn_update = new javax.swing.JButton();
@@ -372,6 +376,11 @@ public class CustomerView extends javax.swing.JInternalFrame {
         lbl_contact_star.setForeground(java.awt.Color.red);
         lbl_contact_star.setText("*");
 
+        hdn_txt_person_id.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        hdn_txt_person_id.setEnabled(false);
+        hdn_txt_person_id.setMinimumSize(new java.awt.Dimension(80, 32));
+        hdn_txt_person_id.setPreferredSize(new java.awt.Dimension(0, 0));
+
         javax.swing.GroupLayout panel_customer_inputLayout = new javax.swing.GroupLayout(panel_customer_input);
         panel_customer_input.setLayout(panel_customer_inputLayout);
         panel_customer_inputLayout.setHorizontalGroup(
@@ -411,6 +420,11 @@ public class CustomerView extends javax.swing.JInternalFrame {
                                 .addComponent(txt_last_name, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(531, Short.MAX_VALUE))
+            .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                    .addGap(16, 16, 16)
+                    .addComponent(hdn_txt_person_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(1000, Short.MAX_VALUE)))
         );
         panel_customer_inputLayout.setVerticalGroup(
             panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -440,6 +454,11 @@ public class CustomerView extends javax.swing.JInternalFrame {
                     .addComponent(lbl_email)
                     .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
+            .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                    .addGap(16, 16, 16)
+                    .addComponent(hdn_txt_person_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(121, Short.MAX_VALUE)))
         );
 
         panel_customer_buttons.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -605,7 +624,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
             String firstName = this._dtmCustomer.getValueAt(selectedRow, 1).toString();
 
             int confirmDeletion = JOptionPane.showConfirmDialog(this, "Do you really want to delete '"
-                    + firstName +" ?", "Delete Customer", JOptionPane.YES_NO_OPTION);
+                    + firstName + " ?", "Delete Customer", JOptionPane.YES_NO_OPTION);
 
             if (confirmDeletion == 0) {
                 boolean isDeleted = _customerController.deleteCustomerController(deleteCustomer.getIdCustomer());
@@ -647,6 +666,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         Customer updateCustomer = this.getCustomerFields();
         if (updateCustomer != null) {
             if (updateCustomer.getIdCustomer() > 0) {
+
                 int confirmEditing = JOptionPane.showConfirmDialog(null, "Confirm Editing " + updateCustomer.getPerson().getFirstName() + " ?",
                         "Edit Customer", JOptionPane.YES_NO_OPTION);
 
@@ -669,14 +689,24 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
         if (addCustomer != null) {
             if (addCustomer.getIdCustomer() == 0) {
-                int idCustomerAdded = this._customerController.addCustomerController(addCustomer);
-                if (idCustomerAdded > 0) {
-                    JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " added successfully!");
 
-                    getItemCustomer(idCustomerAdded);
-                    cleanFields();
+                Customer checkCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
+
+                if (checkCustomer != null) {
+                    JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Customer", JOptionPane.WARNING_MESSAGE);
+
+                    getItemCustomer(checkCustomer.getIdCustomer());
                 } else {
-                    JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+
+                    int idCustomerAdded = this._customerController.addCustomerController(addCustomer);
+                    if (idCustomerAdded > 0) {
+                        JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " added successfully!");
+
+                        getItemCustomer(idCustomerAdded);
+                        cleanFields();
+                    } else {
+                        JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         }
@@ -690,6 +720,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
     private javax.swing.JButton btn_international_number;
     private javax.swing.JButton btn_update;
     private javax.swing.JTextField hdn_txt_customer_id;
+    private javax.swing.JTextField hdn_txt_person_id;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbl_contact;
     private javax.swing.JLabel lbl_contact_star;

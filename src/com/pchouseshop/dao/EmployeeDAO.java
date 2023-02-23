@@ -165,4 +165,23 @@ public class EmployeeDAO {
         }
         return employee;
     }
+    
+   public Employee searchEmployeeByContactNoDAO(String pContactNo) {
+        Employee employee = null;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM Employee E WHERE E.person.idPerson = (SELECT DISTINCT P.idPerson FROM Person P WHERE P.contactNo = :pContactNo)")
+                    .setParameter("pContactNo", pContactNo);
+
+            employee = (Employee) query.uniqueResult();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        return employee;
+    }
 }

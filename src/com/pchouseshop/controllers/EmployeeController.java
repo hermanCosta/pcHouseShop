@@ -36,4 +36,8 @@ public class EmployeeController {
     public Employee getEmployeeByPassDAO(String pPassStr) {
         return EMPLOYEE_DAO.getEmployeeByPassDAO(pPassStr);
     }
+
+    public Employee searchEmployeeByContactNoDAO(String pContactNo) {
+        return EMPLOYEE_DAO.searchEmployeeByContactNoDAO(pContactNo);
+    }
 }

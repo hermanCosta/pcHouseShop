@@ -101,6 +101,8 @@ public class CustomerModal extends javax.swing.JDialog {
                     this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""),
                     this.txt_email.getText().toLowerCase());
 
+            person.setIdPerson(CommonExtension.setIdExtension(this.hdn_txt_person_id));
+            
             getCustomer = new Customer(person, CommonSetting.COMPANY);
 
             int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
@@ -112,6 +114,7 @@ public class CustomerModal extends javax.swing.JDialog {
 
     private void setCustomerFields(Customer pCustomer) {
         this.txt_contact.setFormatterFactory(null);
+        this.hdn_txt_person_id.setText(String.valueOf(pCustomer.getPerson().getIdPerson()));
         this.hdn_txt_customer_id.setText(String.valueOf(pCustomer.getIdCustomer()));
         this.txt_first_name.setText(pCustomer.getPerson().getFirstName());
         this.txt_last_name.setText(pCustomer.getPerson().getLastName());
@@ -173,6 +176,7 @@ public class CustomerModal extends javax.swing.JDialog {
 
     private void cleanFields() {
         this.hdn_txt_customer_id.setText("");
+        this.hdn_txt_person_id.setText("");
         this.txt_first_name.setText("");
         this.txt_last_name.setText("");
         this.txt_contact.setText("");
@@ -253,8 +257,9 @@ public class CustomerModal extends javax.swing.JDialog {
         lbl_first_name_star = new javax.swing.JLabel();
         lbl_last_name_star = new javax.swing.JLabel();
         lbl_contact_star = new javax.swing.JLabel();
+        hdn_txt_person_id = new javax.swing.JTextField();
         panel_customer_buttons = new javax.swing.JPanel();
-        btn_add = new javax.swing.JButton();
+        btn_select = new javax.swing.JButton();
         btn_update = new javax.swing.JButton();
         btn_clear_fields = new javax.swing.JButton();
 
@@ -375,6 +380,11 @@ public class CustomerModal extends javax.swing.JDialog {
         lbl_contact_star.setForeground(java.awt.Color.red);
         lbl_contact_star.setText("*");
 
+        hdn_txt_person_id.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        hdn_txt_person_id.setEnabled(false);
+        hdn_txt_person_id.setMinimumSize(new java.awt.Dimension(80, 32));
+        hdn_txt_person_id.setPreferredSize(new java.awt.Dimension(0, 0));
+
         javax.swing.GroupLayout panel_customer_inputLayout = new javax.swing.GroupLayout(panel_customer_input);
         panel_customer_input.setLayout(panel_customer_inputLayout);
         panel_customer_inputLayout.setHorizontalGroup(
@@ -416,6 +426,11 @@ public class CustomerModal extends javax.swing.JDialog {
                         .addComponent(lbl_email)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))))
+            .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                    .addGap(16, 16, 16)
+                    .addComponent(hdn_txt_person_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(552, Short.MAX_VALUE)))
         );
         panel_customer_inputLayout.setVerticalGroup(
             panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -446,18 +461,23 @@ public class CustomerModal extends javax.swing.JDialog {
                     .addComponent(lbl_email)
                     .addComponent(txt_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
+            .addGroup(panel_customer_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panel_customer_inputLayout.createSequentialGroup()
+                    .addGap(16, 16, 16)
+                    .addComponent(hdn_txt_person_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(122, Short.MAX_VALUE)))
         );
 
         panel_customer_buttons.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        btn_add.setBackground(new java.awt.Color(21, 76, 121));
-        btn_add.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
-        btn_add.setForeground(new java.awt.Color(255, 255, 255));
-        btn_add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_select_customer.png"))); // NOI18N
-        btn_add.setText("Select");
-        btn_add.addActionListener(new java.awt.event.ActionListener() {
+        btn_select.setBackground(new java.awt.Color(21, 76, 121));
+        btn_select.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        btn_select.setForeground(new java.awt.Color(255, 255, 255));
+        btn_select.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_select_customer.png"))); // NOI18N
+        btn_select.setText("Select");
+        btn_select.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_addActionPerformed(evt);
+                btn_selectActionPerformed(evt);
             }
         });
 
@@ -489,7 +509,7 @@ public class CustomerModal extends javax.swing.JDialog {
             panel_customer_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_customer_buttonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btn_add)
+                .addComponent(btn_select)
                 .addGap(18, 18, 18)
                 .addComponent(btn_update)
                 .addGap(18, 18, 18)
@@ -501,7 +521,7 @@ public class CustomerModal extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_customer_buttonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_customer_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_add, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btn_select, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btn_update, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btn_clear_fields, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -573,9 +593,9 @@ public class CustomerModal extends javax.swing.JDialog {
                     this._dtmCustomer.getValueAt(selectedRow, 2).toString(),
                     this._dtmCustomer.getValueAt(selectedRow, 3).toString(),
                     this._dtmCustomer.getValueAt(selectedRow, 4).toString());
-
+            
             updatePerson.setIdPerson((Integer) this._dtmCustomer.getValueAt(selectedRow, 5));
-
+            
             Customer updateCustomer = new Customer(updatePerson, CommonSetting.COMPANY);
             updateCustomer.setIdCustomer((int) this._dtmCustomer.getValueAt(selectedRow, 0));
 
@@ -605,7 +625,7 @@ public class CustomerModal extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btn_copyActionPerformed
 
-    private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
+    private void btn_selectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_selectActionPerformed
         int selectedRow = this.table_view_customers.getSelectedRow();
 
         if (selectedRow >= 0) {
@@ -624,13 +644,13 @@ public class CustomerModal extends javax.swing.JDialog {
             _newOrderView.setCustomerFields(useCustomer);
             this.dispose();
         }
-    }//GEN-LAST:event_btn_addActionPerformed
+    }//GEN-LAST:event_btn_selectActionPerformed
 
     private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
         Customer updateCustomer = this.getCustomerFields();
         if (updateCustomer != null) {
             if (updateCustomer.getIdCustomer() > 0) {
-                int confirmEditing = JOptionPane.showConfirmDialog(null, "Confirm Editing " + updateCustomer.getPerson().getFirstName() + " ?",
+                int confirmEditing = JOptionPane.showConfirmDialog(this, "Confirm Editing " + updateCustomer.getPerson().getFirstName() + " ?",
                         "Edit Customer", JOptionPane.YES_NO_OPTION);
 
                 if (confirmEditing == 0) {
@@ -653,12 +673,13 @@ public class CustomerModal extends javax.swing.JDialog {
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_add;
     private javax.swing.JButton btn_clear_fields;
     private javax.swing.JButton btn_copy;
     private javax.swing.JButton btn_international_number;
+    private javax.swing.JButton btn_select;
     private javax.swing.JButton btn_update;
     private javax.swing.JTextField hdn_txt_customer_id;
+    private javax.swing.JTextField hdn_txt_person_id;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbl_contact;
     private javax.swing.JLabel lbl_contact_star;

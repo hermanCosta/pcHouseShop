@@ -60,7 +60,7 @@ public class OrderProdServ implements Serializable {
         this.order = order;
     }
 
-    public ProductService getListProdServ() {
+    public ProductService getProdServ() {
         return prodServ;
     }
 

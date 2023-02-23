@@ -143,7 +143,7 @@ public class CommonExtension {
         String encodePassword = "";
         JOptionPane op = new JOptionPane(passwordPanel, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-        JDialog dlg = op.createDialog("User Password ?");
+        JDialog dlg = op.createDialog("User Authentication");
 
         // Wire up FocusListener to ensure JPasswordField is able to request focus when the dialog is first shown.
         dlg.addWindowFocusListener(new WindowAdapter() {

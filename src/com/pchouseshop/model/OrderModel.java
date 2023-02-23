@@ -62,10 +62,13 @@ public class OrderModel implements Serializable {
     @Column(name = "BAD_SECTOR")
     private int bad_sector;
 
+    @Column(name = "NOTE")
+    private String note;
+    
     public OrderModel() {
     }
 
-    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, String status, Date created, Date finished, Date picked, int bad_sector) {
+    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, String status, Date created, Date finished, Date picked, int bad_sector, String note) {
         this.customer = customer;
         this.device = device;
         this.employee = employee;
@@ -77,6 +80,7 @@ public class OrderModel implements Serializable {
         this.finished = finished;
         this.picked = picked;
         this.bad_sector = bad_sector;
+        this.note = note;
     }
 
     public int getIdOrder() {
@@ -173,5 +177,13 @@ public class OrderModel implements Serializable {
 
     public void setBad_sector(int bad_sector) {
         this.bad_sector = bad_sector;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

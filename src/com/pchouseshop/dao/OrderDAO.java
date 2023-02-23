@@ -1,7 +1,9 @@
 package com.pchouseshop.dao;
 
 import com.pchouseshop.connection.HibernateUtil;
+import com.pchouseshop.model.Company;
 import com.pchouseshop.model.OrderModel;
+import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,6 +15,7 @@ public class OrderDAO {
     Session _session = null;
     SessionFactory _sessionFactory = HibernateUtil.getSessionFactory();
     Transaction _transaction;
+    List<OrderModel> _listOrder = null;
 
     public Integer getLastOrderIdDAO() {
         Integer orderId = 0;
@@ -38,10 +41,10 @@ public class OrderDAO {
 
         return orderId;
     }
-    
+
     public Integer addOrderDAO(OrderModel pOrder) {
         Integer idOrderAdded = 0;
-        
+
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
@@ -54,19 +57,19 @@ public class OrderDAO {
                 _session.close();
             }
         }
-         
+
         return idOrderAdded;
     }
-    
-     public OrderModel getItemOrderDAO(int pIdOrder) {
+
+    public OrderModel getItemOrderDAO(int pIdOrder) {
         OrderModel itemOrder = null;
-        
+
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            
-            itemOrder = (OrderModel)_session.get(OrderModel.class, pIdOrder);
-            
+
+            itemOrder = (OrderModel) _session.get(OrderModel.class, pIdOrder);
+
             _transaction.commit();
 
         } catch (HibernateException e) {
@@ -75,7 +78,54 @@ public class OrderDAO {
                 _session.close();
             }
         }
-        
+
         return itemOrder;
+    }
+
+    public List<OrderModel> getAllOrderDAO(Company pCompany) {
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM OrderModel O WHERE O.company = :pCompany ORDER BY O.created DESC")
+                    .setParameter("pCompany", pCompany);
+
+            _listOrder = query.getResultList();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return _listOrder;
+    }
+    
+    public List<OrderModel> searchOrderDAO(Company pCompany, String pSearch) {
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("SELECT DISTINCT O FROM OrderModel O, Customer C, Person P, Device D "
+                    + "WHERE O.company = :pCompany "
+                    + "AND ((O.customer = C AND C.person = P AND P.firstName LIKE :pSearch) "
+                    + "OR (O.customer = C AND C.person = P AND P.lastName LIKE :pSearch) "
+                    + "OR (O.customer = C AND C.person = P AND P.contactNo LIKE :pSearch) "
+                    + "OR (O.customer = C AND C.person = P AND P.email LIKE :pSearch) "
+                    + "OR (O.device = D AND D.brand LIKE :pSearch) "
+                    + "OR (O.device = D AND D.model LIKE :pSearch) "
+                    + "OR (O.device = D AND D.serialNumber LIKE :pSearch)"
+                    + "OR O.idOrder LIKE :pSearch)")
+                    .setParameter("pCompany", pCompany)
+                    .setParameter("pSearch", "%" + pSearch + "%");
+            _listOrder = query.getResultList();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return _listOrder;
     }
 }

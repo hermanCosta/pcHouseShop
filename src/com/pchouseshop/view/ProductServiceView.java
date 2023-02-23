@@ -66,9 +66,9 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                             }
                     );
                 });
-            } else {
-                loadProdServListTable();
             }
+        } else {
+            loadProdServListTable();
         }
     }
 

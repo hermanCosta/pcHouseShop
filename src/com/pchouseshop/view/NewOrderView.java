@@ -172,6 +172,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         Customer customer = null;
         String password;
         Employee employee;
+        boolean isCustAdded = true;
 
         if (this.txt_first_name.getText().trim().isEmpty() || this.txt_last_name.getText().trim().isEmpty()
                 || this.txt_contact.getText().trim().isEmpty() || this.txt_brand.getText().trim().isEmpty()
@@ -189,23 +190,23 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
                 if (idCustomer > 0) {
                     customer = this._customerController.getItemCustomerController(idCustomer);
-//                    if (customer.getPerson().getFirstName().equals(this.txt_first_name.getText())
-//                            || customer.getPerson().getLastName().equals(this.txt_last_name.getText())
-//                            || customer.getPerson().getContactNo().equals(this.txt_contact.getText())
-//                            || customer.getPerson().getEmail().equals(this.txt_email.getText())) {
-//
-//                        this.hdn_txt_customer_id.setText("");
-//                    }
+                    if (customer.getPerson().getFirstName().equals(this.txt_first_name.getText())
+                            || customer.getPerson().getLastName().equals(this.txt_last_name.getText())
+                            || customer.getPerson().getContactNo().equals(this.txt_contact.getText())
+                            || customer.getPerson().getEmail().equals(this.txt_email.getText())) {
 
-                } 
-                else {
+                        isCustAdded = false;
+                    }
+                }
 
-                    Customer searchCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
+                if (!isCustAdded) {
 
-                    if (searchCustomer != null) {
+                    Customer checkCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
+
+                    if (checkCustomer != null) {
                         JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
 
-                        CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
+                        CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, checkCustomer);
                         customerModal.setVisible(true);
 
                         return getOrderModel;
@@ -232,7 +233,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                         CommonSetting.COMPANY,
                         Double.parseDouble(this.txt_total.getText()),
                         Double.parseDouble(this.txt_due.getText()),
-                        "IN PROGRESS", new Date(), null, null, (int) this.spn_bad_sectors.getValue());
+                        "IN PROGRESS", new Date(), null, null, (int) this.spn_bad_sectors.getValue(), this.editor_pane_notes.getText());
 
             } else {
                 JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
@@ -827,11 +828,11 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "ID", "Fault Description", ""
+                "ID", "Fault Description"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -848,8 +849,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             table_view_faults.getColumnModel().getColumn(0).setMinWidth(0);
             table_view_faults.getColumnModel().getColumn(0).setPreferredWidth(0);
             table_view_faults.getColumnModel().getColumn(0).setMaxWidth(0);
-            table_view_faults.getColumnModel().getColumn(2).setPreferredWidth(30);
-            table_view_faults.getColumnModel().getColumn(2).setMaxWidth(30);
         }
 
         layered_pane_list_fault.add(scroll_pane_faults, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 545, 231));
@@ -1044,19 +1043,6 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                     }
                 }
 
-                OrderNote addOrderNote = getOrderNote(addOrder);
-                if (addOrderNote != null) {
-
-                    int idNoteAdded = _orderNoteController.addOrderNoteController(addOrderNote);
-                    if (idNoteAdded > 0) {
-                        isAdded = true;
-                    } else {
-                        isAdded = false;
-                        System.out.println("Erro to add notes");
-                        return;
-                    }
-                }
-
                 if (!this.txt_deposit.getText().trim().isEmpty()) {
                     Deposit deposit = new Deposit(addOrder, Double.parseDouble(this.txt_deposit.getText()));
                     int idDepositAdded = this._depositController.addDepositController(deposit);
@@ -1094,16 +1080,37 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_depositKeyReleased
 
     private void btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
+        boolean isCustAdded = true;
+        int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
+        Customer customer = null;
 
-        Customer searchCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
-        if (searchCustomer != null) {
-            JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
+        if (idCustomer > 0) {
+            customer = this._customerController.getItemCustomerController(idCustomer);
+            if (!customer.getPerson().getFirstName().equals(this.txt_first_name.getText())
+                    || !customer.getPerson().getLastName().equals(this.txt_last_name.getText())
+                    || !customer.getPerson().getContactNo().equals(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""))
+                    || !customer.getPerson().getEmail().equals(this.txt_email.getText())) {
 
-            CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
-            customerModal.setVisible(true);
-
+                isCustAdded = false;
+            }
         }
 
+        if (!isCustAdded) {
+
+            Customer searchCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
+
+            if (searchCustomer != null) {
+                JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
+
+                CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
+                customerModal.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "New Customer will be added", "New Order", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Customer is the same from DB", "New Order", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("Customer: " + customer);
+        }
         //NoteView noteView = new NoteView(this, true);
         //noteView.setVisible(true);
 //        int confirmCancelling = JOptionPane.showConfirmDialog(null, "Do you really want to cancel ?", "New Order",
