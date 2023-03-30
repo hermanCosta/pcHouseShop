@@ -130,7 +130,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         }
     }
 
-    private void getItemCustomer(int idCustomer) {
+    private void getItemCustomer(long idCustomer) {
         if (idCustomer != 0) {
             Customer customerItem = _customerController.getItemCustomerController(idCustomer);
 
@@ -698,7 +698,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
                     getItemCustomer(checkCustomer.getIdCustomer());
                 } else {
 
-                    int idCustomerAdded = this._customerController.addCustomerController(addCustomer);
+                    long idCustomerAdded = this._customerController.addCustomerController(addCustomer);
                     if (idCustomerAdded > 0) {
                         JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " added successfully!");
 

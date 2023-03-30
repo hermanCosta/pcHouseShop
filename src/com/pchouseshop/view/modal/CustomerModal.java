@@ -7,6 +7,7 @@ import com.pchouseshop.controllers.OrderController;
 import com.pchouseshop.controllers.PersonController;
 import com.pchouseshop.model.Customer;
 import com.pchouseshop.model.Person;
+import com.pchouseshop.view.CreatedOrderView;
 import com.pchouseshop.view.NewOrderView;
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -25,20 +26,22 @@ import javax.swing.text.MaskFormatter;
 
 public class CustomerModal extends javax.swing.JDialog {
 
-    NewOrderView _newOrderView;
+    private Customer _customer;
+    private NewOrderView _newOrderView;
+    private CreatedOrderView _createdOrderView;
     public final OrderController _orderController;
     private final DefaultTableModel _dtmCustomer;
     private final CustomerController _customerController;
     private List<Customer> _listCustomer;
-    private Customer _customer;
 
-    public CustomerModal(NewOrderView newOrderView, java.awt.Frame parent, boolean modal, Customer customer) {
+    public CustomerModal(NewOrderView newOrderView, CreatedOrderView createdOrderView, java.awt.Frame parent, boolean modal, Customer customer) {
         super(parent, modal);
         initComponents();
 
         CommonSetting.tableSettings(this.table_view_customers);
 
         this._newOrderView = newOrderView;
+        this._createdOrderView = createdOrderView;
         this.txt_contact.setFocusLostBehavior(JFormattedTextField.PERSIST);
 
         this._orderController = new OrderController();
@@ -154,7 +157,7 @@ public class CustomerModal extends javax.swing.JDialog {
         }
     }
 
-    private void getItemCustomer(int idCustomer) {
+    private void getItemCustomer(long idCustomer) {
         if (idCustomer != 0) {
             Customer customerItem = _customerController.getItemCustomerController(idCustomer);
 
@@ -597,7 +600,7 @@ public class CustomerModal extends javax.swing.JDialog {
             updatePerson.setIdPerson((Integer) this._dtmCustomer.getValueAt(selectedRow, 5));
             
             Customer updateCustomer = new Customer(updatePerson, CommonSetting.COMPANY);
-            updateCustomer.setIdCustomer((int) this._dtmCustomer.getValueAt(selectedRow, 0));
+            updateCustomer.setIdCustomer((long) this._dtmCustomer.getValueAt(selectedRow, 0));
 
             setCustomerFields(updateCustomer);
         }
@@ -639,9 +642,13 @@ public class CustomerModal extends javax.swing.JDialog {
             usePerson.setIdPerson((Integer) this._dtmCustomer.getValueAt(selectedRow, 5));
 
             Customer useCustomer = new Customer(usePerson, CommonSetting.COMPANY);
-            useCustomer.setIdCustomer((Integer) this._dtmCustomer.getValueAt(selectedRow, 0));
-
-            _newOrderView.setCustomerFields(useCustomer);
+            useCustomer.setIdCustomer((long) this._dtmCustomer.getValueAt(selectedRow, 0));
+            
+            if (_newOrderView != null) {
+                _newOrderView.setCustomerFields(useCustomer);
+            } else {
+                _createdOrderView.setCustomerFields(useCustomer);
+            }
             this.dispose();
         }
     }//GEN-LAST:event_btn_selectActionPerformed

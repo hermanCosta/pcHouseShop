@@ -9,7 +9,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class Deposit_ {
 
 	public static volatile SingularAttribute<Deposit, Double> amount;
-	public static volatile SingularAttribute<Deposit, Integer> idDeposit;
+	public static volatile SingularAttribute<Deposit, Long> idDeposit;
 	public static volatile SingularAttribute<Deposit, OrderModel> order;
 
 	public static final String AMOUNT = "amount";

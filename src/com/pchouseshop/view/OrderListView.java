@@ -216,9 +216,9 @@ public class OrderListView extends javax.swing.JInternalFrame {
 
             CommonSetting.MAIN_MENU_DESKTOP_PANE.removeAll();
             switch (orderModel.getStatus()) {
-                case "IN PROGRESS":
+                case IN_PROGRESS:
                     CreatedOrderView createdOrderView = new CreatedOrderView(orderModel, listOrderFault, listOrderProdServ, listOrderDeposit);
-                    
+                     
                     CommonSetting.MAIN_MENU_DESKTOP_PANE.add(createdOrderView).setVisible(true);
                     CommonSetting.setMaxInternalFrame(createdOrderView);
                 break;

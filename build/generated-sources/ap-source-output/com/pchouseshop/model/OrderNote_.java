@@ -9,7 +9,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(OrderNote.class)
 public abstract class OrderNote_ {
 
-	public static volatile SingularAttribute<OrderNote, Integer> idOrderNote;
+	public static volatile SingularAttribute<OrderNote, Long> idOrderNote;
 	public static volatile SingularAttribute<OrderNote, String> note;
 	public static volatile SingularAttribute<OrderNote, Date> created;
 	public static volatile SingularAttribute<OrderNote, Employee> employee;

@@ -17,14 +17,14 @@ public class OrderProdServDAO {
     Transaction _transaction;
     List<OrderProdServ> _listOrderProdServ;
 
-    public Integer addOrderProdServDAO(OrderProdServ pOrderProdServ) {
-        Integer idOrderProdServAdded = 0;
+    public long addOrderProdServDAO(OrderProdServ pOrderProdServ) {
+        long idOrderProdServAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             idOrderProdServAdded = (Integer) _session.save(pOrderProdServ);
-
+            
             _transaction.commit();
         } catch (HibernateException e) {
         } finally {
@@ -54,4 +54,28 @@ public class OrderProdServDAO {
 
         return _listOrderProdServ;
     }
+    
+    public int deleteOrderProdServDAO(long pIdOrderProdServ) {
+        int result = 0;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            
+            Query query = _session.createQuery("DELETE FROM OrderProdServ O WHERE O.idOrderProdServ = :pIdOrderProdServ")
+                    .setParameter("pIdOrderProdServ", pIdOrderProdServ);
+            
+            
+            result = query.executeUpdate();
+            
+            _transaction.commit();
+            
+        } catch (Exception e) {
+        } finally {
+            if(_session != null) {
+            _session.close();
+            }
+        }
+        
+        return result;
+    } 
 }

@@ -28,6 +28,14 @@ public class CommonExtension {
             return Integer.parseInt(jTextField.getText());
         }
     }
+    
+    public static long setLongIdExtension(Object object) {
+        if (object == null) {
+            return 0;
+        } else {
+            return (long) object;
+        }
+    }
 
     public static String joinCustomFields(JTextField jLabelField, JTextField jTextField) {
         String strCustom = "";

@@ -1,10 +1,13 @@
 package com.pchouseshop.model;
 
+import Enum.OrderStatus;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -44,8 +47,9 @@ public class OrderModel implements Serializable {
     @Column(name = "DUE")
     private double due;
     
+    @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
-    private String status;
+    private OrderStatus status;
     
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(name = "CREATED")
@@ -68,7 +72,7 @@ public class OrderModel implements Serializable {
     public OrderModel() {
     }
 
-    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, String status, Date created, Date finished, Date picked, int bad_sector, String note) {
+    public OrderModel(Customer customer, Device device, Employee employee, Company company, double total, double due, OrderStatus status, Date created, Date finished, Date picked, int bad_sector, String note) {
         this.customer = customer;
         this.device = device;
         this.employee = employee;
@@ -139,11 +143,11 @@ public class OrderModel implements Serializable {
         this.due = due;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 

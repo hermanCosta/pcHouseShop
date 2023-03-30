@@ -18,7 +18,7 @@ public class OrderProdServ implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ORDER_PROD_SERV")
-    private Integer idOrderProdServ;
+    private long idOrderProdServ;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_ORDER", referencedColumnName = "ID_ORDER")
@@ -44,11 +44,11 @@ public class OrderProdServ implements Serializable {
         this.total = total;
     }
 
-    public Integer getIdOrderProdServ() {
+    public long getIdOrderProdServ() {
         return idOrderProdServ;
     }
 
-    public void setIdOrderProdServ(Integer idOrderProdServ) {
+    public void setIdOrderProdServ(long idOrderProdServ) {
         this.idOrderProdServ = idOrderProdServ;
     }
 

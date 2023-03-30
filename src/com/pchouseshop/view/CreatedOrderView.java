@@ -1,5 +1,7 @@
 package com.pchouseshop.view;
 
+import Enum.OrderStatus;
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.CustomerController;
@@ -24,6 +26,7 @@ import com.pchouseshop.model.OrderProdServ;
 import com.pchouseshop.model.Person;
 import com.pchouseshop.model.ProductService;
 import com.pchouseshop.view.modal.CustomerModal;
+import com.pchouseshop.view.modal.NoteModal;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -58,6 +61,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     private final DefaultListModel _defaultListModelProdServ;
     private final DefaultListModel _defaultListModelFault;
 
+    private OrderModel _orderModel;
+
     public CreatedOrderView(OrderModel orderModel, List<OrderFault> listOrderFault, List<OrderProdServ> listOrderProdServ, List<Deposit> listOrderDeposit) {
         initComponents();
 
@@ -86,6 +91,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         this.list_prod_serv_search.setModel(_defaultListModelProdServ);
         this.list_fault_search.setModel(_defaultListModelFault);
 
+        this._orderModel = orderModel;
         loadOrderFields(orderModel, listOrderFault, listOrderProdServ, listOrderDeposit);
     }
 
@@ -93,39 +99,51 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         setCustomerFields(orderModel.getCustomer());
         setDeviceFields(orderModel.getDevice());
 
-        this.lbl_auto_order_no.setText(String.valueOf(orderModel.getIdOrder()));
+        this.lbl_auto_order_no.setText(String.format("%06d", orderModel.getIdOrder()));
         this.spn_bad_sectors.setValue(orderModel.getBad_sector());
         this.editor_pane_notes.setText(orderModel.getNote());
         this.txt_total.setText(String.valueOf(orderModel.getTotal()));
         this.txt_due.setText(String.valueOf(orderModel.getDue()));
-        
+
+        loadOrderDeposit(listOrderDeposit);
+        loadOrderFault(listOrderFault);
+        loadOrderProdServ(listOrderProdServ);
+    }
+
+    private void loadOrderDeposit(List<Deposit> listOrderDeposit) {
         if (listOrderDeposit != null) {
             double totalDeposit = 0;
             for (Deposit orderDeposit : listOrderDeposit) {
-               totalDeposit += orderDeposit.getAmount();
+                totalDeposit += orderDeposit.getAmount();
             }
             this.txt_deposit.setText(String.valueOf(totalDeposit));
         }
-        
+    }
+
+    private void loadOrderFault(List<OrderFault> listOrderFault) {
         if (listOrderFault != null) {
             _dtmFault.setRowCount(0);
-            for (OrderFault fault : listOrderFault) {
-                _dtmFault.addRow(
-                        new Object[]{
-                            fault.getIdOrderFault(),
-                            fault.getFault()
-                        });
+            for (OrderFault orderFault : listOrderFault) {
+                _dtmFault.addRow(new Object[]{
+                    orderFault.getFault().getIdFault(),
+                    orderFault.getFault().getDescription(),
+                    orderFault.getIdOrderFault()
+                });
             }
         }
-        
+    }
+
+    private void loadOrderProdServ(List<OrderProdServ> listOrderProdServ) {
         if (listOrderProdServ != null) {
             _dtmProdServ.setRowCount(0);
-            for (OrderProdServ prodServ : listOrderProdServ) {
-                _dtmProdServ.addRow(new Object[] {
-                    prodServ.getIdOrderProdServ(),
-                    prodServ.getProdServ().getProdServName(),
-                    prodServ.getQty(),
-                    prodServ.getTotal()
+            for (OrderProdServ orderProdServ : listOrderProdServ) {
+                _dtmProdServ.addRow(new Object[]{
+                    orderProdServ.getProdServ().getIdProductService(),
+                    orderProdServ.getProdServ().getProdServName(),
+                    orderProdServ.getQty(),
+                    orderProdServ.getProdServ().getPrice(),
+                    orderProdServ.getTotal(),
+                    orderProdServ.getIdOrderProdServ()
                 });
             }
         }
@@ -191,19 +209,18 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     private OrderModel getOrderFields() {
         OrderModel getOrderModel = null;
         Customer customer = null;
-        String password;
         Employee employee;
-        boolean isCustAdded = true;
+        boolean isNewCustomer = true;
 
         if (this.txt_first_name.getText().trim().isEmpty() || this.txt_last_name.getText().trim().isEmpty()
                 || this.txt_contact.getText().trim().isEmpty() || this.txt_brand.getText().trim().isEmpty()
                 || this.txt_model.getText().trim().isEmpty() || this.txt_serial_number.getText().trim().isEmpty()
                 || this.table_view_products.getRowCount() == 0 || this.table_view_faults.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Please, check Empty fields !", "New Order", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please, check Empty fields !", "Update Order", JOptionPane.ERROR_MESSAGE);
 
             return getOrderModel;
         } else {
-            password = CommonExtension.requestUserPassword();
+            String password = CommonExtension.requestUserPassword();
             employee = _employeeController.getEmployeeByPassDAO(password);
             if (employee != null) {
 
@@ -216,18 +233,18 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                             || customer.getPerson().getContactNo().equals(this.txt_contact.getText())
                             || customer.getPerson().getEmail().equals(this.txt_email.getText())) {
 
-                        isCustAdded = false;
+                        isNewCustomer = false;
                     }
                 }
 
-                if (!isCustAdded) {
+                if (isNewCustomer) {
 
                     Customer checkCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
 
                     if (checkCustomer != null) {
-                        JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "Update Order", JOptionPane.WARNING_MESSAGE);
 
-                        CustomerModal customerModal = new CustomerModal(null, new MainMenuView(CommonSetting.COMPANY), true, checkCustomer);
+                        CustomerModal customerModal = new CustomerModal(null, this, new MainMenuView(CommonSetting.COMPANY), true, checkCustomer);
                         customerModal.setVisible(true);
 
                         return getOrderModel;
@@ -254,12 +271,14 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                         CommonSetting.COMPANY,
                         Double.parseDouble(this.txt_total.getText()),
                         Double.parseDouble(this.txt_due.getText()),
-                        "IN PROGRESS", 
-                        new Date(), 
-                        null, 
-                        null, 
-                        (int) this.spn_bad_sectors.getValue(), 
+                        OrderStatus.IN_PROGRESS,
+                        new Date(),
+                        null,
+                        null,
+                        (int) this.spn_bad_sectors.getValue(),
                         this.editor_pane_notes.getText());
+
+                getOrderModel.setIdOrder(Integer.valueOf(this.lbl_auto_order_no.getText()));
 
             } else {
                 JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
@@ -288,6 +307,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 orderProdServItem.setProdServ(prodServItem);
                 orderProdServItem.setQty(Integer.parseInt(_dtmProdServ.getValueAt(i, 2).toString()));
                 orderProdServItem.setTotal(Double.parseDouble(_dtmProdServ.getValueAt(i, 3).toString()));
+                orderProdServItem.setIdOrderProdServ(CommonExtension.setLongIdExtension(this._dtmProdServ.getValueAt(i, 5)));
 
                 listOrderProdServ.add(orderProdServItem);
             }
@@ -312,6 +332,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 
                 orderFaultItem.setOrder(order);
                 orderFaultItem.setFault(faultItem);
+                orderFaultItem.setIdOrderFault(CommonExtension.setLongIdExtension(this._dtmFault.getValueAt(i, 2)));
 
                 listOrderFault.add(orderFaultItem);
             }
@@ -379,7 +400,10 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         txt_due = new javax.swing.JTextField();
         panel_order_buttons = new javax.swing.JPanel();
         btn_save_order = new javax.swing.JButton();
-        btn_cancel = new javax.swing.JButton();
+        btn_print = new javax.swing.JButton();
+        btn_notes = new javax.swing.JButton();
+        btn_fix = new javax.swing.JButton();
+        btn_not_fix = new javax.swing.JButton();
         txt_search_fault = new javax.swing.JTextField();
         lbl_search_fault_icon = new javax.swing.JLabel();
         layered_pane_list_fault = new javax.swing.JLayeredPane();
@@ -784,15 +808,51 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             }
         });
 
-        btn_cancel.setBackground(new java.awt.Color(21, 76, 121));
-        btn_cancel.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
-        btn_cancel.setForeground(new java.awt.Color(255, 255, 255));
-        btn_cancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_cancel.png"))); // NOI18N
-        btn_cancel.setText("Cancel");
-        btn_cancel.setNextFocusableComponent(txt_first_name);
-        btn_cancel.addActionListener(new java.awt.event.ActionListener() {
+        btn_print.setBackground(new java.awt.Color(21, 76, 121));
+        btn_print.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        btn_print.setForeground(new java.awt.Color(255, 255, 255));
+        btn_print.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_print.png"))); // NOI18N
+        btn_print.setText("Print");
+        btn_print.setNextFocusableComponent(txt_first_name);
+        btn_print.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_cancelActionPerformed(evt);
+                btn_printActionPerformed(evt);
+            }
+        });
+
+        btn_notes.setBackground(new java.awt.Color(21, 76, 121));
+        btn_notes.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        btn_notes.setForeground(new java.awt.Color(255, 255, 255));
+        btn_notes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_notes.png"))); // NOI18N
+        btn_notes.setText("Notes");
+        btn_notes.setNextFocusableComponent(txt_first_name);
+        btn_notes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_notesActionPerformed(evt);
+            }
+        });
+
+        btn_fix.setBackground(new java.awt.Color(0, 153, 102));
+        btn_fix.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        btn_fix.setForeground(new java.awt.Color(255, 255, 255));
+        btn_fix.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_fix_order.png"))); // NOI18N
+        btn_fix.setText("Fixed");
+        btn_fix.setNextFocusableComponent(txt_first_name);
+        btn_fix.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_fixActionPerformed(evt);
+            }
+        });
+
+        btn_not_fix.setBackground(new java.awt.Color(255, 51, 51));
+        btn_not_fix.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        btn_not_fix.setForeground(new java.awt.Color(255, 255, 255));
+        btn_not_fix.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_not_fix.png"))); // NOI18N
+        btn_not_fix.setText("Not Fixed");
+        btn_not_fix.setNextFocusableComponent(txt_first_name);
+        btn_not_fix.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_not_fixActionPerformed(evt);
             }
         });
 
@@ -804,7 +864,13 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(btn_save_order)
                 .addGap(18, 18, 18)
-                .addComponent(btn_cancel)
+                .addComponent(btn_print)
+                .addGap(18, 18, 18)
+                .addComponent(btn_notes)
+                .addGap(18, 18, 18)
+                .addComponent(btn_fix)
+                .addGap(18, 18, 18)
+                .addComponent(btn_not_fix)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_order_buttonsLayout.setVerticalGroup(
@@ -813,7 +879,10 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(panel_order_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_save_order)
-                    .addComponent(btn_cancel))
+                    .addComponent(btn_print)
+                    .addComponent(btn_notes)
+                    .addComponent(btn_fix)
+                    .addComponent(btn_not_fix))
                 .addContainerGap())
         );
 
@@ -854,7 +923,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "ID", "Fault Description", ""
+                "ID", "Fault Description", "OrderFaultID"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -865,6 +934,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
+        table_view_faults.setToolTipText(CommonConstant.TBL_REMOVE_ITEM_TOOL_TIP);
         table_view_faults.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 table_view_faultsMouseClicked(evt);
@@ -875,9 +945,9 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             table_view_faults.getColumnModel().getColumn(0).setMinWidth(0);
             table_view_faults.getColumnModel().getColumn(0).setPreferredWidth(0);
             table_view_faults.getColumnModel().getColumn(0).setMaxWidth(0);
-            table_view_faults.getColumnModel().getColumn(2).setPreferredWidth(30);
-            table_view_faults.getColumnModel().getColumn(2).setMaxWidth(30);
-            table_view_faults.getColumnModel().getColumn(2).setHeaderValue("");
+            table_view_faults.getColumnModel().getColumn(2).setMinWidth(0);
+            table_view_faults.getColumnModel().getColumn(2).setPreferredWidth(0);
+            table_view_faults.getColumnModel().getColumn(2).setMaxWidth(0);
         }
 
         layered_pane_list_fault.add(scroll_pane_faults, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 545, 231));
@@ -914,17 +984,18 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "ID", "Product | Service", "Qty", "Unit €", "Total €"
+                "ID", "Product | Service", "Qty", "Unit €", "Total €", "OrderProdServId"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true, true, false
+                false, false, true, true, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
+        table_view_products.setToolTipText(CommonConstant.TBL_REMOVE_ITEM_TOOL_TIP);
         table_view_products.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 table_view_productsMouseClicked(evt);
@@ -946,6 +1017,9 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             table_view_products.getColumnModel().getColumn(3).setMaxWidth(120);
             table_view_products.getColumnModel().getColumn(4).setPreferredWidth(80);
             table_view_products.getColumnModel().getColumn(4).setMaxWidth(120);
+            table_view_products.getColumnModel().getColumn(5).setMinWidth(0);
+            table_view_products.getColumnModel().getColumn(5).setPreferredWidth(0);
+            table_view_products.getColumnModel().getColumn(5).setMaxWidth(0);
         }
 
         layered_pane_list_prod_serv.add(scroll_pane_products, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 545, 220));
@@ -1025,59 +1099,72 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_save_orderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_save_orderActionPerformed
-        OrderModel addOrder = getOrderFields();
+        OrderModel updateOrder = getOrderFields();
 
-        boolean isAdded = false;
-        if (addOrder != null) {
+        boolean isUpdated = false;
+        if (updateOrder != null) {
 
-            Device device = _deviceController.searchDeviceBySerialNumberController(addOrder.getDevice().getSerialNumber());
+            Device device = _deviceController.searchDeviceBySerialNumberController(updateOrder.getDevice().getSerialNumber());
             if (device != null) {
-                addOrder.setDevice(device);
-                isAdded = true;
+                updateOrder.setDevice(device);
+                isUpdated = true;
+            } else {
+                int idDeviceAdded = _deviceController.addDeviceController(updateOrder.getDevice());
+                if (idDeviceAdded > 0) {
+                    isUpdated = true;
+                    System.out.println("Device Added: " + idDeviceAdded);
+                } else {
+                    System.err.println("Error to add Device!");
+                    return;
+                }
             }
 
-            int idOrderAdded = this._orderController.addOrderController(addOrder);
-            if (idOrderAdded > 0) {
-                addOrder.setIdOrder(idOrderAdded);
+            boolean isOrderUpdated = this._orderController.updateOrderController(updateOrder);
+            if (isOrderUpdated) {
 
-                List<OrderFault> listOrderFault = getOrderFault(addOrder);
+                List<OrderFault> listOrderFault = getOrderFault(updateOrder);
                 if (listOrderFault != null) {
-                    for (OrderFault faultItem : listOrderFault) {
-                        int idOrderFaultAdded = _orderFaultController.addOrderFaultDAO(faultItem);
-                        System.out.println("Fault Added: " + idOrderAdded);
+                    for (OrderFault orderFaultItem : listOrderFault) {
 
-                        if (idOrderFaultAdded > 0) {
-                            isAdded = true;
-                        } else {
-                            isAdded = false;
-                            System.out.println("Error to add fault!");
-                            return;
+                        if (orderFaultItem.getIdOrderFault() == 0) {
+                            long idOrderFaultAdded = _orderFaultController.addOrderFaultController(orderFaultItem);
+                            if (idOrderFaultAdded > 0) {
+                                isUpdated = true;
+                                System.out.println("Fault Added: " + idOrderFaultAdded);
+
+                            } else {
+                                isUpdated = false;
+                                System.err.println("Error to add fault!");
+                                return;
+                            }
                         }
                     }
                 }
 
-                List<OrderProdServ> listOrderProdServ = getOrderProdServ(addOrder);
+                List<OrderProdServ> listOrderProdServ = getOrderProdServ(updateOrder);
                 if (listOrderProdServ != null) {
-                    for (OrderProdServ prodServItem : listOrderProdServ) {
-                        int idOrderProdServAdded = _orderProdServController.addOrderProdServController(prodServItem);
-                        System.out.println("ProdServ Added: " + idOrderProdServAdded);
+                    for (OrderProdServ OrderProdServItem : listOrderProdServ) {
 
-                        if (idOrderProdServAdded > 0) {
-                            isAdded = true;
-                        } else {
-                            isAdded = false;
-                            System.out.println("Error to add ProdServ");
-                            return;
+                        if (OrderProdServItem.getIdOrderProdServ() == 0) {
+                            long idOrderProdServAdded = _orderProdServController.addOrderProdServController(OrderProdServItem);
+                            if (idOrderProdServAdded > 0) {
+                                isUpdated = true;
+                                System.out.println("ProdServ Added: " + idOrderProdServAdded);
+                            } else {
+                                isUpdated = false;
+                                System.err.println("Error to add ProdServ");
+                                return;
+                            }
                         }
                     }
                 }
 
-                if (!this.txt_deposit.getText().trim().isEmpty()) {
-                    Deposit deposit = new Deposit(addOrder, Double.parseDouble(this.txt_deposit.getText()));
-                    int idDepositAdded = this._depositController.addDepositController(deposit);
+                if (!this.txt_deposit.getText().trim().isEmpty() || Double.parseDouble(this.txt_deposit.getText()) > 0) {
+                    Deposit deposit = new Deposit(updateOrder, Double.parseDouble(this.txt_deposit.getText()));
+                    long idDepositAdded = this._depositController.addDepositController(deposit);
 
                     if (idDepositAdded > 0) {
-                        isAdded = true;
+                        isUpdated = true;
                     } else {
                         JOptionPane.showMessageDialog(this, "Deposit could not be saved!", null, JOptionPane.ERROR_MESSAGE);
                         return;
@@ -1085,10 +1172,14 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 }
             }
 
-            if (isAdded) {
-                JOptionPane.showMessageDialog(this, "Order: " + addOrder.getIdOrder() + " created successfully!");
+            if (isUpdated) {
+                JOptionPane.showMessageDialog(this, "Order: " + updateOrder.getIdOrder() + " updated successfully!");
+                
+                loadOrderDeposit(_depositController.getOrderDepositController(updateOrder));
+                loadOrderFault(_orderFaultController.getOrderFaultController(updateOrder));
+                loadOrderProdServ(_orderProdServController.getOrderProdServController(updateOrder));
             } else {
-                JOptionPane.showMessageDialog(this, "Order could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Order could not be updated!", null, JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_save_orderActionPerformed
@@ -1106,46 +1197,13 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_depositKeyReleased
 
-    private void btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
-        boolean isCustAdded = true;
-        int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
-        Customer customer = null;
+    private void btn_printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_printActionPerformed
 
-        if (idCustomer > 0) {
-            customer = this._customerController.getItemCustomerController(idCustomer);
-            if (!customer.getPerson().getFirstName().equals(this.txt_first_name.getText())
-                    || !customer.getPerson().getLastName().equals(this.txt_last_name.getText())
-                    || !customer.getPerson().getContactNo().equals(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""))
-                    || !customer.getPerson().getEmail().equals(this.txt_email.getText())) {
-
-                isCustAdded = false;
-            }
-        }
-
-        if (!isCustAdded) {
-
-            Customer searchCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
-
-            if (searchCustomer != null) {
-                JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
-
-                CustomerModal customerModal = new CustomerModal(null, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
-                customerModal.setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(this, "New Customer will be added", "New Order", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Customer is the same from DB", "New Order", JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("Customer: " + customer);
-        }
-        //NoteView noteView = new NoteView(this, true);
-        //noteView.setVisible(true);
-//        int confirmCancelling = JOptionPane.showConfirmDialog(null, "Do you really want to cancel ?", "New Order",
 //                JOptionPane.YES_NO_OPTION);
 //        if (confirmCancelling == 0) {
 //            //new MainMenu().setVisible(true);
 //        }
-    }//GEN-LAST:event_btn_cancelActionPerformed
+    }//GEN-LAST:event_btn_printActionPerformed
 
     private void txt_depositKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyPressed
         //Accepts number characters only
@@ -1232,7 +1290,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_search_faultKeyReleased
 
     private void btn_seacrh_customerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seacrh_customerActionPerformed
-        CustomerModal customerModal = new CustomerModal(null, new MainMenuView(CommonSetting.COMPANY), true, null);
+        CustomerModal customerModal = new CustomerModal(null,this, new MainMenuView(CommonSetting.COMPANY), true, null);
         customerModal.setVisible(true);
     }//GEN-LAST:event_btn_seacrh_customerActionPerformed
 
@@ -1245,7 +1303,22 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 
     private void table_view_faultsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_faultsMouseClicked
         if (evt.getClickCount() == 2) {
-            this._dtmFault.removeRow(table_view_faults.getSelectedRow());
+            int selectedRow = this.table_view_faults.getSelectedRow();
+
+            String password = CommonExtension.requestUserPassword();
+            Employee employee = _employeeController.getEmployeeByPassDAO(password);
+            if (employee != null) {
+
+                int idOrderFaultDeleted = this._orderFaultController.deleteOrderFaultController((Integer) this._dtmFault.getValueAt(selectedRow, 2));
+
+                if (idOrderFaultDeleted > 0) {
+                    this._dtmFault.removeRow(table_view_faults.getSelectedRow());
+                } else {
+                    JOptionPane.showMessageDialog(this, this._dtmFault.getValueAt(selectedRow, 1).toString() + " could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_table_view_faultsMouseClicked
 
@@ -1294,7 +1367,23 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 
     private void table_view_productsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_productsMouseClicked
         if (evt.getClickCount() == 2) {
-            this._dtmProdServ.removeRow(this.table_view_products.getSelectedRow());
+            int selectedRow = this.table_view_products.getSelectedRow();
+
+            String password = CommonExtension.requestUserPassword();
+            Employee employee = _employeeController.getEmployeeByPassDAO(password);
+
+            if (employee != null) {
+                int idDeleteOrderProdServ = this._orderProdServController.deleteOrderProdServController((Integer) this._dtmProdServ.getValueAt(selectedRow, 5));
+
+                if (idDeleteOrderProdServ > 0) {
+                    this._dtmProdServ.removeRow(this.table_view_products.getSelectedRow());
+                } else {
+                    JOptionPane.showMessageDialog(this, this._dtmProdServ.getValueAt(selectedRow, 1).toString() + " could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
+            }
+
             // Sum price column and set into total textField
             getPriceSum();
         }
@@ -1384,10 +1473,27 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txt_serial_numberKeyPressed
 
+    private void btn_notesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_notesActionPerformed
+         OrderModel getOrder = getOrderFields();
+        NoteModal noteModal = new NoteModal(getOrder, new MainMenuView(CommonSetting.COMPANY), true);
+        noteModal.setVisible(true);
+    }//GEN-LAST:event_btn_notesActionPerformed
+
+    private void btn_fixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_fixActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_fixActionPerformed
+
+    private void btn_not_fixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_not_fixActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_not_fixActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_cancel;
     private javax.swing.JButton btn_copy;
+    private javax.swing.JButton btn_fix;
     private javax.swing.JButton btn_international_number1;
+    private javax.swing.JButton btn_not_fix;
+    private javax.swing.JButton btn_notes;
+    private javax.swing.JButton btn_print;
     private javax.swing.JButton btn_save_order;
     private javax.swing.JButton btn_seacrh_customer;
     private javax.swing.JEditorPane editor_pane_notes;

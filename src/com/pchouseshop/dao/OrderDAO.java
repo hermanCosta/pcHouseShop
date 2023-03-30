@@ -100,7 +100,7 @@ public class OrderDAO {
 
         return _listOrder;
     }
-    
+
     public List<OrderModel> searchOrderDAO(Company pCompany, String pSearch) {
         try {
             _session = _sessionFactory.openSession();
@@ -128,4 +128,23 @@ public class OrderDAO {
 
         return _listOrder;
     }
+
+    public boolean updateOrderDAO(OrderModel pOrderModel) {
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            _session.update(pOrderModel);
+
+            _transaction.commit();
+
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return true;
+    }
+
 }

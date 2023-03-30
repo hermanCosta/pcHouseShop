@@ -964,6 +964,9 @@
                         <Column editable="false" title="Fault Description" type="java.lang.Object"/>
                       </Table>
                     </Property>
+                    <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="CommonConstant.TBL_REMOVE_ITEM_TOOL_TIP" type="code"/>
+                    </Property>
                     <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                       <TableColumnModel selectionModel="0">
                         <Column maxWidth="0" minWidth="0" prefWidth="0" resizable="true">
@@ -1066,6 +1069,9 @@
                         <Column editable="true" title="Unit &#x20ac;" type="java.lang.Object"/>
                         <Column editable="false" title="Total &#x20ac;" type="java.lang.Object"/>
                       </Table>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="CommonConstant.TBL_REMOVE_ITEM_TOOL_TIP" type="code"/>
                     </Property>
                     <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                       <TableColumnModel selectionModel="0">

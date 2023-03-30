@@ -24,8 +24,12 @@ public class OrderController {
     public List<OrderModel> getAllOrderController(Company pCompany) {
         return ORDER_DAO.getAllOrderDAO(pCompany);
     }
-    
+
     public List<OrderModel> searchOrderController(Company pCompany, String pSearch) {
         return ORDER_DAO.searchOrderDAO(pCompany, pSearch);
+    }
+
+    public boolean updateOrderController(OrderModel pOrderModel) {
+        return ORDER_DAO.updateOrderDAO(pOrderModel);
     }
 }

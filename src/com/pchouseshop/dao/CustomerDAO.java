@@ -38,14 +38,14 @@ public class CustomerDAO {
         return _listCustomer;
     }
 
-    public int addCustomerDAO(Customer pCustomer) {
-        Integer idCustomerAdded = 0;
+    public long addCustomerDAO(Customer pCustomer) {
+        long idCustomerAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
 
-            idCustomerAdded = (Integer) _session.save(pCustomer);
+            idCustomerAdded = (long) _session.save(pCustomer);
 
             _transaction.commit();
 
@@ -82,7 +82,7 @@ public class CustomerDAO {
         return true;
     }
 
-    public boolean deleteCustomerDAO(int pId) {
+    public boolean deleteCustomerDAO(long pId) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
@@ -124,7 +124,7 @@ public class CustomerDAO {
         return customer;
     }
     
-    public Customer getItemCustomerDAO(int pIdCustomer) {
+    public Customer getItemCustomerDAO(long pIdCustomer) {
         Customer itemCustomer = null;
         
         try {

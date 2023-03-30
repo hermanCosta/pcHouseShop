@@ -14,7 +14,7 @@ public class CustomerController {
         return CUSTOMER_DAO.getAllCustomerDAO(company);
     }
 
-    public int addCustomerController(Customer pCustomer) {
+    public long addCustomerController(Customer pCustomer) {
         return CUSTOMER_DAO.addCustomerDAO(pCustomer);
     }
 
@@ -22,7 +22,7 @@ public class CustomerController {
         return CUSTOMER_DAO.updateCustomerDAO(pCustomer);
     }
 
-    public boolean deleteCustomerController(int pId) {
+    public boolean deleteCustomerController(long pId) {
         return CUSTOMER_DAO.deleteCustomerDAO(pId);
     }
 
@@ -30,7 +30,7 @@ public class CustomerController {
         return CUSTOMER_DAO.getCustomerDAO(pPerson);
     }
     
-    public Customer getItemCustomerController(int pIdCustomer) {
+    public Customer getItemCustomerController(long pIdCustomer) {
         return CUSTOMER_DAO.getItemCustomerDAO(pIdCustomer);
     }
     

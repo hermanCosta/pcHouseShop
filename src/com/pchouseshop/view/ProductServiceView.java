@@ -104,14 +104,17 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         this.txt_prod_serv_notes.setText(pProdServ.getNote());
     }
 
-    private void cleanFields() {
+    private void clearFields() {
+        this.txt_search_prodServ.setText("");
         this.hdn_txt_prod_serv_id.setText("");
         this.txt_prod_serv_name.setText("");
         this.txt_prod_serv_price.setText("");
         this.txt_prod_serv_qty.setText("1");
         this.txt_prod_serv_notes.setText("");
         this.combo_box_prod_serv_categ.setSelectedIndex(0);
+        
         loadProdServListTable();
+        this.txt_search_prodServ.requestFocus();
     }
 
     @SuppressWarnings("unchecked")
@@ -151,7 +154,6 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         setTitle("Product | Service");
         setMaximumSize(new java.awt.Dimension(1049, 700));
         setPreferredSize(new java.awt.Dimension(1050, 650));
-        setSize(new java.awt.Dimension(0, 0));
 
         panel_product_list.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -379,6 +381,14 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
             table_view_products_list.getColumnModel().getColumn(0).setMinWidth(0);
             table_view_products_list.getColumnModel().getColumn(0).setPreferredWidth(0);
             table_view_products_list.getColumnModel().getColumn(0).setMaxWidth(0);
+            table_view_products_list.getColumnModel().getColumn(1).setPreferredWidth(250);
+            table_view_products_list.getColumnModel().getColumn(1).setMaxWidth(300);
+            table_view_products_list.getColumnModel().getColumn(2).setPreferredWidth(80);
+            table_view_products_list.getColumnModel().getColumn(2).setMaxWidth(100);
+            table_view_products_list.getColumnModel().getColumn(3).setPreferredWidth(50);
+            table_view_products_list.getColumnModel().getColumn(3).setMaxWidth(100);
+            table_view_products_list.getColumnModel().getColumn(5).setPreferredWidth(120);
+            table_view_products_list.getColumnModel().getColumn(5).setMaxWidth(150);
         }
 
         txt_search_prodServ.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
@@ -457,7 +467,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                 if (isUpdated) {
 
                     loadProdServListTable();
-                    cleanFields();
+                    clearFields();
                 } else {
                     JOptionPane.showMessageDialog(this, updateProdServ.getProdServName() + "could not be updated!", null, JOptionPane.ERROR_MESSAGE);
                 }
@@ -474,7 +484,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
             if (idProdServAdded > 0) {
                 JOptionPane.showMessageDialog(this, addProdServ.getProdServName() + " added successfully!");
                 loadProdServListTable();
-                cleanFields();
+                clearFields();
             } else {
                 JOptionPane.showMessageDialog(this, addProdServ.getProdServName() + "could not be saved!", null, JOptionPane.ERROR_MESSAGE);
             }
@@ -500,14 +510,14 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                 if (isDeleted) {
                     loadProdServListTable();
                 } else {
-                    JOptionPane.showMessageDialog(this, deleteProdServ.getProdServName() + "could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, deleteProdServ.getProdServName() + " could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
     }//GEN-LAST:event_txt_delete_product_serviceActionPerformed
 
     private void btn_clear_fieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clear_fieldsActionPerformed
-        cleanFields();
+        clearFields();
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
     private void table_view_products_listMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_products_listMouseClicked

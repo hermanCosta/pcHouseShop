@@ -1,37 +1,59 @@
-package com.pchouseshop.view;
+package com.pchouseshop.view.modal;
 
 import com.pchouseshop.controllers.EmployeeController;
 import com.pchouseshop.controllers.OrderController;
 import com.pchouseshop.controllers.OrderNoteController;
-import com.pchouseshop.model.Customer;
 import com.pchouseshop.model.Employee;
 import com.pchouseshop.model.OrderModel;
 import com.pchouseshop.model.OrderNote;
-import com.pchouseshop.model.Person;
 import java.util.Date;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-public class NoteView extends javax.swing.JDialog {
-    
+public class NoteModal extends javax.swing.JDialog {
+
     /* For invoking this JDialog in a JInternalFrame
      NoteView noteView = new NoteView(new MainMenuView(CommonSetting.COMPANY), true);
         noteView.setVisible(true);
      */
-    
-    private  final OrderController _orderController;
+    private final OrderController _orderController;
     private final OrderNoteController _orderNoteController;
     private final EmployeeController _employeeController;
-    NewOrderView _NewOrderView;
+    private final DefaultTableModel _dtmOrderNote;
+    private List<OrderNote> _listOrderNotes;
+    private OrderModel _createdOrderView;
 
-    public NoteView(NewOrderView newOrderView, java.awt.Frame parent, boolean modal) {
+    public NoteModal(OrderModel orderModel, java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
 
+        this._createdOrderView = orderModel;
         this._orderController = new OrderController();
         this._orderNoteController = new OrderNoteController();
         this._employeeController = new EmployeeController();
-        this._NewOrderView = newOrderView;
+        this._createdOrderView = orderModel;
+        this._dtmOrderNote = (DefaultTableModel) this.table_view_notes.getModel();
+        loadOrderNoteListTable();
+    }
+
+    private void loadOrderNoteListTable() {
+        this._listOrderNotes = this._orderNoteController.getAllOrderNoteController(_createdOrderView);
+
+        _dtmOrderNote.setRowCount(0);
+
+        if (this._listOrderNotes != null) {
+            for (OrderNote orderNote : _listOrderNotes) {
+                _dtmOrderNote.addRow(
+                        new Object[]{
+                            orderNote.getIdOrderNote(),
+                            orderNote.getCreated(),
+                            orderNote.getNote(),
+                            orderNote.getEmployee()
+                        }
+                );
+            }
+        }
     }
 
     private OrderNote getOrderNote(OrderModel order) {
@@ -93,11 +115,11 @@ public class NoteView extends javax.swing.JDialog {
 
             },
             new String [] {
-                "Date", "Note", "User"
+                "IDOrderNote", "Date", "Note", "User"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -111,10 +133,13 @@ public class NoteView extends javax.swing.JDialog {
         });
         scroll_pane_notes.setViewportView(table_view_notes);
         if (table_view_notes.getColumnModel().getColumnCount() > 0) {
-            table_view_notes.getColumnModel().getColumn(0).setPreferredWidth(150);
-            table_view_notes.getColumnModel().getColumn(0).setMaxWidth(200);
-            table_view_notes.getColumnModel().getColumn(2).setPreferredWidth(100);
-            table_view_notes.getColumnModel().getColumn(2).setMaxWidth(150);
+            table_view_notes.getColumnModel().getColumn(0).setMinWidth(0);
+            table_view_notes.getColumnModel().getColumn(0).setPreferredWidth(0);
+            table_view_notes.getColumnModel().getColumn(0).setMaxWidth(0);
+            table_view_notes.getColumnModel().getColumn(1).setPreferredWidth(150);
+            table_view_notes.getColumnModel().getColumn(1).setMaxWidth(200);
+            table_view_notes.getColumnModel().getColumn(3).setPreferredWidth(100);
+            table_view_notes.getColumnModel().getColumn(3).setMaxWidth(150);
         }
 
         panel_note_input.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -311,19 +336,7 @@ public class NoteView extends javax.swing.JDialog {
     }//GEN-LAST:event_txt_search_noteActionPerformed
 
     private void btn_clear_fieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clear_fieldsActionPerformed
-        //clearFields();
-        //loadFaultListTable();
-        
-        Person person = new Person();
-        person.setFirstName("Herman");
-        person.setLastName("Costa");
-        person.setContactNo("(11) 95423-1558");
-        person.setEmail("hermanhgc@gmail.com");
-        Customer customer = new Customer();
-        customer.setPerson(person);
-        this.dispose();
-        
-        _NewOrderView.setCustomerFields(customer);
+        clearFields();
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
     private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
@@ -332,7 +345,7 @@ public class NoteView extends javax.swing.JDialog {
         OrderNote addOrderNote = getOrderNote(order);
         if (addOrderNote != null) {
 
-            int idNoteAdded = _orderNoteController.addOrderNoteController(addOrderNote);
+            long idNoteAdded = _orderNoteController.addOrderNoteController(addOrderNote);
             if (idNoteAdded > 0) {
                 JOptionPane.showMessageDialog(this, "Note created successfully!");
             } else {

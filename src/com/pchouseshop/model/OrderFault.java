@@ -18,7 +18,7 @@ public class OrderFault implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ORDER_FAULT")
-    private Integer idOrderFault;
+    private long idOrderFault;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_ORDER", referencedColumnName = "ID_ORDER")
@@ -36,11 +36,11 @@ public class OrderFault implements Serializable {
         this.fault = fault;
     }
 
-    public Integer getIdOrderFault() {
+    public long getIdOrderFault() {
         return idOrderFault;
     }
 
-    public void setIdOrderFault(Integer idOrderFault) {
+    public void setIdOrderFault(long idOrderFault) {
         this.idOrderFault = idOrderFault;
     }
 
@@ -58,5 +58,10 @@ public class OrderFault implements Serializable {
 
     public void setFault(Fault fault) {
         this.fault = fault;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderFault{" + "idOrderFault=" + idOrderFault + ", order=" + order + ", fault=" + fault + '}';
     }
 }

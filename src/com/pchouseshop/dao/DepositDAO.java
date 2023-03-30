@@ -17,13 +17,13 @@ public class DepositDAO {
     Transaction _transaction;
     List<Deposit> _orderDeposit;
 
-    public Integer addDepositDAO(Deposit pDeposit) {
-        Integer idDepositAdded = 0;
+    public long addDepositDAO(Deposit pDeposit) {
+        long idDepositAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idDepositAdded = (Integer) _session.save(pDeposit);
+            idDepositAdded = (long) _session.save(pDeposit);
 
             _transaction.commit();
         } catch (HibernateException e) {

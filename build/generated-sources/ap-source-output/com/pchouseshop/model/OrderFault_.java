@@ -9,7 +9,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class OrderFault_ {
 
 	public static volatile SingularAttribute<OrderFault, Fault> fault;
-	public static volatile SingularAttribute<OrderFault, Integer> idOrderFault;
+	public static volatile SingularAttribute<OrderFault, Long> idOrderFault;
 	public static volatile SingularAttribute<OrderFault, OrderModel> order;
 
 	public static final String FAULT = "fault";

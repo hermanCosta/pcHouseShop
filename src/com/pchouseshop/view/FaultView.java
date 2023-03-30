@@ -357,7 +357,7 @@ public class FaultView extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(this, addFault.getDescription() + " added successfully!");
                 loadFaultListTable();
 
-                this.txt_search_fault.setText("");
+                this.txt_fault_description.setText("");
             } else {
                 JOptionPane.showMessageDialog(this, addFault.getDescription() + "could not be saved!", null, JOptionPane.ERROR_MESSAGE);
             }
@@ -376,6 +376,7 @@ public class FaultView extends javax.swing.JInternalFrame {
 
                 if (isUpdated) {
                     getItemFault(updateFault.getIdFault());
+                    this.txt_fault_description.setText("");
                 } else {
                     JOptionPane.showMessageDialog(this, updateFault.getDescription() + "could not be updated!", null, JOptionPane.ERROR_MESSAGE);
                 }

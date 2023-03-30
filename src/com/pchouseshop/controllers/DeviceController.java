@@ -13,6 +13,10 @@ public class DeviceController {
         return DEVICE_DAO.getAllDeviceDAO();
     }
 
+    public int addDeviceController(Device pDevice) {
+        return DEVICE_DAO.addDeviceDAO(pDevice);
+    }
+
     public List<Device> getAllDeviceController() {
         return DEVICE_DAO.getAllDeviceDAO();
     }

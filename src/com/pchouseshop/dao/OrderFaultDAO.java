@@ -11,18 +11,19 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 public class OrderFaultDAO {
+
     Session _session = null;
     SessionFactory _sessionFactory = HibernateUtil.getSessionFactory();
     Transaction _transaction;
     List<OrderFault> _listOrderFault;
-    
-    public Integer addOrderFaultDAO(OrderFault pOrderFault) {
-        Integer idOrderFaultAdded = 0;
-        
+
+    public long addOrderFaultDAO(OrderFault pOrderFault) {
+        long idOrderFaultAdded = 0;
+
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idOrderFaultAdded = (Integer) _session.save(pOrderFault);
+            idOrderFaultAdded = (long) _session.save(pOrderFault);
 
             _transaction.commit();
         } catch (HibernateException e) {
@@ -31,13 +32,13 @@ public class OrderFaultDAO {
                 _session.close();
             }
         }
-         
+
         return idOrderFaultAdded;
     }
-    
+
     public List<OrderFault> getOrderFaultDAO(OrderModel pOrder) {
         try {
-             _session = _sessionFactory.openSession();
+            _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM OrderFault O WHERE O.order = :pOrder")
                     .setParameter("pOrder", pOrder);
@@ -50,7 +51,50 @@ public class OrderFaultDAO {
                 _session.close();
             }
         }
-        
+
         return _listOrderFault;
+    }
+
+    public boolean updateOrderFaultDAO(OrderFault pOrderFault) {
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+
+            _session.saveOrUpdate(pOrderFault);
+
+            _transaction.commit();
+
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return true;
+    }
+    
+    public int deleteOrderFaultDAO(long pIdOrderFault) {
+        int resultDelete = 0;
+        try
+        {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            
+            Query query = _session.createQuery("DELETE FROM OrderFault O WHERE O.idOrderFault = :pIdOrderFault")
+                    .setParameter("pIdOrderFault", pIdOrderFault);
+            
+            resultDelete = query.executeUpdate();
+            
+            _transaction.commit();
+            
+        } catch(HibernateException e) {}
+        finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        
+        return resultDelete;
     }
 }

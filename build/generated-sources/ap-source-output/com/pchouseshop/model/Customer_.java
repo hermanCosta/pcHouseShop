@@ -10,7 +10,7 @@ public abstract class Customer_ {
 
 	public static volatile SingularAttribute<Customer, Person> person;
 	public static volatile SingularAttribute<Customer, Company> company;
-	public static volatile SingularAttribute<Customer, Integer> idCustomer;
+	public static volatile SingularAttribute<Customer, Long> idCustomer;
 
 	public static final String PERSON = "person";
 	public static final String COMPANY = "company";

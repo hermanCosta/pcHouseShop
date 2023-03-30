@@ -9,7 +9,7 @@ public class DepositController {
 
     private final DepositDAO DEPOSIT_DAO = new DepositDAO();
 
-    public Integer addDepositController(Deposit pDeposit) {
+    public long addDepositController(Deposit pDeposit) {
         return DEPOSIT_DAO.addDepositDAO(pDeposit);
     }
 

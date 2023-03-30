@@ -16,8 +16,8 @@ public class OrderNoteDAO {
     Transaction _transaction;
     List<OrderNote> _listOrderNote;
     
-    public Integer addOrderNoteDAO(OrderNote pOrderNote) {
-        Integer idOrderNoteAdded = 0;
+    public long addOrderNoteDAO(OrderNote pOrderNote) {
+        long idOrderNoteAdded = 0;
         
         try {
             _session = _sessionFactory.openSession();
@@ -36,7 +36,7 @@ public class OrderNoteDAO {
         return idOrderNoteAdded;
     }
     
-    public List<OrderNote> getOrderNoteDAO(OrderModel pOrder) {
+    public List<OrderNote> getAllOrderNoteDAO(OrderModel pOrder) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();

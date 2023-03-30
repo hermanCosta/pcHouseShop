@@ -1,5 +1,7 @@
 package com.pchouseshop.view;
 
+import Enum.OrderStatus;
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.CustomerController;
@@ -206,7 +208,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                     if (checkCustomer != null) {
                         JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
 
-                        CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, checkCustomer);
+                        CustomerModal customerModal = new CustomerModal(this, null, new MainMenuView(CommonSetting.COMPANY), true, checkCustomer);
                         customerModal.setVisible(true);
 
                         return getOrderModel;
@@ -233,7 +235,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                         CommonSetting.COMPANY,
                         Double.parseDouble(this.txt_total.getText()),
                         Double.parseDouble(this.txt_due.getText()),
-                        "IN PROGRESS", new Date(), null, null, (int) this.spn_bad_sectors.getValue(), this.editor_pane_notes.getText());
+                        OrderStatus.IN_PROGRESS, new Date(), null, null, (int) this.spn_bad_sectors.getValue(), this.editor_pane_notes.getText());
 
             } else {
                 JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
@@ -839,6 +841,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
+        table_view_faults.setToolTipText(CommonConstant.TBL_REMOVE_ITEM_TOOL_TIP);
         table_view_faults.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 table_view_faultsMouseClicked(evt);
@@ -896,6 +899,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
+        table_view_products.setToolTipText(CommonConstant.TBL_REMOVE_ITEM_TOOL_TIP);
         table_view_products.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 table_view_productsMouseClicked(evt);
@@ -1014,7 +1018,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 List<OrderFault> listOrderFault = getOrderFault(addOrder);
                 if (listOrderFault != null) {
                     for (OrderFault faultItem : listOrderFault) {
-                        int idOrderFaultAdded = _orderFaultController.addOrderFaultDAO(faultItem);
+                        long idOrderFaultAdded = _orderFaultController.addOrderFaultController(faultItem);
                         System.out.println("Fault Added: " + idOrderAdded);
 
                         if (idOrderFaultAdded > 0) {
@@ -1030,7 +1034,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 List<OrderProdServ> listOrderProdServ = getOrderProdServ(addOrder);
                 if (listOrderProdServ != null) {
                     for (OrderProdServ prodServItem : listOrderProdServ) {
-                        int idOrderProdServAdded = _orderProdServController.addOrderProdServController(prodServItem);
+                        long idOrderProdServAdded = _orderProdServController.addOrderProdServController(prodServItem);
                         System.out.println("ProdServ Added: " + idOrderProdServAdded);
 
                         if (idOrderProdServAdded > 0) {
@@ -1045,7 +1049,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
                 if (!this.txt_deposit.getText().trim().isEmpty()) {
                     Deposit deposit = new Deposit(addOrder, Double.parseDouble(this.txt_deposit.getText()));
-                    int idDepositAdded = this._depositController.addDepositController(deposit);
+                    long idDepositAdded = this._depositController.addDepositController(deposit);
 
                     if (idDepositAdded > 0) {
                         isAdded = true;
@@ -1061,7 +1065,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 clearFields();
                 generateOrderId();
             } else {
-                JOptionPane.showMessageDialog(this, "Order could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Order could not be created!", null, JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_save_orderActionPerformed
@@ -1102,7 +1106,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             if (searchCustomer != null) {
                 JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Order", JOptionPane.WARNING_MESSAGE);
 
-                CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
+                CustomerModal customerModal = new CustomerModal(this, null, new MainMenuView(CommonSetting.COMPANY), true, searchCustomer);
                 customerModal.setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(this, "New Customer will be added", "New Order", JOptionPane.INFORMATION_MESSAGE);
@@ -1205,7 +1209,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_search_faultKeyReleased
 
     private void btn_seacrh_customerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seacrh_customerActionPerformed
-        CustomerModal customerModal = new CustomerModal(this, new MainMenuView(CommonSetting.COMPANY), true, null);
+        CustomerModal customerModal = new CustomerModal(this,null, new MainMenuView(CommonSetting.COMPANY), true, null);
         customerModal.setVisible(true);
     }//GEN-LAST:event_btn_seacrh_customerActionPerformed
 

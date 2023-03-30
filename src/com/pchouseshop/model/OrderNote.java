@@ -20,7 +20,7 @@ public class OrderNote implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ORDER_NOTE")
-    private Integer idOrderNote;
+    private long idOrderNote;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_ORDER", referencedColumnName = "ID_ORDER")
@@ -47,11 +47,11 @@ public class OrderNote implements Serializable {
         this.created = created;
     }
 
-    public Integer getIdOrderNote() {
+    public long getIdOrderNote() {
         return idOrderNote;
     }
 
-    public void setIdOrderNote(Integer idOrderNote) {
+    public void setIdOrderNote(long idOrderNote) {
         this.idOrderNote = idOrderNote;
     }
 

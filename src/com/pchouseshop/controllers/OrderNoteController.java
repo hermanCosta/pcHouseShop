@@ -9,11 +9,11 @@ public class OrderNoteController {
 
     private final OrderNoteDAO ORDER_NOTE_DAO = new OrderNoteDAO();
 
-    public Integer addOrderNoteController(OrderNote pOrderNote) {
+    public long addOrderNoteController(OrderNote pOrderNote) {
         return ORDER_NOTE_DAO.addOrderNoteDAO(pOrderNote);
     }
 
-    public List<OrderNote> getOrderNoteController(OrderModel pOrder) {
-        return ORDER_NOTE_DAO.getOrderNoteDAO(pOrder);
+    public List<OrderNote> getAllOrderNoteController(OrderModel pOrder) {
+        return ORDER_NOTE_DAO.getAllOrderNoteDAO(pOrder);
     }
 }

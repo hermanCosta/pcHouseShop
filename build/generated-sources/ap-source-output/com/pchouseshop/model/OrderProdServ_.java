@@ -11,7 +11,7 @@ public abstract class OrderProdServ_ {
 	public static volatile SingularAttribute<OrderProdServ, ProductService> prodServ;
 	public static volatile SingularAttribute<OrderProdServ, Double> total;
 	public static volatile SingularAttribute<OrderProdServ, Integer> qty;
-	public static volatile SingularAttribute<OrderProdServ, Integer> idOrderProdServ;
+	public static volatile SingularAttribute<OrderProdServ, Long> idOrderProdServ;
 	public static volatile SingularAttribute<OrderProdServ, OrderModel> order;
 
 	public static final String PROD_SERV = "prodServ";

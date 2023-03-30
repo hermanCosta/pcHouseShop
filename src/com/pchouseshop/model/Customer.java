@@ -18,7 +18,7 @@ public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_CUSTOMER")
-    private int idCustomer;
+    private long idCustomer;
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_PERSON", referencedColumnName = "ID_PERSON")
@@ -36,11 +36,11 @@ public class Customer implements Serializable {
         this.company = company;
     }
 
-    public int getIdCustomer() {
+    public long getIdCustomer() {
         return idCustomer;
     }
 
-    public void setIdCustomer(int idCustomer) {
+    public void setIdCustomer(long idCustomer) {
         this.idCustomer = idCustomer;
     }
 

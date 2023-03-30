@@ -13,11 +13,12 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 public class DeviceDAO {
-     List<Device> _listDevice = new ArrayList<>();
+
+    List<Device> _listDevice = new ArrayList<>();
     Session _session = null;
     SessionFactory _sessionFactory = HibernateUtil.getSessionFactory();
     Transaction _transaction;
-    
+
     public List<Device> getAllDeviceDAO() {
         try {
             _session = _sessionFactory.openSession();
@@ -36,7 +37,26 @@ public class DeviceDAO {
 
         return _listDevice;
     }
-    
+
+    public int addDeviceDAO(Device pDevice) {
+        int idDeviceAdded = 0;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            idDeviceAdded = (int) _session.save(pDevice);
+
+            _transaction.commit();
+
+        } catch (Exception e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return idDeviceAdded;
+    }
+
     public Device searchDeviceBySerialNumber(String pSearch) {
         Device deviceItem = null;
         try {
@@ -56,14 +76,14 @@ public class DeviceDAO {
 
         return deviceItem;
     }
-    
+
     public ArrayList<String> searchBrandDAO(String pSearch) {
         ArrayList<String> listBrand = null;
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("SELECT DISTINCT D.brand FROM Device D WHERE D.brand LIKE :pSearch")
-                    .setParameter("pSearch", "%"+ pSearch +"%");
+                    .setParameter("pSearch", "%" + pSearch + "%");
 
             listBrand = (ArrayList<String>) query.getResultList();
             _transaction.commit();
@@ -76,15 +96,15 @@ public class DeviceDAO {
 
         return listBrand;
     }
-    
-     public ArrayList<String> searchModelDAO(String pBrand, String pModel) {
+
+    public ArrayList<String> searchModelDAO(String pBrand, String pModel) {
         ArrayList<String> listModel = null;
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("SELECT DISTINCT D.model FROM Device D WHERE D.brand = :pBrand AND D.model LIKE :pModel")
                     .setParameter("pBrand", pBrand)
-                    .setParameter("pModel", "%"+ pModel +"%");
+                    .setParameter("pModel", "%" + pModel + "%");
 
             listModel = (ArrayList<String>) query.getResultList();
             _transaction.commit();
@@ -97,15 +117,15 @@ public class DeviceDAO {
 
         return listModel;
     }
-    
-      public ArrayList<String> searchSerialNumberDAO(String pBrand, String pSerialNumber) {
+
+    public ArrayList<String> searchSerialNumberDAO(String pBrand, String pSerialNumber) {
         ArrayList<String> listSerialNumber = null;
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("SELECT DISTINCT D.serialNumber FROM Device D WHERE D.brand = :pBrand AND D.serialNumber LIKE :pSerialNumber")
                     .setParameter("pBrand", pBrand)
-                    .setParameter("pSerialNumber", "%"+ pSerialNumber +"%");
+                    .setParameter("pSerialNumber", "%" + pSerialNumber + "%");
 
             listSerialNumber = (ArrayList<String>) query.getResultList();
             _transaction.commit();
