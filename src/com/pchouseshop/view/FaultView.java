@@ -1,5 +1,6 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.FaultController;
@@ -66,7 +67,7 @@ public class FaultView extends javax.swing.JInternalFrame {
         Fault getFault = null;
 
         if (txt_fault_description.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please, check Empty field", "New Fault", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_EMPTY_FIELDS, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
             return getFault;
         } else {
@@ -84,7 +85,7 @@ public class FaultView extends javax.swing.JInternalFrame {
         this.txt_fault_description.setText(pFault.getDescription());
     }
 
-    private void getItemFault(int idFault) {
+    private void getItemFault(long idFault) {
         if (idFault != 0) {
             Fault faultItem = _faultController.getItemFaultController(idFault);
 
@@ -351,15 +352,15 @@ public class FaultView extends javax.swing.JInternalFrame {
         Fault addFault = this.getFaultFields();
 
         if (addFault != null) {
-            int idFault = this._faultController.addFaultController(addFault);
+            long idFault = this._faultController.addFaultController(addFault);
 
             if (idFault > 0) {
-                JOptionPane.showMessageDialog(this, addFault.getDescription() + " added successfully!");
+                JOptionPane.showMessageDialog(this,CommonConstant.SUCCESS_SAVE);
                 loadFaultListTable();
 
                 this.txt_fault_description.setText("");
             } else {
-                JOptionPane.showMessageDialog(this, addFault.getDescription() + "could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_addActionPerformed
@@ -368,8 +369,7 @@ public class FaultView extends javax.swing.JInternalFrame {
         Fault updateFault = this.getFaultFields();
 
         if (updateFault != null) {
-            int confirmEditing = JOptionPane.showConfirmDialog(null, "Confirm Editing " + updateFault.getDescription() + " ?",
-                    "Edit Fault", JOptionPane.YES_NO_OPTION);
+            int confirmEditing = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_UPDATE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
             if (confirmEditing == 0) {
                 boolean isUpdated = this._faultController.updateFaultController(updateFault);
@@ -378,7 +378,7 @@ public class FaultView extends javax.swing.JInternalFrame {
                     getItemFault(updateFault.getIdFault());
                     this.txt_fault_description.setText("");
                 } else {
-                    JOptionPane.showMessageDialog(this, updateFault.getDescription() + "could not be updated!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -396,7 +396,7 @@ public class FaultView extends javax.swing.JInternalFrame {
                     _dtmFault.getValueAt(selectedRow, 1).toString()
             );
 
-            updateFault.setIdFault((Integer) this._dtmFault.getValueAt(selectedRow, 0));
+            updateFault.setIdFault((long) this._dtmFault.getValueAt(selectedRow, 0));
             setFaultFields(updateFault);
         }
     }//GEN-LAST:event_table_view_faultsMouseClicked
@@ -411,8 +411,7 @@ public class FaultView extends javax.swing.JInternalFrame {
             deleteFault.setIdFault((Integer) _dtmFault.getValueAt(selectedRow, 0));
             deleteFault.setDescription(_dtmFault.getValueAt(selectedRow, 1).toString());
 
-            int confirmDeletion = JOptionPane.showConfirmDialog(this, "Do you really want to delete '"
-                    + deleteFault.getDescription(), "Delete Fault", JOptionPane.YES_NO_OPTION);
+            int confirmDeletion = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_DELETE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
             if (confirmDeletion == 0) {
                 boolean isDeleted = this._faultController.deleteFaultController(deleteFault);
@@ -420,7 +419,7 @@ public class FaultView extends javax.swing.JInternalFrame {
                 if (isDeleted) {
                     loadFaultListTable();
                 } else {
-                    JOptionPane.showMessageDialog(this, deleteFault.getDescription() + "could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }

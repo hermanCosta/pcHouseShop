@@ -30,7 +30,7 @@ public class OrderNote implements Serializable {
     @JoinColumn(name = "ID_EMPLOYEE", referencedColumnName = "ID_EMPLOYEE")
     private Employee employee;
 
-    @Column(name = "note")
+    @Column(name = "NOTE")
     private String note;
 
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)

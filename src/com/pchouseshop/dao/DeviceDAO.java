@@ -38,12 +38,12 @@ public class DeviceDAO {
         return _listDevice;
     }
 
-    public int addDeviceDAO(Device pDevice) {
-        int idDeviceAdded = 0;
+    public long addDeviceDAO(Device pDevice) {
+        long idDeviceAdded = 0;
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idDeviceAdded = (int) _session.save(pDevice);
+            idDeviceAdded = (long) _session.save(pDevice);
 
             _transaction.commit();
 

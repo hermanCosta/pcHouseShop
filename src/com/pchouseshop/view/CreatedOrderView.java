@@ -216,7 +216,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 || this.txt_contact.getText().trim().isEmpty() || this.txt_brand.getText().trim().isEmpty()
                 || this.txt_model.getText().trim().isEmpty() || this.txt_serial_number.getText().trim().isEmpty()
                 || this.table_view_products.getRowCount() == 0 || this.table_view_faults.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Please, check Empty fields !", "Update Order", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_EMPTY_FIELDS, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
             return getOrderModel;
         } else {
@@ -242,7 +242,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                     Customer checkCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
 
                     if (checkCustomer != null) {
-                        JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "Update Order", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(this, CommonConstant.WARN_EXIST_PERSON, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
                         CustomerModal customerModal = new CustomerModal(null, this, new MainMenuView(CommonSetting.COMPANY), true, checkCustomer);
                         customerModal.setVisible(true);
@@ -281,7 +281,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 getOrderModel.setIdOrder(Integer.valueOf(this.lbl_auto_order_no.getText()));
 
             } else {
-                JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,CommonConstant.NOT_AUTHORIZED, this.getTitle(), JOptionPane.ERROR_MESSAGE);
             }
         }
 
@@ -292,7 +292,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         List<OrderProdServ> listOrderProdServ = new ArrayList<>();
 
         if (this.table_view_products.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Please, add at least one product|service !", "New Order", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_ADD_ITEM + "product|service", this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
             return listOrderProdServ;
         } else {
@@ -320,7 +320,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         List<OrderFault> listOrderFault = new ArrayList<>();
 
         if (this.table_view_faults.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Please, add at least one fault !", "New Order", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_ADD_ITEM + "fault", this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
             return listOrderFault;
         } else {
@@ -1102,6 +1102,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         OrderModel updateOrder = getOrderFields();
 
         boolean isUpdated = false;
+        boolean hasDepositNote = false;
+        
         if (updateOrder != null) {
 
             Device device = _deviceController.searchDeviceBySerialNumberController(updateOrder.getDevice().getSerialNumber());
@@ -1109,7 +1111,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 updateOrder.setDevice(device);
                 isUpdated = true;
             } else {
-                int idDeviceAdded = _deviceController.addDeviceController(updateOrder.getDevice());
+                long idDeviceAdded = _deviceController.addDeviceController(updateOrder.getDevice());
                 if (idDeviceAdded > 0) {
                     isUpdated = true;
                     System.out.println("Device Added: " + idDeviceAdded);
@@ -1159,27 +1161,38 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                     }
                 }
 
-                if (!this.txt_deposit.getText().trim().isEmpty() || Double.parseDouble(this.txt_deposit.getText()) > 0) {
+                if (!this.txt_deposit.getText().trim().isEmpty() && Double.parseDouble(this.txt_deposit.getText()) > 0) {
                     Deposit deposit = new Deposit(updateOrder, Double.parseDouble(this.txt_deposit.getText()));
                     long idDepositAdded = this._depositController.addDepositController(deposit);
 
                     if (idDepositAdded > 0) {
+                        // Add deposit note
+                        OrderNote orderNote = new OrderNote(updateOrder, updateOrder.getEmployee() , CommonExtension.setDepositPayNote(Double.parseDouble(this.txt_deposit.getText())), new Date());
+                        _orderNoteController.addOrderNoteController(orderNote);
                         isUpdated = true;
+                        hasDepositNote = true;
                     } else {
-                        JOptionPane.showMessageDialog(this, "Deposit could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, CommonConstant.ERROR_ADD_DEPOSIT, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                 }
             }
 
             if (isUpdated) {
-                JOptionPane.showMessageDialog(this, "Order: " + updateOrder.getIdOrder() + " updated successfully!");
+                
+                if (!hasDepositNote) {
+                     // Add update note
+                 OrderNote orderNote = new OrderNote(updateOrder, updateOrder.getEmployee() , CommonConstant.ORDER_UPDATED_NOTE, new Date());
+                        _orderNoteController.addOrderNoteController(orderNote);
+                }
+
+                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_UPDATE);
                 
                 loadOrderDeposit(_depositController.getOrderDepositController(updateOrder));
                 loadOrderFault(_orderFaultController.getOrderFaultController(updateOrder));
                 loadOrderProdServ(_orderProdServController.getOrderProdServController(updateOrder));
             } else {
-                JOptionPane.showMessageDialog(this, "Order could not be updated!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, null, JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_save_orderActionPerformed
@@ -1258,9 +1271,9 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             if (this._listFault.isEmpty() || this._listFault == null) {
                 Fault addFault = new Fault(this.txt_search_fault.getText().toUpperCase());
 
-                int confirmInsertion = JOptionPane.showConfirmDialog(null, "Do you want to add a new fault ?", "Add New Fault", JOptionPane.YES_NO_OPTION);
+                int confirmInsertion = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_ADD_ITEM, this.getTitle(), JOptionPane.YES_NO_OPTION);
                 if (confirmInsertion == 0) {
-                    int idFault = this._faultController.addFaultController(addFault);
+                    long idFault = this._faultController.addFaultController(addFault);
                     if (idFault > 0) {
 
                         this._dtmFault.addRow(
@@ -1309,15 +1322,15 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             Employee employee = _employeeController.getEmployeeByPassDAO(password);
             if (employee != null) {
 
-                int idOrderFaultDeleted = this._orderFaultController.deleteOrderFaultController((Integer) this._dtmFault.getValueAt(selectedRow, 2));
+                long idOrderFaultDeleted = this._orderFaultController.deleteOrderFaultController((long) this._dtmFault.getValueAt(selectedRow, 2));
 
                 if (idOrderFaultDeleted > 0) {
                     this._dtmFault.removeRow(table_view_faults.getSelectedRow());
                 } else {
-                    JOptionPane.showMessageDialog(this, this._dtmFault.getValueAt(selectedRow, 1).toString() + " could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE_ITEM, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.NOT_AUTHORIZED, this.getTitle(), JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_table_view_faultsMouseClicked
@@ -1351,7 +1364,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                         new Object[]{
                             prodServ.getIdProductService(),
                             prodServ.getProdServName(),
-                            CommonSetting.DEFAULT_QTY,
+                            CommonConstant.DEFAULT_QTY,
                             CommonExtension.getPriceFormat(prodServ.getPrice()),
                             CommonExtension.getPriceFormat(prodServ.getPrice() * 1)
                         }
@@ -1373,15 +1386,15 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             Employee employee = _employeeController.getEmployeeByPassDAO(password);
 
             if (employee != null) {
-                int idDeleteOrderProdServ = this._orderProdServController.deleteOrderProdServController((Integer) this._dtmProdServ.getValueAt(selectedRow, 5));
+                long idDeleteOrderProdServ = this._orderProdServController.deleteOrderProdServController((long) this._dtmProdServ.getValueAt(selectedRow, 5));
 
                 if (idDeleteOrderProdServ > 0) {
                     this._dtmProdServ.removeRow(this.table_view_products.getSelectedRow());
                 } else {
-                    JOptionPane.showMessageDialog(this, this._dtmProdServ.getValueAt(selectedRow, 1).toString() + " could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE_ITEM, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Wrong password, please try again!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.NOT_AUTHORIZED, this.getTitle(), JOptionPane.ERROR_MESSAGE);
             }
 
             // Sum price column and set into total textField
@@ -1474,8 +1487,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_serial_numberKeyPressed
 
     private void btn_notesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_notesActionPerformed
-         OrderModel getOrder = getOrderFields();
-        NoteModal noteModal = new NoteModal(getOrder, new MainMenuView(CommonSetting.COMPANY), true);
+        NoteModal noteModal = new NoteModal(_orderModel, new MainMenuView(CommonSetting.COMPANY), true);
         noteModal.setVisible(true);
     }//GEN-LAST:event_btn_notesActionPerformed
 

@@ -12,7 +12,7 @@ public class FaultController {
         return FAULT_DAO.getAllFaultDAO();
     }
 
-    public int addFaultController(Fault pFault) {
+    public long addFaultController(Fault pFault) {
         return FAULT_DAO.addFaultDAO(pFault);
     }
 
@@ -28,7 +28,7 @@ public class FaultController {
         return FAULT_DAO.searchFaultDAO(pSearch);
     }
     
-    public Fault getItemFaultController(int pIdFault) {
+    public Fault getItemFaultController(long pIdFault) {
         return FAULT_DAO.getItemFaultDAO(pIdFault);
     }
     

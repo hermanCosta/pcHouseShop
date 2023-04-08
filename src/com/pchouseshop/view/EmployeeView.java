@@ -1,5 +1,6 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.EmployeeController;
@@ -74,12 +75,12 @@ public class EmployeeView extends javax.swing.JInternalFrame {
                 || this.txt_confirm_pwd.getPassword().length == 0
                 || this.combo_box_access_level.getSelectedIndex() == 0) {
 
-            JOptionPane.showMessageDialog(this, "Please, check Mandatory fields", "New Employee", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_EMPTY_FIELDS, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
             return getEmployee;
         } else if (!Arrays.equals(this.txt_password.getPassword(), this.txt_confirm_pwd.getPassword())) {
 
-            JOptionPane.showMessageDialog(this, "Passwords do not match, please try again !", "New Employee", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.NOT_MATCH_PASSWORD, this.getTitle(), JOptionPane.ERROR_MESSAGE);
 
             return getEmployee;
         } else {
@@ -92,7 +93,7 @@ public class EmployeeView extends javax.swing.JInternalFrame {
 
             person.setIdPerson(CommonExtension.setIdExtension(this.hdn_txt_person_id));
 
-            getEmployee = new Employee(person, this.txt_username.getText().toLowerCase(), this.combo_box_access_level.getSelectedItem().toString().toUpperCase());
+            getEmployee = new Employee(person, this.txt_username.getText().toUpperCase(), this.combo_box_access_level.getSelectedItem().toString().toUpperCase());
 
             getEmployee.setIdEmplyoee(CommonExtension.setIdExtension(this.hdn_txt_employee_id));
             getEmployee.setPassword(CommonExtension.encryptPassword(this.txt_password));
@@ -147,7 +148,7 @@ public class EmployeeView extends javax.swing.JInternalFrame {
         }
     }
 
-    private void getItemEmployee(int idEmployee) {
+    private void getItemEmployee(long idEmployee) {
         if (idEmployee != 0) {
             Employee customerItem = _employeeController.getItemEmployeeController(idEmployee);
 
@@ -747,14 +748,10 @@ public class EmployeeView extends javax.swing.JInternalFrame {
         int selectedRow = this.table_view_employees.getSelectedRow();
 
         if (selectedRow >= 0) {
-
             Employee deleteEmployee = new Employee();
-
             deleteEmployee.setIdEmplyoee((Integer) this._dtmEmployee.getValueAt(selectedRow, 0));
-            String firstName = this._dtmEmployee.getValueAt(selectedRow, 1).toString();
 
-            int confirmDeletion = JOptionPane.showConfirmDialog(this, "Do you really want to delete '"
-                    + firstName, "Delete Employee", JOptionPane.YES_NO_OPTION);
+            int confirmDeletion = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_DELETE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
             if (confirmDeletion == 0) {
                 boolean isDeleted = _employeeController.deleteEmplyoeeController(deleteEmployee.getIdEmplyoee());
@@ -763,7 +760,7 @@ public class EmployeeView extends javax.swing.JInternalFrame {
                     clearFields();
                     loadEmployeeListTable();
                 } else {
-                    JOptionPane.showMessageDialog(this, deleteEmployee.getPerson().getFirstName() + "could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -776,7 +773,7 @@ public class EmployeeView extends javax.swing.JInternalFrame {
     private void table_view_employeesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_employeesMouseClicked
         if (evt.getClickCount() == 2) {
             int selectedRow = this.table_view_employees.getSelectedRow();
-            int idEmployee = (int) this._dtmEmployee.getValueAt(selectedRow, 0);
+            long idEmployee = (long) this._dtmEmployee.getValueAt(selectedRow, 0);
 
             Employee updateEmployee = _employeeController.getItemEmployeeController(idEmployee);
             setEmployeeFields(updateEmployee);
@@ -787,8 +784,7 @@ public class EmployeeView extends javax.swing.JInternalFrame {
         Employee updateEmployee = this.getEmployeeFields();
         if (updateEmployee != null) {
             if (updateEmployee.getIdEmplyoee() > 0) {
-                int confirmEditing = JOptionPane.showConfirmDialog(null, "Confirm Editing " + updateEmployee.getPerson().getFirstName() + " ?",
-                        "Edit Employee", JOptionPane.YES_NO_OPTION);
+                long confirmEditing = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_UPDATE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
                 if (confirmEditing == 0) {
                     boolean isUpdated = this._employeeController.updateEmployeeController(updateEmployee);
@@ -798,7 +794,7 @@ public class EmployeeView extends javax.swing.JInternalFrame {
                         clearFields();
 
                     } else {
-                        JOptionPane.showMessageDialog(this, updateEmployee.getPerson().getFirstName() + "could not be updated!", null, JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -814,18 +810,18 @@ public class EmployeeView extends javax.swing.JInternalFrame {
                 Employee checkEmployee = _employeeController.searchEmployeeByContactNoDAO(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
 
                 if (checkEmployee != null) {
-                    JOptionPane.showMessageDialog(this, "There is another employee associated to this contact !", "New Employee", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.WARN_EXIST_PERSON, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
                     getItemEmployee(checkEmployee.getIdEmplyoee());
                 } else {
 
-                    int idCustomerAdded = this._employeeController.addEmployeeController(addEmployee);
+                    long idCustomerAdded = this._employeeController.addEmployeeController(addEmployee);
                     if (idCustomerAdded > 0) {
 
                         getItemEmployee(idCustomerAdded);
                         clearFields();
                     } else {
-                        JOptionPane.showMessageDialog(this, addEmployee.getPerson().getFirstName() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }

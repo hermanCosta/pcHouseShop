@@ -13,7 +13,7 @@ public class DeviceController {
         return DEVICE_DAO.getAllDeviceDAO();
     }
 
-    public int addDeviceController(Device pDevice) {
+    public long addDeviceController(Device pDevice) {
         return DEVICE_DAO.addDeviceDAO(pDevice);
     }
 

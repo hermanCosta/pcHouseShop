@@ -38,13 +38,13 @@ public class PersonDAO {
         return _listPerson;
     }
 
-    public int addPersonDAO(Person pPerson) {
-        Integer idPersonAdded = 0;
+    public long addPersonDAO(Person pPerson) {
+        long idPersonAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idPersonAdded = (Integer) _session.save(pPerson);
+            idPersonAdded = (long) _session.save(pPerson);
 
             _transaction.commit();
 

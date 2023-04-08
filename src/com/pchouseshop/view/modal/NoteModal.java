@@ -1,5 +1,8 @@
 package com.pchouseshop.view.modal;
 
+import com.pchouseshop.common.CommonConstant;
+import com.pchouseshop.common.CommonExtension;
+import com.pchouseshop.common.CommonStrings;
 import com.pchouseshop.controllers.EmployeeController;
 import com.pchouseshop.controllers.OrderController;
 import com.pchouseshop.controllers.OrderNoteController;
@@ -47,32 +50,67 @@ public class NoteModal extends javax.swing.JDialog {
                 _dtmOrderNote.addRow(
                         new Object[]{
                             orderNote.getIdOrderNote(),
-                            orderNote.getCreated(),
+                            CommonStrings.formatDateToString(orderNote.getCreated()),
                             orderNote.getNote(),
-                            orderNote.getEmployee()
+                            orderNote.getEmployee().getUsername()
                         }
                 );
             }
         }
     }
 
-    private OrderNote getOrderNote(OrderModel order) {
-        OrderNote orderNote = null;
-        Employee employee = this._employeeController.getItemEmployeeController(4);
+    private void searchFault() {
+        if (!this.txt_search_note.getText().trim().isEmpty()) {
+            this._listOrderNotes = this._orderNoteController.searchOrderNoteController(_createdOrderView, this.txt_search_note.getText().toUpperCase());
 
-        if (this.txt_note_description.getText().trim().isEmpty()) {
+            if (this._listOrderNotes != null) {
+                _dtmOrderNote.setRowCount(0);
+
+                for (OrderNote orderNote : _listOrderNotes) {
+                    _dtmOrderNote.addRow(
+                            new Object[]{
+                                orderNote.getIdOrderNote(),
+                                CommonStrings.formatDateToString(orderNote.getCreated()),
+                                orderNote.getNote(),
+                                orderNote.getEmployee().getUsername()
+                            }
+                    );
+                }
+            }
+        } else {
+            loadOrderNoteListTable();
+        }
+    }
+
+    private OrderNote getOrderNoteFields(OrderModel order) {
+        OrderNote orderNote = null;
+
+        if (this.editor_pane_notes.getText().trim().isEmpty() || !this.editor_pane_notes.isEnabled() || !this.hdn_txt_note_id.getText().trim().isEmpty()) {
             return orderNote;
         } else {
-            orderNote = new OrderNote(order, employee, this.txt_note_description.getText(), new Date());
+            Long idOrderNote = _orderNoteController.checkExistingOrderNoteController(this.editor_pane_notes.getText().toUpperCase(), order);
+            if (idOrderNote != null) {
+                JOptionPane.showMessageDialog(this, CommonConstant.WARN_EXIST_ITEM, null, JOptionPane.ERROR_MESSAGE);
+                return orderNote;
+            } else {
+                String password = CommonExtension.requestUserPassword();
+                Employee employee = _employeeController.getEmployeeByPassDAO(password);
+                if (employee != null) {
+                    orderNote = new OrderNote(order, employee, this.editor_pane_notes.getText().toUpperCase(), new Date());
+                } else {
+                    JOptionPane.showMessageDialog(this, CommonConstant.NOT_AUTHORIZED, null, JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
         return orderNote;
     }
 
     private void clearFields() {
         this.txt_search_note.setText("");
-        this.txt_note_description.setText("");
+        this.editor_pane_notes.setText("");
 
         this.txt_search_note.requestFocus();
+        this.editor_pane_notes.setEditable(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -87,8 +125,10 @@ public class NoteModal extends javax.swing.JDialog {
         panel_note_input = new javax.swing.JPanel();
         hdn_txt_note_id = new javax.swing.JTextField();
         lbl_note_star = new javax.swing.JLabel();
-        lbl_note = new javax.swing.JLabel();
-        txt_note_description = new javax.swing.JTextField();
+        scroll_pane_notes1 = new javax.swing.JScrollPane();
+        editor_pane_notes = new javax.swing.JEditorPane();
+        lbl_notes = new javax.swing.JLabel();
+        lbl_max_char = new javax.swing.JLabel();
         panel_fault_buttons = new javax.swing.JPanel();
         btn_clear_fields = new javax.swing.JButton();
         btn_add = new javax.swing.JButton();
@@ -103,9 +143,9 @@ public class NoteModal extends javax.swing.JDialog {
         lbl_search_icon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_search_black.png"))); // NOI18N
 
         txt_search_note.setPreferredSize(new java.awt.Dimension(12, 30));
-        txt_search_note.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_search_noteActionPerformed(evt);
+        txt_search_note.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txt_search_noteKeyReleased(evt);
             }
         });
 
@@ -136,8 +176,8 @@ public class NoteModal extends javax.swing.JDialog {
             table_view_notes.getColumnModel().getColumn(0).setMinWidth(0);
             table_view_notes.getColumnModel().getColumn(0).setPreferredWidth(0);
             table_view_notes.getColumnModel().getColumn(0).setMaxWidth(0);
-            table_view_notes.getColumnModel().getColumn(1).setPreferredWidth(150);
-            table_view_notes.getColumnModel().getColumn(1).setMaxWidth(200);
+            table_view_notes.getColumnModel().getColumn(1).setPreferredWidth(120);
+            table_view_notes.getColumnModel().getColumn(1).setMaxWidth(150);
             table_view_notes.getColumnModel().getColumn(3).setPreferredWidth(100);
             table_view_notes.getColumnModel().getColumn(3).setMaxWidth(150);
         }
@@ -153,11 +193,20 @@ public class NoteModal extends javax.swing.JDialog {
         lbl_note_star.setForeground(java.awt.Color.red);
         lbl_note_star.setText("*");
 
-        lbl_note.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        lbl_note.setText("new Note");
+        scroll_pane_notes1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll_pane_notes1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scroll_pane_notes1.setVerifyInputWhenFocusTarget(false);
 
-        txt_note_description.setMinimumSize(new java.awt.Dimension(80, 32));
-        txt_note_description.setPreferredSize(new java.awt.Dimension(600, 25));
+        editor_pane_notes.setBorder(null);
+        editor_pane_notes.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+        editor_pane_notes.setFocusCycleRoot(false);
+        editor_pane_notes.setPreferredSize(new java.awt.Dimension(403, 58));
+        scroll_pane_notes1.setViewportView(editor_pane_notes);
+
+        lbl_notes.setText("New Note");
+
+        lbl_max_char.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        lbl_max_char.setText("max 1000 charactere");
 
         javax.swing.GroupLayout panel_note_inputLayout = new javax.swing.GroupLayout(panel_note_input);
         panel_note_input.setLayout(panel_note_inputLayout);
@@ -166,25 +215,33 @@ public class NoteModal extends javax.swing.JDialog {
             .addGroup(panel_note_inputLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_note_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(hdn_txt_note_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_note_star))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbl_note)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_note_description, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                    .addGroup(panel_note_inputLayout.createSequentialGroup()
+                        .addGroup(panel_note_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(hdn_txt_note_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_note_star))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbl_notes)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbl_max_char)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(scroll_pane_notes1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 556, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panel_note_inputLayout.setVerticalGroup(
             panel_note_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_note_inputLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(panel_note_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel_note_inputLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(hdn_txt_note_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
+                        .addComponent(lbl_note_star, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panel_note_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(lbl_note)
-                        .addComponent(lbl_note_star, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txt_note_description, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(hdn_txt_note_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(lbl_notes)
+                        .addComponent(lbl_max_char)))
+                .addGap(0, 0, 0)
+                .addComponent(scroll_pane_notes1, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         panel_fault_buttons.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -242,10 +299,9 @@ public class NoteModal extends javax.swing.JDialog {
                 .addGroup(panel_fault_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btn_clear_fields, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(panel_fault_buttonsLayout.createSequentialGroup()
-                        .addGroup(panel_fault_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btn_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btn_add, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(btn_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(btn_add, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -273,10 +329,10 @@ public class NoteModal extends javax.swing.JDialog {
                     .addComponent(txt_search_note, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lbl_search_icon, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroll_pane_notes, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(panel_note_input, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(scroll_pane_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(panel_note_input, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panel_fault_buttons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -304,70 +360,30 @@ public class NoteModal extends javax.swing.JDialog {
 
     private void table_view_notesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_notesMouseClicked
         if (evt.getClickCount() == 2) {
-            DefaultTableModel dtm = (DefaultTableModel) table_view_notes.getModel();
-
             int selectedRow = table_view_notes.getSelectedRow();
-            String selectedNote = dtm.getValueAt(selectedRow, 1).toString();
-            String selectedUser = dtm.getValueAt(selectedRow, 2).toString();
-
-            if (selectedUser.equals("System")) {
-                JOptionPane.showMessageDialog(this, "Notes from System are not allowed to delete !", "Order Notes", JOptionPane.ERROR_MESSAGE);
-            } else {
-                int confirmDeletion = JOptionPane.showConfirmDialog(null, "Do you want to Delete note " + selectedNote + " ?", "Order Notes", JOptionPane.YES_NO_OPTION);
-                if (confirmDeletion == 0) {
-                }
-            }
+            this.editor_pane_notes.setText(_dtmOrderNote.getValueAt(selectedRow, 2).toString());
+            this.editor_pane_notes.setEditable(false);
         }
     }//GEN-LAST:event_table_view_notesMouseClicked
-
-    private void txt_search_noteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_search_noteActionPerformed
-
-//        Date date = new Date();
-//        Timestamp currentDate = new Timestamp(date.getTime());
-//        noteDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(currentDate);
-//        note = txt_search_note.getText();
-//
-//        int confirmInsertion = JOptionPane.showConfirmDialog(this, "Do you want to add note: " + note + " to the Database ?", "Order Notes", JOptionPane.YES_OPTION);
-//        if (confirmInsertion == 0) {
-//
-//            txt_search_note.setText("");
-//            loadTableNotes();
-//        }
-    }//GEN-LAST:event_txt_search_noteActionPerformed
 
     private void btn_clear_fieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clear_fieldsActionPerformed
         clearFields();
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
     private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
-
-        OrderModel order = _orderController.getItemOrderController(7);
-        OrderNote addOrderNote = getOrderNote(order);
+        OrderNote addOrderNote = getOrderNoteFields(_createdOrderView);
         if (addOrderNote != null) {
 
             long idNoteAdded = _orderNoteController.addOrderNoteController(addOrderNote);
             if (idNoteAdded > 0) {
-                JOptionPane.showMessageDialog(this, "Note created successfully!");
+                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE_ITEM);
+                loadOrderNoteListTable();
+                clearFields();
             } else {
-                JOptionPane.showMessageDialog(this, "Notes could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE_ITEM, null, JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
-
-//        Note addFault = this.getFaultFields();
-//
-//        if (addFault != null) {
-//            int idFault = this._faultController.addFaultController(addFault);
-//
-//            if (idFault > 0) {
-//                JOptionPane.showMessageDialog(this, addFault.getDescription() + " added successfully!");
-//                loadFaultListTable();
-//
-//                this.txt_search_fault.setText("");
-//            } else {
-//                JOptionPane.showMessageDialog(this, addFault.getDescription() + "could not be saved!", null, JOptionPane.ERROR_MESSAGE);
-//            }
-//        }
     }//GEN-LAST:event_btn_addActionPerformed
 
     private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
@@ -395,20 +411,26 @@ public class NoteModal extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btn_deleteActionPerformed
 
+    private void txt_search_noteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_search_noteKeyReleased
+        searchFault();
+    }//GEN-LAST:event_txt_search_noteKeyReleased
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_add;
     private javax.swing.JButton btn_clear_fields;
     private javax.swing.JButton btn_delete;
+    private javax.swing.JEditorPane editor_pane_notes;
     private javax.swing.JTextField hdn_txt_note_id;
-    private javax.swing.JLabel lbl_note;
+    private javax.swing.JLabel lbl_max_char;
     private javax.swing.JLabel lbl_note_star;
+    private javax.swing.JLabel lbl_notes;
     private javax.swing.JLabel lbl_search_icon;
     private javax.swing.JPanel panel_fault_buttons;
     private javax.swing.JPanel panel_note_input;
     private javax.swing.JPanel panel_notes;
     private javax.swing.JScrollPane scroll_pane_notes;
+    private javax.swing.JScrollPane scroll_pane_notes1;
     private javax.swing.JTable table_view_notes;
-    private javax.swing.JTextField txt_note_description;
     private javax.swing.JTextField txt_search_note;
     // End of variables declaration//GEN-END:variables
 }

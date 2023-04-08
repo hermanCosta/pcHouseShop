@@ -1,6 +1,7 @@
 package com.pchouseshop.dao;
 
 import com.pchouseshop.connection.HibernateUtil;
+import com.pchouseshop.model.Company;
 import com.pchouseshop.model.Refurb;
 import java.util.List;
 import org.hibernate.HibernateException;
@@ -16,14 +17,14 @@ public class RefurbDAO {
     Transaction _transaction;
     List<Refurb> _listRefurbProd = null;
 
-    public List<Refurb> getAllRefurbProdDAO(int pIdCompany) {
+    public List<Refurb> getAllRefurbProdDAO(Company pCompany) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM Refurb R "
-                    + "WHERE R.idCompany = :idCompany "
+                    + "WHERE R.company = :pCompany "
                     + "ORDER BY R.category ASC")
-                    .setParameter("idCompany", pIdCompany);
+                    .setParameter("pCompany", pCompany);
 
             _listRefurbProd = query.getResultList();
             _transaction.commit();
@@ -37,14 +38,14 @@ public class RefurbDAO {
         return _listRefurbProd;
     }
 
-    public int addRefurbProductDAO(Refurb pRefurbProd) {
-        Integer idRefurbAdded = 0;
+    public long addRefurbProductDAO(Refurb pRefurbProd) {
+        long idRefurbAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
 
-            idRefurbAdded = (Integer) _session.save(pRefurbProd);
+            idRefurbAdded = (long) _session.save(pRefurbProd);
 
             _transaction.commit();
 
@@ -58,7 +59,7 @@ public class RefurbDAO {
         return idRefurbAdded;
     }
 
-    public Refurb getItemRefurbProdDAO(int pIdRefurbProd) {
+    public Refurb getItemRefurbProdDAO(long pIdRefurbProd) {
         Refurb itemRefurbProd = null;
 
         try {
@@ -151,15 +152,15 @@ public class RefurbDAO {
         return _listRefurbProd;
     }
 
-    public List<Refurb> getAllRefurbByCategoryDAO(int pIdCompany, String pCategory) {
+    public List<Refurb> getAllRefurbByCategoryDAO(Company pCompany, String pCategory) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM Refurb R "
-                    + "WHERE R.idCompany = :idCompany "
+                    + "WHERE R.company = :pCompany "
                     + "AND R.category = :category "
                     + "ORDER BY R.brand ASC")
-                    .setParameter("idCompany", pIdCompany)
+                    .setParameter("pCompany", pCompany)
                     .setParameter("category", pCategory);
 
             _listRefurbProd = query.getResultList();
@@ -174,12 +175,12 @@ public class RefurbDAO {
         return _listRefurbProd;
     }
 
-    public List<Refurb> searchRefurbByCategoryDAO(int pIdCompany, String pCategory, String pSearch) {
+    public List<Refurb> searchRefurbByCategoryDAO(Company pCompany, String pCategory, String pSearch) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM Refurb R "
-                    + "WHERE R.idCompany = :idCompany "
+                    + "WHERE R.company = :pCompany "
                     + "AND R.category = :pCategory "
                     + "AND(R.brand LIKE :pSearch "
                     + "OR R.model LIKE :pSearch "
@@ -200,7 +201,7 @@ public class RefurbDAO {
                     + "OR R.custom5 LIKE :pSearch "
                     + "OR R.custom6 LIKE :pSearch) "
                     + "ORDER BY R.brand ASC")
-                    .setParameter("idCompany", pIdCompany)
+                    .setParameter("company", pCompany)
                     .setParameter("pCategory", pCategory)
                     .setParameter("pSearch", "%" + pSearch + "%");
             _listRefurbProd = query.getResultList();
@@ -215,18 +216,18 @@ public class RefurbDAO {
         return _listRefurbProd;
     }
 
-    public List<Refurb> getAllCustomRefurbProdDAO(int pIdCompany) {
+    public List<Refurb> getAllCustomRefurbProdDAO(Company pCompany) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM Refurb R "
-                    + "WHERE R.idCompany = :idCompany "
+                    + "WHERE R.company = :pCompany "
                     + "AND R.category <> 'COMPUTER' "
                     + "AND R.category <> 'CONSOLE' "
                     + "AND R.category <> 'MONITOR' "
                     + "AND R.category <> 'TV' "
                     + "ORDER BY R.category ASC")
-                    .setParameter("idCompany", pIdCompany);
+                    .setParameter("pCompany", pCompany);
 
             _listRefurbProd = query.getResultList();
             _transaction.commit();
@@ -240,12 +241,12 @@ public class RefurbDAO {
         return _listRefurbProd;
     }
 
-    public List<Refurb> searchCustomRefurbDAO(int pIdCompany, String pSearch) {
+    public List<Refurb> searchCustomRefurbDAO(Company pCompany, String pSearch) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM Refurb R "
-                    + "WHERE R.idCompany = :idCompany "
+                    + "WHERE R.company = :company "
                     + "AND R.category <> 'COMPUTER' "
                     + "AND R.category <> 'CONSOLE' "
                     + "AND R.category <> 'MONITOR' "
@@ -269,7 +270,7 @@ public class RefurbDAO {
                     + "OR R.custom5 LIKE :pSearch "
                     + "OR R.custom6 LIKE :pSearch) "
                     + "ORDER BY R.category ASC")
-                    .setParameter("idCompany", pIdCompany)
+                    .setParameter("company", pCompany)
                     .setParameter("pSearch", "%" + pSearch + "%");
             _listRefurbProd = query.getResultList();
             _transaction.commit();

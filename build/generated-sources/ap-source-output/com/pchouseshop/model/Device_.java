@@ -10,7 +10,7 @@ public abstract class Device_ {
 
 	public static volatile SingularAttribute<Device, String> serialNumber;
 	public static volatile SingularAttribute<Device, String> model;
-	public static volatile SingularAttribute<Device, Integer> idDevice;
+	public static volatile SingularAttribute<Device, Long> idDevice;
 	public static volatile SingularAttribute<Device, String> brand;
 
 	public static final String SERIAL_NUMBER = "serialNumber";

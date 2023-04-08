@@ -8,7 +8,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Employee.class)
 public abstract class Employee_ {
 
-	public static volatile SingularAttribute<Employee, Integer> idEmployee;
+	public static volatile SingularAttribute<Employee, Long> idEmployee;
 	public static volatile SingularAttribute<Employee, String> password;
 	public static volatile SingularAttribute<Employee, String> accessLevel;
 	public static volatile SingularAttribute<Employee, Person> person;

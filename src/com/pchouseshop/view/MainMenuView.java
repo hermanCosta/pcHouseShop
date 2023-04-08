@@ -1,11 +1,11 @@
 package com.pchouseshop.view;
 
 import com.pchouseshop.common.CommonSetting;
+import com.pchouseshop.common.CommonStrings;
 import com.pchouseshop.model.Company;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -38,13 +38,10 @@ public class MainMenuView extends javax.swing.JFrame {
         Timer updateTimer;
         int DELAY = 100;
         updateTimer = new Timer(DELAY, (ActionEvent e) -> {
-            Date currentDate = new Date();
-            SimpleDateFormat dtf = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss");
-            String dateTime = dtf.format(currentDate);
-            this.lbl_time_stamp.setText(dateTime);
+            this.lbl_time_stamp.setText(CommonStrings.formatDateToString(new Date()));
         });
-
         updateTimer.start();
+        
         this.lbl_shop_name.setText(this._company.getName().toUpperCase());
         
         //  label.setText("<html><p style=\"width:100px\">"+paragraph+"</p></html>");

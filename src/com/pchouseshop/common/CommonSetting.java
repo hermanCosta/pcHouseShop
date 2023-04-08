@@ -25,12 +25,11 @@ import javax.swing.table.TableColumn;
 
 public class CommonSetting {
 
-    Color defaultColor = new Color(21, 76, 121);
-    Color clickedColor = new Color(118, 181, 197);
-    public static int ID_COMPANY;
+    public static final Color defaultColor = new Color(21, 76, 121);
+    public static final Color clickedColor = new Color(118, 181, 197);
+    public static long ID_COMPANY;
     public static Company COMPANY;
     public static JDesktopPane MAIN_MENU_DESKTOP_PANE;
-    public static int DEFAULT_QTY = 1;
 
     public static void tableSettings(JTable jTable) {
         jTable.setRowHeight(20);

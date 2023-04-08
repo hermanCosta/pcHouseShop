@@ -15,7 +15,7 @@ public abstract class OrderModel_ {
 	public static volatile SingularAttribute<OrderModel, Date> finished;
 	public static volatile SingularAttribute<OrderModel, Employee> employee;
 	public static volatile SingularAttribute<OrderModel, Integer> bad_sector;
-	public static volatile SingularAttribute<OrderModel, Integer> idOrder;
+	public static volatile SingularAttribute<OrderModel, Long> idOrder;
 	public static volatile SingularAttribute<OrderModel, Double> total;
 	public static volatile SingularAttribute<OrderModel, Double> due;
 	public static volatile SingularAttribute<OrderModel, Date> picked;

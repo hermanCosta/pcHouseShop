@@ -1,5 +1,6 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.CustomerController;
@@ -67,7 +68,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
         if (this.txt_first_name.getText().trim().isEmpty() || this.txt_last_name.getText().trim().isEmpty()
                 || this.txt_contact.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please, check Empty fields", "New Costumer", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_EMPTY_FIELDS, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
             return getCustomer;
         } else {
@@ -620,11 +621,9 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
             Customer deleteCustomer = new Customer();
 
-            deleteCustomer.setIdCustomer((Integer) this._dtmCustomer.getValueAt(selectedRow, 0));
-            String firstName = this._dtmCustomer.getValueAt(selectedRow, 1).toString();
+            deleteCustomer.setIdCustomer((long) this._dtmCustomer.getValueAt(selectedRow, 0));
 
-            int confirmDeletion = JOptionPane.showConfirmDialog(this, "Do you really want to delete '"
-                    + firstName + " ?", "Delete Customer", JOptionPane.YES_NO_OPTION);
+            int confirmDeletion = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_DELETE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
             if (confirmDeletion == 0) {
                 boolean isDeleted = _customerController.deleteCustomerController(deleteCustomer.getIdCustomer());
@@ -633,7 +632,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
                     cleanFields();
                     loadCustomerListTable();
                 } else {
-                    JOptionPane.showMessageDialog(this, deleteCustomer.getPerson().getFirstName() + "could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -653,10 +652,10 @@ public class CustomerView extends javax.swing.JInternalFrame {
                     this._dtmCustomer.getValueAt(selectedRow, 3).toString(),
                     this._dtmCustomer.getValueAt(selectedRow, 4).toString());
 
-            updatePerson.setIdPerson((Integer) this._dtmCustomer.getValueAt(selectedRow, 5));
+            updatePerson.setIdPerson((long) this._dtmCustomer.getValueAt(selectedRow, 5));
 
             Customer updateCustomer = new Customer(updatePerson, CommonSetting.COMPANY);
-            updateCustomer.setIdCustomer((int) this._dtmCustomer.getValueAt(selectedRow, 0));
+            updateCustomer.setIdCustomer((long) this._dtmCustomer.getValueAt(selectedRow, 0));
 
             setCustomerFields(updateCustomer);
         }
@@ -667,8 +666,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
         if (updateCustomer != null) {
             if (updateCustomer.getIdCustomer() > 0) {
 
-                int confirmEditing = JOptionPane.showConfirmDialog(null, "Confirm Editing " + updateCustomer.getPerson().getFirstName() + " ?",
-                        "Edit Customer", JOptionPane.YES_NO_OPTION);
+                int confirmEditing = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_UPDATE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
                 if (confirmEditing == 0) {
                     boolean isUpdated = this._customerController.updateCustomerController(updateCustomer);
@@ -677,7 +675,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
                         getItemCustomer(updateCustomer.getIdCustomer());
 
                     } else {
-                        JOptionPane.showMessageDialog(this, updateCustomer.getPerson().getFirstName() + "could not be updated!", null, JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -693,19 +691,19 @@ public class CustomerView extends javax.swing.JInternalFrame {
                 Customer checkCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
 
                 if (checkCustomer != null) {
-                    JOptionPane.showMessageDialog(this, "There is another customer associated to this contact !", "New Customer", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.WARN_EXIST_PERSON, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
                     getItemCustomer(checkCustomer.getIdCustomer());
                 } else {
 
                     long idCustomerAdded = this._customerController.addCustomerController(addCustomer);
                     if (idCustomerAdded > 0) {
-                        JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " added successfully!");
+                        JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
 
                         getItemCustomer(idCustomerAdded);
                         cleanFields();
                     } else {
-                        JOptionPane.showMessageDialog(this, addCustomer.getPerson().getFirstName() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }

@@ -5,23 +5,23 @@
             <url>src/com/pchouseshop/view/CreatedOrderView.java</url>
             <bookmark id="7">
                 <name/>
-                <line>1196</line>
+                <line>1202</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/dao/CustomerDAO.java</file>
-            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/view/modal/CustomerModal.java</file>
+            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/controllers/OrderNoteController.java</file>
             <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/common/CommonExtension.java</file>
-            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/model/Customer.java</file>
+            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/common/CommonStrings.java</file>
+            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/model/OrderNote.java</file>
+            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/view/FaultView.java</file>
             <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/view/CreatedOrderView.java</file>
-            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/view/CustomerView.java</file>
-            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/controllers/DeviceController.java</file>
+            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/dao/DepositDAO.java</file>
+            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/view/modal/NoteModal.java</file>
+            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/dao/OrderNoteDAO.java</file>
             <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/view/OrderListView.java</file>
-            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/model/OrderProdServ.java</file>
-            <file>file:/C:/Users/Herman/dev/pcHouseShop/src/com/pchouseshop/controllers/CustomerController.java</file>
         </group>
     </open-files>
 </project-private>

@@ -5,6 +5,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -14,7 +16,7 @@ public class Refurb implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "ID_REFURB")
-    private int idRefurb;
+    private long idRefurb;
 
     @Column(name = "CATEGORY")
     private String category;
@@ -73,13 +75,14 @@ public class Refurb implements Serializable {
     @Column(name = "CUSTOM_6")
     private String custom6;
 
-    @Column(name = "ID_COMPANY")
-    private int idCompany;
+     @OneToOne()
+    @JoinColumn(name = "ID_COMPANY", referencedColumnName = "ID_COMPANY")
+    private Company company;
 
     public Refurb() {
     }
 
-    public Refurb(String category, String brand, String model, double price, int qty, String serialNumber, String note, String screen, String processor, String ramMemory, String storage, String gpuBoard, String batteryHealth, String custom1, String custom2, String custom3, String custom4, String custom5, String custom6, int idCompany) {
+    public Refurb(String category, String brand, String model, double price, int qty, String serialNumber, String note, String screen, String processor, String ramMemory, String storage, String gpuBoard, String batteryHealth, String custom1, String custom2, String custom3, String custom4, String custom5, String custom6, Company idCompany) {
         this.category = category;
         this.brand = brand;
         this.model = model;
@@ -99,14 +102,14 @@ public class Refurb implements Serializable {
         this.custom4 = custom4;
         this.custom5 = custom5;
         this.custom6 = custom6;
-        this.idCompany = idCompany;
+        this.company = company;
     }
 
-    public int getIdRefurb() {
+    public long getIdRefurb() {
         return idRefurb;
     }
 
-    public void setIdRefurb(int idRefurb) {
+    public void setIdRefurb(long idRefurb) {
         this.idRefurb = idRefurb;
     }
 
@@ -262,12 +265,12 @@ public class Refurb implements Serializable {
         this.custom6 = custom6;
     }
 
-    public int getIdCompany() {
-        return idCompany;
+    public Company getIdCompany() {
+        return company;
     }
 
-    public void setIdCompany(int idCompany) {
-        this.idCompany = idCompany;
+    public void setIdCompany(Company company) {
+        this.company = company;
     }
 
 }

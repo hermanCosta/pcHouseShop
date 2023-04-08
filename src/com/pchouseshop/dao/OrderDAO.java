@@ -17,18 +17,18 @@ public class OrderDAO {
     Transaction _transaction;
     List<OrderModel> _listOrder = null;
 
-    public Integer getLastOrderIdDAO() {
-        Integer orderId = 0;
+    public long getLastOrderIdDAO() {
+        long orderId = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("SELECT MAX(O.idOrder) FROM OrderModel O");
 
-            orderId = (Integer) query.uniqueResult();
+            orderId = (long) query.uniqueResult();
             _transaction.commit();
 
-            if (orderId == null) {
+            if (orderId == 0) {
                 orderId = 1;
             }
 
@@ -42,13 +42,13 @@ public class OrderDAO {
         return orderId;
     }
 
-    public Integer addOrderDAO(OrderModel pOrder) {
-        Integer idOrderAdded = 0;
+    public long addOrderDAO(OrderModel pOrder) {
+        long idOrderAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idOrderAdded = (Integer) _session.save(pOrder);
+            idOrderAdded = (long) _session.save(pOrder);
 
             _transaction.commit();
         } catch (HibernateException e) {
@@ -61,7 +61,7 @@ public class OrderDAO {
         return idOrderAdded;
     }
 
-    public OrderModel getItemOrderDAO(int pIdOrder) {
+    public OrderModel getItemOrderDAO(long pIdOrder) {
         OrderModel itemOrder = null;
 
         try {

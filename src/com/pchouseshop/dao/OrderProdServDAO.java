@@ -23,7 +23,7 @@ public class OrderProdServDAO {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idOrderProdServAdded = (Integer) _session.save(pOrderProdServ);
+            idOrderProdServAdded = (long) _session.save(pOrderProdServ);
             
             _transaction.commit();
         } catch (HibernateException e) {
@@ -55,8 +55,8 @@ public class OrderProdServDAO {
         return _listOrderProdServ;
     }
     
-    public int deleteOrderProdServDAO(long pIdOrderProdServ) {
-        int result = 0;
+    public long deleteOrderProdServDAO(long pIdOrderProdServ) {
+        long result = 0;
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();

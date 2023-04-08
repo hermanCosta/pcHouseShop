@@ -37,13 +37,13 @@ public class FaultDAO {
         return _listFault;
     }
     
-    public int addFaultDAO(Fault pFault) {
-        Integer idFaultAdded = 0;
+    public long addFaultDAO(Fault pFault) {
+        long idFaultAdded = 0;
         
         try {
             _session = _sessionFactory.openSession();    
             _transaction = _session.beginTransaction();
-            idFaultAdded = (Integer)_session.save(pFault);
+            idFaultAdded = (long)_session.save(pFault);
             
             _transaction.commit();
             
@@ -109,7 +109,7 @@ public class FaultDAO {
         return _listFault;
     }
     
-    public Fault getItemFaultDAO(int pIdFault) {
+    public Fault getItemFaultDAO(long pIdFault) {
         Fault itemFault = null;
         
         try {

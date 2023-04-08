@@ -9,15 +9,15 @@ public class OrderController {
 
     private final OrderDAO ORDER_DAO = new OrderDAO();
 
-    public int getLastOrderIdController() {
+    public long getLastOrderIdController() {
         return ORDER_DAO.getLastOrderIdDAO();
     }
 
-    public Integer addOrderController(OrderModel pOrder) {
+    public long addOrderController(OrderModel pOrder) {
         return ORDER_DAO.addOrderDAO(pOrder);
     }
 
-    public OrderModel getItemOrderController(int pIdOrder) {
+    public OrderModel getItemOrderController(long pIdOrder) {
         return ORDER_DAO.getItemOrderDAO(pIdOrder);
     }
 

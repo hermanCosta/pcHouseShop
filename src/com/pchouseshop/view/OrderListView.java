@@ -1,5 +1,6 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.DepositController;
 import com.pchouseshop.controllers.OrderController;
@@ -102,7 +103,7 @@ public class OrderListView extends javax.swing.JInternalFrame {
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
-        setTitle("Order List View");
+        setToolTipText(CommonConstant.TBL_OPEN_ITEM_TOOL_TIP);
         setMaximumSize(new java.awt.Dimension(1049, 700));
         setPreferredSize(new java.awt.Dimension(1050, 650));
 
@@ -125,6 +126,7 @@ public class OrderListView extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
+        table_view_order_list.setToolTipText(CommonConstant.TBL_OPEN_ITEM_TOOL_TIP);
         table_view_order_list.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
         table_view_order_list.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -209,16 +211,16 @@ public class OrderListView extends javax.swing.JInternalFrame {
         if (evt.getClickCount() == 2) {
             int selectedRow = table_view_order_list.getSelectedRow();
 
-            OrderModel orderModel = _orderController.getItemOrderController((Integer) _dtmOrder.getValueAt(selectedRow, 0));
+            OrderModel orderModel = _orderController.getItemOrderController((long) _dtmOrder.getValueAt(selectedRow, 0));
             List<OrderFault> listOrderFault = _orderFaultController.getOrderFaultController(orderModel);
             List<OrderProdServ> listOrderProdServ = _orderProdServController.getOrderProdServController(orderModel);
             List<Deposit> listOrderDeposit = _orderDeposit.getOrderDepositController(orderModel);
-
+            
             CommonSetting.MAIN_MENU_DESKTOP_PANE.removeAll();
             switch (orderModel.getStatus()) {
                 case IN_PROGRESS:
                     CreatedOrderView createdOrderView = new CreatedOrderView(orderModel, listOrderFault, listOrderProdServ, listOrderDeposit);
-                     
+                    
                     CommonSetting.MAIN_MENU_DESKTOP_PANE.add(createdOrderView).setVisible(true);
                     CommonSetting.setMaxInternalFrame(createdOrderView);
                 break;

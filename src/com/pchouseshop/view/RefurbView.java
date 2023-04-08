@@ -1,5 +1,6 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.RefurbController;
@@ -32,7 +33,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
     }
 
     private void loadRefurbProdListTable() {
-        this._listRefurb = this._refurbController.getAllRefurbProdController(CommonSetting.ID_COMPANY);
+        this._listRefurb = this._refurbController.getAllRefurbProdController(CommonSetting.COMPANY);
 
         this._dtmRefurb.setRowCount(0);
 
@@ -62,7 +63,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
                 || this.txt_model.getText().trim().isEmpty()
                 || this.txt_price.getText().trim().isEmpty()) {
 
-            JOptionPane.showMessageDialog(this, "Please, check Mandatory fields", "Add Refurb Product", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_EMPTY_FIELDS, this.getTitle(), JOptionPane.WARNING_MESSAGE);
 
             return getRefurb;
         } else {
@@ -86,7 +87,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
                     CommonExtension.joinCustomRefurbFields(this.lbl_custom_4, this.txt_custom_4),
                     CommonExtension.joinCustomRefurbFields(this.lbl_custom_5, this.txt_custom_5),
                     CommonExtension.joinCustomRefurbFields(this.lbl_custom_6, this.txt_custom_6),
-                    CommonSetting.ID_COMPANY);
+                    CommonSetting.COMPANY);
 
             int idRefurb = CommonExtension.setIdExtension(this.txt_refurb_id);
             getRefurb.setIdRefurb(idRefurb);
@@ -165,7 +166,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
         }
     }
 
-    private void getItemRefurbProd(int idRefurbProd) {
+    private void getItemRefurbProd(long idRefurbProd) {
         if (idRefurbProd != 0) {
             Refurb refurbProd = _refurbController.getItemRefurbProdController(idRefurbProd);
 
@@ -951,16 +952,16 @@ public class RefurbView extends javax.swing.JInternalFrame {
         Refurb addRefurbProd = this.getRefurbFields();
 
         if (addRefurbProd != null) {
-            int isRefurnAdded = this._refurbController.addRefurbProductController(addRefurbProd);
+            long isRefurnAdded = this._refurbController.addRefurbProductController(addRefurbProd);
 
             if (isRefurnAdded > 0) {
-                JOptionPane.showMessageDialog(this, addRefurbProd.getCategory() + " added successfully!");
+                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
                 loadRefurbProdListTable();
                 cleanBasicInfoPanelFields();
                 cleanExtraInfoPanelFields();
                 cleanCustomInfoPanelFields();
             } else {
-                JOptionPane.showMessageDialog(this, addRefurbProd.getCategory() + " could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_addActionPerformed
@@ -969,8 +970,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
         Refurb updateRefurb = getRefurbFields();
 
         if (updateRefurb != null) {
-            int confirmEditing = JOptionPane.showConfirmDialog(null, "Confirm Editing " + updateRefurb.getCategory() + "?",
-                    "Edit Refurb Product", JOptionPane.YES_NO_OPTION);
+            int confirmEditing = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_UPDATE,this.getTitle(), JOptionPane.YES_NO_OPTION);
             if (confirmEditing == 0) {
                 boolean isUpdated = this._refurbController.updateRefurbProdController(updateRefurb);
 
@@ -981,7 +981,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
                     cleanExtraInfoPanelFields();
                     cleanCustomInfoPanelFields();
                 } else {
-                    JOptionPane.showMessageDialog(this, updateRefurb.getCategory() + " could not be updated!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -1030,8 +1030,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
             deleteRefurbProd.setIdRefurb((Integer) this._dtmRefurb.getValueAt(selectedRow, 0));
             deleteRefurbProd.setModel(this._dtmRefurb.getValueAt(selectedRow, 2).toString());
 
-            int confirmDeletion = JOptionPane.showConfirmDialog(this, "Do you really want to delete "
-                    + deleteRefurbProd.getCategory() + " ?", "Delete Refurb Product", JOptionPane.YES_NO_OPTION);
+            int confirmDeletion = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_DELETE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
             if (confirmDeletion == 0) {
                 boolean isDeleted = this._refurbController.deleteRefurbProdController(deleteRefurbProd);
@@ -1039,7 +1038,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
                 if (isDeleted) {
                     loadRefurbProdListTable();
                 } else {
-                    JOptionPane.showMessageDialog(this, deleteRefurbProd.getCategory() + " could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE_ITEM, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }

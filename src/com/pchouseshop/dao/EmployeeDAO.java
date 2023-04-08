@@ -40,14 +40,14 @@ public class EmployeeDAO {
         return _listEmployee;
     }
 
-    public int addEmployeeDAO(Employee pEmployee) {
-        Integer idEmployeeAdded = 0;
+    public long addEmployeeDAO(Employee pEmployee) {
+        long idEmployeeAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
 
-            idEmployeeAdded = (Integer) _session.save(pEmployee);
+            idEmployeeAdded = (long) _session.save(pEmployee);
 
             _transaction.commit();
 
@@ -84,7 +84,7 @@ public class EmployeeDAO {
         return true;
     }
 
-    public boolean deleteEmplyoeeDAO(int pEmployeeId) {
+    public boolean deleteEmplyoeeDAO(long pEmployeeId) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
@@ -126,7 +126,7 @@ public class EmployeeDAO {
         return employee;
     }
     
-    public Employee getItemEmployeeDAO(int pIdEmployeeId) {
+    public Employee getItemEmployeeDAO(long pIdEmployeeId) {
         Employee itemEmployee = null;
         
         try {

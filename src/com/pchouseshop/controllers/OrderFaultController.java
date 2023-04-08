@@ -21,7 +21,7 @@ public class OrderFaultController {
         return ORDER_FAULT_DAO.updateOrderFaultDAO(pOrderFault);
     }
 
-    public int deleteOrderFaultController(long pIdOrderFault) {
+    public long deleteOrderFaultController(long pIdOrderFault) {
         return ORDER_FAULT_DAO.deleteOrderFaultDAO(pIdOrderFault);
     }
 }

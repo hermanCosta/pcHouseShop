@@ -9,7 +9,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class Fault_ {
 
 	public static volatile SingularAttribute<Fault, String> description;
-	public static volatile SingularAttribute<Fault, Integer> idFault;
+	public static volatile SingularAttribute<Fault, Long> idFault;
 
 	public static final String DESCRIPTION = "description";
 	public static final String ID_FAULT = "idFault";

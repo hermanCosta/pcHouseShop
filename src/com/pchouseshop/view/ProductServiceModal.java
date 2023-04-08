@@ -25,7 +25,7 @@ public class ProductServiceModal extends javax.swing.JDialog {
     }
 
     private void loadProdServListTable() {
-        this._listProdServ = _productServiceController.getAllProductController(CommonSetting.ID_COMPANY);
+        this._listProdServ = _productServiceController.getAllProductController(CommonSetting.COMPANY);
 
         _dtmProdServ.setRowCount(0);
         CommonSetting.fitContentJtable(this.table_view_products_list);

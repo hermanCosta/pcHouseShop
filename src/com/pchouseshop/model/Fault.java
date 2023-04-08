@@ -14,7 +14,7 @@ public class Fault implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "ID_FAULT")
-    private int idFault;
+    private long idFault;
     
     @Column(name = "DESCRIPTION")
     private String description;
@@ -26,11 +26,11 @@ public class Fault implements Serializable {
         this.description = description;
     }
 
-    public int getIdFault() {
+    public long getIdFault() {
         return idFault;
     }
 
-    public void setIdFault(int idFault) {
+    public void setIdFault(long idFault) {
         this.idFault = idFault;
     }
 

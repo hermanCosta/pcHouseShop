@@ -13,7 +13,7 @@ public class Company implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "ID_COMPANY")
-    private int idCompany;
+    private long idCompany;
     
     @Column(name = "NAME") 
     private String name;
@@ -37,7 +37,7 @@ public class Company implements Serializable {
         
     }
 
-    public Company(int idCompany, String name, String address, String contactOne, String contactTwo, String email, String password) {
+    public Company(long idCompany, String name, String address, String contactOne, String contactTwo, String email, String password) {
         this.idCompany = idCompany;
         this.name = name;
         this.address = address;
@@ -47,7 +47,7 @@ public class Company implements Serializable {
         this.password = password;
     }
 
-    public int getIdCompany() {
+    public long getIdCompany() {
         return idCompany;
     }
                

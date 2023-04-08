@@ -10,7 +10,6 @@ public abstract class Refurb_ {
 
 	public static volatile SingularAttribute<Refurb, String> note;
 	public static volatile SingularAttribute<Refurb, String> serialNumber;
-	public static volatile SingularAttribute<Refurb, Integer> idCompany;
 	public static volatile SingularAttribute<Refurb, String> ramMemory;
 	public static volatile SingularAttribute<Refurb, String> screen;
 	public static volatile SingularAttribute<Refurb, String> storage;
@@ -23,6 +22,7 @@ public abstract class Refurb_ {
 	public static volatile SingularAttribute<Refurb, Integer> idRefurb;
 	public static volatile SingularAttribute<Refurb, String> model;
 	public static volatile SingularAttribute<Refurb, String> custom1;
+	public static volatile SingularAttribute<Refurb, Company> company;
 	public static volatile SingularAttribute<Refurb, String> batteryHealth;
 	public static volatile SingularAttribute<Refurb, String> custom2;
 	public static volatile SingularAttribute<Refurb, String> category;
@@ -32,7 +32,6 @@ public abstract class Refurb_ {
 
 	public static final String NOTE = "note";
 	public static final String SERIAL_NUMBER = "serialNumber";
-	public static final String ID_COMPANY = "idCompany";
 	public static final String RAM_MEMORY = "ramMemory";
 	public static final String SCREEN = "screen";
 	public static final String STORAGE = "storage";
@@ -45,6 +44,7 @@ public abstract class Refurb_ {
 	public static final String ID_REFURB = "idRefurb";
 	public static final String MODEL = "model";
 	public static final String CUSTOM1 = "custom1";
+	public static final String COMPANY = "company";
 	public static final String BATTERY_HEALTH = "batteryHealth";
 	public static final String CUSTOM2 = "custom2";
 	public static final String CATEGORY = "category";

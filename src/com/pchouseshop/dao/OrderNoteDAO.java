@@ -22,7 +22,7 @@ public class OrderNoteDAO {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idOrderNoteAdded = (Integer) _session.save(pOrderNote);
+            idOrderNoteAdded = (long) _session.save(pOrderNote);
 
             _transaction.commit();
         } catch (HibernateException e) {
@@ -52,6 +52,49 @@ public class OrderNoteDAO {
             }
         }
 
+        return _listOrderNote;
+    }
+    
+    public Long checkExistingOrderNoteDAO(String pNote, OrderModel pOrder) {
+        Long idOrderNote = null; 
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("SELECT DISTINCT O.idOrderNote FROM OrderNote O WHERE O.note = :pNote AND O.order = :pOrder")
+                    .setParameter("pNote", pNote)
+                    .setParameter("pOrder", pOrder);
+            
+            idOrderNote = (Long) query.uniqueResult();
+            
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        return idOrderNote;
+    }
+    
+    public List<OrderNote> searchOrderNoteDAO(OrderModel pOrder, String pSearch) {
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+            Query query = _session.createQuery("FROM OrderNote O WHERE "
+                    + "O.order = :pOrder AND O.note LIKE :pSearch")
+                    .setParameter("pOrder", pOrder)
+                    .setParameter("pSearch", "%" + pSearch + "%");
+            
+            _listOrderNote = query.getResultList();
+            
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+        
         return _listOrderNote;
     }
 }

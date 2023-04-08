@@ -10,7 +10,7 @@ public abstract class Person_ {
 
 	public static volatile SingularAttribute<Person, String> firstName;
 	public static volatile SingularAttribute<Person, String> lastName;
-	public static volatile SingularAttribute<Person, Integer> idPerson;
+	public static volatile SingularAttribute<Person, Long> idPerson;
 	public static volatile SingularAttribute<Person, String> email;
 	public static volatile SingularAttribute<Person, String> contactNo;
 

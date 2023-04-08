@@ -23,7 +23,7 @@ public class OrderModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ORDER")
-    private int idOrder;
+    private long idOrder;
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_CUSTOMER", referencedColumnName = "ID_CUSTOMER")
@@ -87,11 +87,11 @@ public class OrderModel implements Serializable {
         this.note = note;
     }
 
-    public int getIdOrder() {
+    public long getIdOrder() {
         return idOrder;
     }
 
-    public void setIdOrder(int idOrder) {
+    public void setIdOrder(long idOrder) {
         this.idOrder = idOrder;
     }
 

@@ -11,7 +11,7 @@ public abstract class Company_ {
 	public static volatile SingularAttribute<Company, String> contactOne;
 	public static volatile SingularAttribute<Company, String> password;
 	public static volatile SingularAttribute<Company, String> address;
-	public static volatile SingularAttribute<Company, Integer> idCompany;
+	public static volatile SingularAttribute<Company, Long> idCompany;
 	public static volatile SingularAttribute<Company, String> name;
 	public static volatile SingularAttribute<Company, String> contactTwo;
 	public static volatile SingularAttribute<Company, String> email;

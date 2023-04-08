@@ -5,6 +5,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -14,7 +16,7 @@ public class ProductService implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "ID_PROD_SERV")
-    private int idProductService;
+    private long idProductService;
     
     @Column(name = "NAME")
     private String prodServName;
@@ -31,27 +33,28 @@ public class ProductService implements Serializable {
     @Column(name = "NOTE")
     private String note;
         
-    @Column(name = "ID_COMPANY")
-    private int idCompany;
+    @OneToOne()
+    @JoinColumn(name = "ID_COMPANY", referencedColumnName = "ID_COMPANY")
+    private Company company;
 
     public ProductService() {
         
     }
 
-    public ProductService(String prodServName, int qty, double price, String category, String note, int idCompany) {
+    public ProductService(String prodServName, int qty, double price, String category, String note, Company company) {
         this.prodServName = prodServName;
         this.qty = qty;
         this.price = price;
         this.category = category;
         this.note = note;
-        this.idCompany = idCompany;
+        this.company = company;
     }
 
-    public int getIdProductService() {
+    public long getIdProductService() {
         return idProductService;
     }
     
-    public void setIdProductService(int idProductService) {
+    public void setIdProductService(long idProductService) {
         this.idProductService = idProductService;
     }
 
@@ -95,12 +98,12 @@ public class ProductService implements Serializable {
         this.note = note;
     }
 
-    public int getIdCompany() {
-        return idCompany;
+    public Company getCompany() {
+        return company;
     }
 
-    public void setIdCompany(int idCompany) {
-        this.idCompany = idCompany;
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     @Override

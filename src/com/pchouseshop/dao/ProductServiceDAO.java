@@ -1,6 +1,7 @@
 package com.pchouseshop.dao;
 
 import com.pchouseshop.connection.HibernateUtil;
+import com.pchouseshop.model.Company;
 import com.pchouseshop.model.ProductService;
 import java.util.List;
 import org.hibernate.HibernateException;
@@ -16,12 +17,13 @@ public class ProductServiceDAO {
     SessionFactory _sessionFactory = HibernateUtil.getSessionFactory();
     Transaction _transaction;
 
-    public List<ProductService> getAllProductsDAO(int pIdCompany) {
+    public List<ProductService> getAllProductsDAO(Company pCompany) {
         try {
             _session = _sessionFactory.openSession();
+            
             _transaction = _session.beginTransaction();
-            Query query = _session.createQuery("FROM ProductService PS WHERE PS.idCompany = :idCompany ORDER BY PS.idProductService ASC")
-                    .setParameter("idCompany", pIdCompany);
+            Query query = _session.createQuery("FROM ProductService PS WHERE PS.company = :pCompany ORDER BY PS.idProductService ASC")
+                    .setParameter("pCompany", pCompany);
 
             _listProducts = query.getResultList();
             _transaction.commit();
@@ -35,12 +37,12 @@ public class ProductServiceDAO {
         return _listProducts;
     }
 
-    public List<ProductService> getMinStockProductDAO(int pIdCompany) {
+    public List<ProductService> getMinStockProductDAO(Company pCompany) {
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            Query query = _session.createQuery("FROM ProductService PS WHERE PS.category = 'PRODUCT' AND PS.qty <= 2 AND PS.idCompany = :idCompany")
-                    .setParameter("idCompany", pIdCompany);
+            Query query = _session.createQuery("FROM ProductService PS WHERE PS.category = 'PRODUCT' AND PS.qty <= 2 AND PS.company = :pCompany")
+                    .setParameter("pCompany", pCompany);
 
             _listProducts = query.getResultList();
             _transaction.commit();
@@ -53,13 +55,13 @@ public class ProductServiceDAO {
         return _listProducts;
     }
 
-    public int addProductServiceDAO(ProductService pProductService) {
-        Integer idProdServAdded = 0;
+    public long addProductServiceDAO(ProductService pProductService) {
+        long idProdServAdded = 0;
 
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            idProdServAdded = (Integer) _session.save(pProductService);
+            idProdServAdded = (long) _session.save(pProductService);
 
             _transaction.commit();
 
@@ -152,7 +154,7 @@ public class ProductServiceDAO {
         return _listProducts;
     }
     
-    public ProductService getItemProdServDAO(int pIdProdServ) {
+    public ProductService getItemProdServDAO(long pIdProdServ) {
         ProductService itemCustomer = null;
         
         try {

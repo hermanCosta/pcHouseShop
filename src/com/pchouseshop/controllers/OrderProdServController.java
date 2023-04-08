@@ -17,7 +17,7 @@ public class OrderProdServController {
         return ORDER_PROD_SERV_DAO.getOrderProdServDAO(pOrder);
     }
 
-    public int deleteOrderProdServController(Integer pIdOrderProdServ) {
+    public long deleteOrderProdServController(long pIdOrderProdServ) {
         return ORDER_PROD_SERV_DAO.deleteOrderProdServDAO(pIdOrderProdServ);
     }
 }

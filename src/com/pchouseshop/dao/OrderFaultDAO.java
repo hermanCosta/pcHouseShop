@@ -74,8 +74,8 @@ public class OrderFaultDAO {
         return true;
     }
     
-    public int deleteOrderFaultDAO(long pIdOrderFault) {
-        int resultDelete = 0;
+    public long deleteOrderFaultDAO(long pIdOrderFault) {
+        long resultDelete = 0;
         try
         {
             _session = _sessionFactory.openSession();

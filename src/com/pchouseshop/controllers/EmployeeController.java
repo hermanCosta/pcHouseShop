@@ -13,7 +13,7 @@ public class EmployeeController {
         return EMPLOYEE_DAO.getAllEmployeeDAO();
     }
 
-    public int addEmployeeController(Employee pEmployee) {
+    public long addEmployeeController(Employee pEmployee) {
         return EMPLOYEE_DAO.addEmployeeDAO(pEmployee);
     }
 
@@ -21,7 +21,7 @@ public class EmployeeController {
         return EMPLOYEE_DAO.updateEmployeeDAO(pEmplyoee);
     }
 
-    public boolean deleteEmplyoeeController(int pId) {
+    public boolean deleteEmplyoeeController(long pId) {
         return EMPLOYEE_DAO.deleteEmplyoeeDAO(pId);
     }
 
@@ -29,7 +29,7 @@ public class EmployeeController {
         return EMPLOYEE_DAO.getEmployeeDAO(pPerson);
     }
 
-    public Employee getItemEmployeeController(int pIdEmployee) {
+    public Employee getItemEmployeeController(long pIdEmployee) {
         return EMPLOYEE_DAO.getItemEmployeeDAO(pIdEmployee);
     }
 

@@ -1,25 +1,22 @@
 package com.pchouseshop.controllers;
 
 import com.pchouseshop.dao.ProductServiceDAO;
+import com.pchouseshop.model.Company;
 import com.pchouseshop.model.ProductService;
 import java.util.List;
 
-/**
- *
- * @author herman
- */
 public class ProductServiceController {
     private final ProductServiceDAO PRODSERV_DAO = new ProductServiceDAO();
     
-    public List<ProductService> getAllProductController(int pIdCompany) {
-        return PRODSERV_DAO.getAllProductsDAO(pIdCompany);
+    public List<ProductService> getAllProductController(Company pCompany) {
+        return PRODSERV_DAO.getAllProductsDAO(pCompany);
     }
     
-    public List<ProductService> getMinStockProductController(int pIdCompany) {
-        return PRODSERV_DAO.getMinStockProductDAO(pIdCompany);       
+    public List<ProductService> getMinStockProductController(Company pCompany) {
+        return PRODSERV_DAO.getMinStockProductDAO(pCompany);       
     }
     
-    public int addProductServiceController(ProductService pProductService) {
+    public long addProductServiceController(ProductService pProductService) {
         return PRODSERV_DAO.addProductServiceDAO(pProductService);
     }
     
@@ -39,7 +36,7 @@ public class ProductServiceController {
         return  PRODSERV_DAO.orderSearchProdServDAO(pSearch);
     }
     
-    public ProductService getItemProdServController(int pIdProdServ) {
+    public ProductService getItemProdServController(long pIdProdServ) {
         return  PRODSERV_DAO.getItemProdServDAO(pIdProdServ);
     }
 }

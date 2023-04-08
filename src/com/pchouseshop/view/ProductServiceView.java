@@ -1,5 +1,6 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
 import com.pchouseshop.controllers.ProductServiceController;
@@ -27,7 +28,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
     }
 
     private void loadProdServListTable() {
-        this._listProdServ = _productServiceController.getAllProductController(CommonSetting.ID_COMPANY);
+        this._listProdServ = _productServiceController.getAllProductController(CommonSetting.COMPANY);
 
         _dtmProdServ.setRowCount(0);
         CommonSetting.fitContentJtable(this.table_view_products_list);
@@ -76,7 +77,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         ProductService getProdServ = null;
         if (txt_prod_serv_name.getText().trim().isEmpty() || txt_prod_serv_price.getText().trim().isEmpty()
                 || combo_box_prod_serv_categ.getSelectedItem().equals("SELECT")) {
-            JOptionPane.showMessageDialog(this, "Please check empty fields !", "Product Service", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_EMPTY_FIELDS, this.getTitle(), JOptionPane.WARNING_MESSAGE);
             return getProdServ;
 
         } else {
@@ -86,7 +87,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                     Double.parseDouble(txt_prod_serv_price.getText()),
                     combo_box_prod_serv_categ.getSelectedItem().toString(),
                     txt_prod_serv_notes.getText().toUpperCase(),
-                    CommonSetting.ID_COMPANY
+                    CommonSetting.COMPANY
             );
 
             int idProdServ = CommonExtension.setIdExtension(this.hdn_txt_prod_serv_id);
@@ -458,8 +459,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
     private void btn_update_product_serviceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_update_product_serviceActionPerformed
         ProductService updateProdServ = this.getProdServFields();
         if (updateProdServ != null) {
-            int confirmEditing = JOptionPane.showConfirmDialog(null, "Confirm Editing " + updateProdServ.getProdServName() + " ?",
-                    "Edit Product|Service", JOptionPane.YES_NO_OPTION);
+            int confirmEditing = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_UPDATE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
             if (confirmEditing == 0) {
                 boolean isUpdated = _productServiceController.updateProductService(updateProdServ);
@@ -469,7 +469,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                     loadProdServListTable();
                     clearFields();
                 } else {
-                    JOptionPane.showMessageDialog(this, updateProdServ.getProdServName() + "could not be updated!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -479,14 +479,14 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         ProductService addProdServ = this.getProdServFields();
 
         if (addProdServ != null) {
-            int idProdServAdded = _productServiceController.addProductServiceController(addProdServ);
+            long idProdServAdded = _productServiceController.addProductServiceController(addProdServ);
 
             if (idProdServAdded > 0) {
-                JOptionPane.showMessageDialog(this, addProdServ.getProdServName() + " added successfully!");
+                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
                 loadProdServListTable();
                 clearFields();
             } else {
-                JOptionPane.showMessageDialog(this, addProdServ.getProdServName() + "could not be saved!", null, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_add_product_serviceActionPerformed
@@ -501,8 +501,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
             deleteProdServ.setIdProductService((Integer) _dtmProdServ.getValueAt(selectedRow, 0));
             deleteProdServ.setProdServName(_dtmProdServ.getValueAt(selectedRow, 1).toString());
 
-            int confirmDeletion = JOptionPane.showConfirmDialog(this, "Do you really want to delete '"
-                    + deleteProdServ.getProdServName(), "Delete Product|Service", JOptionPane.YES_NO_OPTION);
+            int confirmDeletion = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_DELETE, this.getTitle(), JOptionPane.YES_NO_OPTION);
 
             if (confirmDeletion == 0) {
                 boolean isDeleted = _productServiceController.deleteProductService(deleteProdServ);
@@ -510,7 +509,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                 if (isDeleted) {
                     loadProdServListTable();
                 } else {
-                    JOptionPane.showMessageDialog(this, deleteProdServ.getProdServName() + " could not be deleted!", null, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -530,9 +529,9 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                     (Double) _dtmProdServ.getValueAt(selectedRow, 2),
                     _dtmProdServ.getValueAt(selectedRow, 5).toString(),
                     _dtmProdServ.getValueAt(selectedRow, 4).toString(),
-                    CommonSetting.ID_COMPANY);
+                    CommonSetting.COMPANY);
 
-            updateProdServ.setIdProductService((Integer) _dtmProdServ.getValueAt(selectedRow, 0));
+            updateProdServ.setIdProductService((long) _dtmProdServ.getValueAt(selectedRow, 0));
             setProdServFields(updateProdServ);
         }
     }//GEN-LAST:event_table_view_products_listMouseClicked

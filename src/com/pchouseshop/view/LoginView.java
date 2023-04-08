@@ -1,5 +1,6 @@
 package com.pchouseshop.view;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.controllers.CompanyController;
 import com.pchouseshop.model.Company;
 import javax.swing.JFrame;
@@ -29,6 +30,7 @@ public class LoginView extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Login");
         setBackground(new java.awt.Color(21, 76, 121));
         setUndecorated(true);
 
@@ -163,7 +165,7 @@ public class LoginView extends javax.swing.JFrame {
 
     private void btn_sign_inActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_sign_inActionPerformed
         if (txt_username.getText().trim().isEmpty() || txt_password.getPassword().length == 0) {
-            JOptionPane.showMessageDialog(this, "Please, Check Empty Fields !", "Login", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, CommonConstant.WARN_EMPTY_FIELDS, this.getTitle(), JOptionPane.WARNING_MESSAGE);
         } else {
             Company company = new Company();
 
@@ -178,7 +180,7 @@ public class LoginView extends javax.swing.JFrame {
                 new MainMenuView(company).setVisible(true);
                 this.dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Login Failed ! please check username or password", "Login", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.ERROR_LOGIN, this.getTitle(), JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btn_sign_inActionPerformed

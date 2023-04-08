@@ -597,7 +597,7 @@ public class CustomerModal extends javax.swing.JDialog {
                     this._dtmCustomer.getValueAt(selectedRow, 3).toString(),
                     this._dtmCustomer.getValueAt(selectedRow, 4).toString());
             
-            updatePerson.setIdPerson((Integer) this._dtmCustomer.getValueAt(selectedRow, 5));
+            updatePerson.setIdPerson((long) this._dtmCustomer.getValueAt(selectedRow, 5));
             
             Customer updateCustomer = new Customer(updatePerson, CommonSetting.COMPANY);
             updateCustomer.setIdCustomer((long) this._dtmCustomer.getValueAt(selectedRow, 0));
@@ -639,7 +639,7 @@ public class CustomerModal extends javax.swing.JDialog {
                     this._dtmCustomer.getValueAt(selectedRow, 3).toString(),
                     this._dtmCustomer.getValueAt(selectedRow, 4).toString());
 
-            usePerson.setIdPerson((Integer) this._dtmCustomer.getValueAt(selectedRow, 5));
+            usePerson.setIdPerson((long) this._dtmCustomer.getValueAt(selectedRow, 5));
 
             Customer useCustomer = new Customer(usePerson, CommonSetting.COMPANY);
             useCustomer.setIdCustomer((long) this._dtmCustomer.getValueAt(selectedRow, 0));

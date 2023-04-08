@@ -200,4 +200,9 @@ public class CommonExtension {
             field.moveCaretPosition(start);
         }
     }
+    
+    public static String setDepositPayNote(double amount) {
+       String deposiNote = amount + " " + CommonConstant.DEPOSIT_ORDER_NOTE;
+       return  deposiNote;
+    }
 }

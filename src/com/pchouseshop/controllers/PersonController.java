@@ -11,7 +11,7 @@ public class PersonController {
         return PERSON_DAO.getAllPersonDAO();
     }
     
-    public int addPersonController(Person pPerson) {
+    public long addPersonController(Person pPerson) {
         return PERSON_DAO.addPersonDAO(pPerson);
     }
     
