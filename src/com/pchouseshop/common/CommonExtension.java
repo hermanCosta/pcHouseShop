@@ -28,7 +28,7 @@ public class CommonExtension {
             return Integer.parseInt(jTextField.getText());
         }
     }
-    
+
     public static long setLongIdExtension(Object object) {
         if (object == null) {
             return 0;
@@ -181,7 +181,7 @@ public class CommonExtension {
         }
     }
 
-    public static void autoCompleteTextField(ArrayList<String> list, String text, JTextField field) {
+    public static void autoCompleteTextField(ArrayList<String> list, String text, JTextField jTextFieldfield) {
         String complete = "";
         int start = text.length();
         int last = text.length();
@@ -195,14 +195,22 @@ public class CommonExtension {
         }
 
         if (last > start) {
-            field.setText(complete);
-            field.setCaretPosition(last);
-            field.moveCaretPosition(start);
+            jTextFieldfield.setText(complete);
+            jTextFieldfield.setCaretPosition(last);
+            jTextFieldfield.moveCaretPosition(start);
         }
     }
-    
+
     public static String setDepositPayNote(double amount) {
-       String deposiNote = amount + " " + CommonConstant.DEPOSIT_ORDER_NOTE;
-       return  deposiNote;
+        String deposiNote = amount + " " + CommonConstant.DEPOSIT_ORDER_NOTE;
+        return deposiNote;
+    }
+
+    public static String formatContactNo(String contact) {
+        String formatedContact = null;
+        if (!contact.trim().isEmpty()) {
+            formatedContact = contact.trim().replace("(", "").replace(")", "").replace("-", "").replaceAll(" ", "");
+        }
+        return formatedContact;
     }
 }

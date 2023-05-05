@@ -1,4 +1,4 @@
-package com.pchouseshop.view;
+package com.pchouseshop.view.modal;
 
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;

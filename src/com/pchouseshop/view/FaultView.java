@@ -352,16 +352,21 @@ public class FaultView extends javax.swing.JInternalFrame {
         Fault addFault = this.getFaultFields();
 
         if (addFault != null) {
-            long idFault = this._faultController.addFaultController(addFault);
+            long idExistFault = _faultController.checkExistFaultDAO(addFault.getDescription());
+            if (addFault.getIdFault() == 0 && idExistFault == 0) {
 
-            if (idFault > 0) {
-                JOptionPane.showMessageDialog(this,CommonConstant.SUCCESS_SAVE);
-                loadFaultListTable();
-
-                this.txt_fault_description.setText("");
+                long idFault = this._faultController.addFaultController(addFault);
+                if (idFault > 0) {
+                    getItemFault(idFault);
+                    this.txt_fault_description.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
+                }
             } else {
-                JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.WARN_EXIST_ITEM, this.getTitle(), JOptionPane.WARNING_MESSAGE);
+                getItemFault(idExistFault);
             }
+
         }
     }//GEN-LAST:event_btn_addActionPerformed
 

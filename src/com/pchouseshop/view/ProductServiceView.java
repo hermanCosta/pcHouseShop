@@ -49,25 +49,21 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         }
     }
 
-    private void searchProductService() {
-        if (!this.txt_search_prodServ.getText().trim().isEmpty()) {
-            _listProdServ = _productServiceController.searchProdServController(this.txt_search_prodServ.getText());
-            if (_listProdServ != null) {
-                _dtmProdServ.setRowCount(0);
+    private void getItemProdServ(long idProdServ) {
+        if (idProdServ != 0) {
+            ProductService prodServItem = _productServiceController.getItemProdServController(idProdServ);
 
-                _listProdServ.forEach((product) -> {
-                    _dtmProdServ.addRow(
-                            new Object[]{
-                                product.getIdProductService(),
-                                product.getProdServName(),
-                                CommonExtension.getPriceFormat(product.getPrice()),
-                                product.getQty(),
-                                product.getNote(),
-                                product.getCategory()
-                            }
-                    );
-                });
-            }
+            this._dtmProdServ.setRowCount(0);
+            _dtmProdServ.addRow(
+                    new Object[]{
+                        prodServItem.getIdProductService(),
+                        prodServItem.getProdServName(),
+                        prodServItem.getPrice(),
+                        prodServItem.getQty(),
+                        prodServItem.getNote(),
+                        prodServItem.getCategory()
+                    }
+            );
         } else {
             loadProdServListTable();
         }
@@ -96,6 +92,30 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         }
     }
 
+    private void searchProductService() {
+        if (!this.txt_search_prodServ.getText().trim().isEmpty()) {
+            _listProdServ = _productServiceController.searchProdServController(this.txt_search_prodServ.getText());
+            if (_listProdServ != null) {
+                _dtmProdServ.setRowCount(0);
+
+                _listProdServ.forEach((product) -> {
+                    _dtmProdServ.addRow(
+                            new Object[]{
+                                product.getIdProductService(),
+                                product.getProdServName(),
+                                product.getPrice(),
+                                product.getQty(),
+                                product.getNote(),
+                                product.getCategory()
+                            }
+                    );
+                });
+            }
+        } else {
+            loadProdServListTable();
+        }
+    }
+
     private void setProdServFields(ProductService pProdServ) {
         this.hdn_txt_prod_serv_id.setText(String.valueOf(pProdServ.getIdProductService()));
         this.txt_prod_serv_name.setText(pProdServ.getProdServName());
@@ -113,8 +133,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         this.txt_prod_serv_qty.setText("1");
         this.txt_prod_serv_notes.setText("");
         this.combo_box_prod_serv_categ.setSelectedIndex(0);
-        
-        loadProdServListTable();
+
         this.txt_search_prodServ.requestFocus();
     }
 
@@ -176,6 +195,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         btn_add_product_service.setForeground(new java.awt.Color(255, 255, 255));
         btn_add_product_service.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/icon_add.png"))); // NOI18N
         btn_add_product_service.setText("Add");
+        btn_add_product_service.setToolTipText("");
         btn_add_product_service.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_add_product_serviceActionPerformed(evt);
@@ -460,13 +480,12 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         ProductService updateProdServ = this.getProdServFields();
         if (updateProdServ != null) {
             int confirmEditing = JOptionPane.showConfirmDialog(this, CommonConstant.CONFIRM_UPDATE, this.getTitle(), JOptionPane.YES_NO_OPTION);
-
             if (confirmEditing == 0) {
                 boolean isUpdated = _productServiceController.updateProductService(updateProdServ);
 
                 if (isUpdated) {
 
-                    loadProdServListTable();
+                    getItemProdServ(updateProdServ.getIdProductService());
                     clearFields();
                 } else {
                     JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
@@ -479,14 +498,20 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         ProductService addProdServ = this.getProdServFields();
 
         if (addProdServ != null) {
-            long idProdServAdded = _productServiceController.addProductServiceController(addProdServ);
+            long idExistProdServ = _productServiceController.checkExistProdServController(addProdServ.getProdServName());
+            if (addProdServ.getIdProductService() == 0 && idExistProdServ == 0) {
+                long idProdServAdded = _productServiceController.addProductServiceController(addProdServ);
 
-            if (idProdServAdded > 0) {
-                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
-                loadProdServListTable();
-                clearFields();
+                if (idProdServAdded > 0) {
+
+                    getItemProdServ(idProdServAdded);
+                    clearFields();
+                } else {
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
+                }
             } else {
-                JOptionPane.showMessageDialog(this,CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, CommonConstant.WARN_EXIST_ITEM, this.getTitle(), JOptionPane.WARNING_MESSAGE);
+                getItemProdServ(idExistProdServ);
             }
         }
     }//GEN-LAST:event_btn_add_product_serviceActionPerformed
@@ -517,6 +542,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
 
     private void btn_clear_fieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clear_fieldsActionPerformed
         clearFields();
+        loadProdServListTable();
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
     private void table_view_products_listMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table_view_products_listMouseClicked

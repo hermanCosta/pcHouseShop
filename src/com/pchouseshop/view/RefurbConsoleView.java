@@ -986,8 +986,8 @@ public class RefurbConsoleView extends javax.swing.JInternalFrame {
                 boolean isUpdated = this._refurbController.updateRefurbProdController(updateRefurb);
 
                 if (isUpdated) {
+                    
                     getItemRefurbProd(updateRefurb.getIdRefurb());
-
                     clearPanelFields();
                     clearPanelLabel();
                 } else {
@@ -1004,9 +1004,8 @@ public class RefurbConsoleView extends javax.swing.JInternalFrame {
             long idRefurbAdded = this._refurbController.addRefurbProductController(addRefurbProd);
 
             if (idRefurbAdded > 0) {
-                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
+                
                 getItemRefurbProd(idRefurbAdded);
-
                 clearPanelFields();
                 clearPanelLabel();
             } else {

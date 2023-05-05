@@ -20,7 +20,7 @@ public class ProductServiceDAO {
     public List<ProductService> getAllProductsDAO(Company pCompany) {
         try {
             _session = _sessionFactory.openSession();
-            
+
             _transaction = _session.beginTransaction();
             Query query = _session.createQuery("FROM ProductService PS WHERE PS.company = :pCompany ORDER BY PS.idProductService ASC")
                     .setParameter("pCompany", pCompany);
@@ -153,16 +153,16 @@ public class ProductServiceDAO {
 
         return _listProducts;
     }
-    
+
     public ProductService getItemProdServDAO(long pIdProdServ) {
         ProductService itemCustomer = null;
-        
+
         try {
             _session = _sessionFactory.openSession();
             _transaction = _session.beginTransaction();
-            
-            itemCustomer = (ProductService)_session.get(ProductService.class, pIdProdServ);
-            
+
+            itemCustomer = (ProductService) _session.get(ProductService.class, pIdProdServ);
+
             _transaction.commit();
 
         } catch (HibernateException e) {
@@ -171,7 +171,28 @@ public class ProductServiceDAO {
                 _session.close();
             }
         }
-        
+
         return itemCustomer;
+    }
+
+    public long checkExistProdServDAO(String pSearch) {
+        long idExistProdServ = 0;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+
+            Query query = _session.createQuery("SELECT PS.idProductService FROM ProductService PS WHERE PS.prodServName = :pSearch")
+                    .setParameter("pSearch", pSearch);
+
+            idExistProdServ = (long) query.uniqueResult();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return idExistProdServ;
     }
 }

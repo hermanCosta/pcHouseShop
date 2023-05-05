@@ -10,7 +10,7 @@ public class CommonConstant {
     public static final String SUCCESS_SAVE_ITEM = "New item saved successfully";
     public static final String ERROR_SAVE_ITEM = "Error, this item could not be saved";
     public static final String ERROR_DELETE_ITEM = "Error, this item could not be deleted";
-    public static final String WARN_EXIST_ITEM = "Error, this item already exist";
+    public static final String WARN_EXIST_ITEM = "This item already exist";
     public static final String WARN_ADD_ITEM = "Please, add at least one item: ";
     public static final String CONFIRM_ADD_ITEM = "Do you want to add a new item in the database?";
     
@@ -33,6 +33,7 @@ public class CommonConstant {
     public static final String WARN_EMPTY_FIELDS = "Please, check empty fields";
     public static final String WARN_EXIST_PERSON = "There is another person associated to this contact numer";
     public static final String WARN_EMPTY_CUSTOM_FIELDS = "Please, enter title and value for custom fields ";
+    public static final String WARN_CUSTOMER_MATCHING = "Customer details are not the same from selected, please check";
     
     public static final String CONFIRM_CANCEL =  "Do you really want to cancel?";
     public static final String CONFIRM_DELETE = "Do you really want to delete?";

@@ -149,4 +149,25 @@ public class FaultDAO {
 
         return _listFault;
     }
+     
+     public long checkExistFaultDAO(String pSearch) {
+        long idExistFault = 0;
+        try {
+            _session = _sessionFactory.openSession();
+            _transaction = _session.beginTransaction();
+
+            Query query = _session.createQuery("SELECT F.idFault FROM Fault F WHERE F.description = :pSearch")
+                    .setParameter("pSearch", pSearch);
+
+            idExistFault = (long) query.uniqueResult();
+            _transaction.commit();
+        } catch (HibernateException e) {
+        } finally {
+            if (_session != null) {
+                _session.close();
+            }
+        }
+
+        return idExistFault;
+    }
 }

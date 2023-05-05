@@ -172,6 +172,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
         Customer customer = null;
         String password;
         Employee employee;
+        boolean isNewCustomer = true;
 
         if (this.txt_first_name.getText().trim().isEmpty() || this.txt_last_name.getText().trim().isEmpty()
                 || this.txt_contact.getText().trim().isEmpty() || this.txt_brand.getText().trim().isEmpty()
@@ -187,13 +188,22 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 int idCustomer = CommonExtension.setIdExtension(this.hdn_txt_customer_id);
 
                 if (idCustomer > 0) {
+                    isNewCustomer = false;
                     customer = this._customerController.getItemCustomerController(idCustomer);
-                    if (customer.getPerson().getFirstName().equals(this.txt_first_name.getText())
-                            || customer.getPerson().getLastName().equals(this.txt_last_name.getText())
-                            || customer.getPerson().getContactNo().equals(this.txt_contact.getText())
-                            || customer.getPerson().getEmail().equals(this.txt_email.getText())) {
+                    if (!customer.getPerson().getFirstName().equals(this.txt_first_name.getText())
+                            || !customer.getPerson().getLastName().equals(this.txt_last_name.getText())
+                            || !CommonExtension.formatContactNo(customer.getPerson().getContactNo()).equals(CommonExtension.formatContactNo(this.txt_contact.getText()))
+                            || !customer.getPerson().getEmail().equals(this.txt_email.getText())) {
+                        
+                        JOptionPane.showMessageDialog(this, CommonConstant.WARN_CUSTOMER_MATCHING, this.getTitle(), JOptionPane.WARNING_MESSAGE);
+                        CustomerModal customerModal = new CustomerModal(this, null, new MainMenuView(CommonSetting.COMPANY), true, customer);
+                        customerModal.setVisible(true);
+                        this.hdn_txt_customer_id.setText("");
+                        return getOrderModel;
                     }
-                } else {
+                } 
+                
+                if (isNewCustomer) {
                     Customer checkCustomer = _customerController.searchCustomerByContactNoController(this.txt_contact.getText().replace("(", "").replace(")", "").replace("-", "").replace(" ", ""));
 
                     if (checkCustomer != null) {
@@ -1161,6 +1171,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txt_search_faultKeyReleased
 
     private void btn_seacrh_customerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seacrh_customerActionPerformed
+        this.hdn_txt_customer_id.setText("");
         CustomerModal customerModal = new CustomerModal(this, null, new MainMenuView(CommonSetting.COMPANY), true, null);
         customerModal.setVisible(true);
     }//GEN-LAST:event_btn_seacrh_customerActionPerformed

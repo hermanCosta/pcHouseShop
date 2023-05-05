@@ -952,11 +952,11 @@ public class RefurbView extends javax.swing.JInternalFrame {
         Refurb addRefurbProd = this.getRefurbFields();
 
         if (addRefurbProd != null) {
-            long isRefurnAdded = this._refurbController.addRefurbProductController(addRefurbProd);
+            long idRefurbAdded = this._refurbController.addRefurbProductController(addRefurbProd);
 
-            if (isRefurnAdded > 0) {
-                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
-                loadRefurbProdListTable();
+            if (idRefurbAdded > 0) {
+                
+                getItemRefurbProd(idRefurbAdded);
                 cleanBasicInfoPanelFields();
                 cleanExtraInfoPanelFields();
                 cleanCustomInfoPanelFields();
@@ -975,8 +975,8 @@ public class RefurbView extends javax.swing.JInternalFrame {
                 boolean isUpdated = this._refurbController.updateRefurbProdController(updateRefurb);
 
                 if (isUpdated) {
+                    
                     getItemRefurbProd(updateRefurb.getIdRefurb());
-
                     cleanBasicInfoPanelFields();
                     cleanExtraInfoPanelFields();
                     cleanCustomInfoPanelFields();

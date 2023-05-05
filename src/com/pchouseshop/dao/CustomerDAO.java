@@ -26,7 +26,7 @@ public class CustomerDAO {
             Query query = _session.createQuery("FROM Customer C WHERE C.company = :company ORDER BY C.person ASC")
                     .setParameter("company", pCompany);
 
-            _listCustomer = query.getResultList();
+            _listCustomer = query.setMaxResults(14).getResultList();
             _transaction.commit();
         } catch (HibernateException e) {
         } finally {

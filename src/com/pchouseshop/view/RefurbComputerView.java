@@ -894,7 +894,6 @@ public class RefurbComputerView extends javax.swing.JInternalFrame {
             long idRefurbAdded = this._refurbController.addRefurbProductController(addRefurbProd);
 
             if (idRefurbAdded > 0) {
-                JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
                 getItemRefurbProd(idRefurbAdded);
 
                 clearPanelFields();

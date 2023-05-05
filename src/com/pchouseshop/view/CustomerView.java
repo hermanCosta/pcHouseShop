@@ -89,16 +89,6 @@ public class CustomerView extends javax.swing.JInternalFrame {
         }
     }
 
-    private void setCustomerFields(Customer pCustomer) {
-        this.txt_contact.setFormatterFactory(null);
-        this.hdn_txt_customer_id.setText(String.valueOf(pCustomer.getIdCustomer()));
-        this.hdn_txt_person_id.setText(String.valueOf(pCustomer.getPerson().getIdPerson()));
-        this.txt_first_name.setText(pCustomer.getPerson().getFirstName());
-        this.txt_last_name.setText(pCustomer.getPerson().getLastName());
-        this.txt_contact.setText(pCustomer.getPerson().getContactNo());
-        this.txt_email.setText(pCustomer.getPerson().getEmail());
-    }
-
     private void searchCustomer() {
         PersonController personController = new PersonController();
         Customer searchCustomer = null;
@@ -151,7 +141,17 @@ public class CustomerView extends javax.swing.JInternalFrame {
         }
     }
 
-    private void cleanFields() {
+    private void setCustomerFields(Customer pCustomer) {
+        this.txt_contact.setFormatterFactory(null);
+        this.hdn_txt_customer_id.setText(String.valueOf(pCustomer.getIdCustomer()));
+        this.hdn_txt_person_id.setText(String.valueOf(pCustomer.getPerson().getIdPerson()));
+        this.txt_first_name.setText(pCustomer.getPerson().getFirstName());
+        this.txt_last_name.setText(pCustomer.getPerson().getLastName());
+        this.txt_contact.setText(pCustomer.getPerson().getContactNo());
+        this.txt_email.setText(pCustomer.getPerson().getEmail());
+    }
+    
+    private void clearFields() {
         this.hdn_txt_customer_id.setText("");
         this.hdn_txt_person_id.setText("");
         this.txt_first_name.setText("");
@@ -610,7 +610,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btn_international_numberActionPerformed
 
     private void btn_clear_fieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clear_fieldsActionPerformed
-        cleanFields();
+        clearFields();
         loadCustomerListTable();
     }//GEN-LAST:event_btn_clear_fieldsActionPerformed
 
@@ -629,7 +629,7 @@ public class CustomerView extends javax.swing.JInternalFrame {
                 boolean isDeleted = _customerController.deleteCustomerController(deleteCustomer.getIdCustomer());
 
                 if (isDeleted) {
-                    cleanFields();
+                    clearFields();
                     loadCustomerListTable();
                 } else {
                     JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
@@ -671,9 +671,9 @@ public class CustomerView extends javax.swing.JInternalFrame {
                 if (confirmEditing == 0) {
                     boolean isUpdated = this._customerController.updateCustomerController(updateCustomer);
                     if (isUpdated) {
-
+                        
                         getItemCustomer(updateCustomer.getIdCustomer());
-
+                        clearFields();
                     } else {
                         JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                     }
@@ -698,10 +698,9 @@ public class CustomerView extends javax.swing.JInternalFrame {
 
                     long idCustomerAdded = this._customerController.addCustomerController(addCustomer);
                     if (idCustomerAdded > 0) {
-                        JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_SAVE);
-
+                        
                         getItemCustomer(idCustomerAdded);
-                        cleanFields();
+                        clearFields();
                     } else {
                         JOptionPane.showMessageDialog(this, CommonConstant.ERROR_SAVE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                     }

@@ -19,7 +19,7 @@ public abstract class Refurb_ {
 	public static volatile SingularAttribute<Refurb, Integer> qty;
 	public static volatile SingularAttribute<Refurb, String> custom3;
 	public static volatile SingularAttribute<Refurb, String> custom4;
-	public static volatile SingularAttribute<Refurb, Integer> idRefurb;
+	public static volatile SingularAttribute<Refurb, Long> idRefurb;
 	public static volatile SingularAttribute<Refurb, String> model;
 	public static volatile SingularAttribute<Refurb, String> custom1;
 	public static volatile SingularAttribute<Refurb, Company> company;

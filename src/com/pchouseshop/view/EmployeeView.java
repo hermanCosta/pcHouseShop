@@ -789,10 +789,9 @@ public class EmployeeView extends javax.swing.JInternalFrame {
                 if (confirmEditing == 0) {
                     boolean isUpdated = this._employeeController.updateEmployeeController(updateEmployee);
                     if (isUpdated) {
-
+                        
                         getItemEmployee(updateEmployee.getIdEmplyoee());
                         clearFields();
-
                     } else {
                         JOptionPane.showMessageDialog(this, CommonConstant.ERROR_UPDATE, this.getTitle(), JOptionPane.ERROR_MESSAGE);
                     }

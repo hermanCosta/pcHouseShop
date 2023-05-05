@@ -180,6 +180,7 @@
                   <Image iconType="3" name="/Img/icon_add.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Add"/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_add_product_serviceActionPerformed"/>

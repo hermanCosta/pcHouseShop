@@ -27,12 +27,16 @@ public class FaultController {
     public List<Fault> searchFault(String pSearch) {
         return FAULT_DAO.searchFaultDAO(pSearch);
     }
-    
+
     public Fault getItemFaultController(long pIdFault) {
         return FAULT_DAO.getItemFaultDAO(pIdFault);
     }
-    
+
     public List<Fault> orderSearchFaultController(String pSearch) {
         return FAULT_DAO.orderSearchFaultDAO(pSearch);
+    }
+
+    public long checkExistFaultDAO(String pSearch) {
+        return FAULT_DAO.checkExistFaultDAO(pSearch);
     }
 }

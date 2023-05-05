@@ -39,4 +39,8 @@ public class ProductServiceController {
     public ProductService getItemProdServController(long pIdProdServ) {
         return  PRODSERV_DAO.getItemProdServDAO(pIdProdServ);
     }
+    
+    public long checkExistProdServController(String pSearch) {
+        return PRODSERV_DAO.checkExistProdServDAO(pSearch);
+    }
 }
