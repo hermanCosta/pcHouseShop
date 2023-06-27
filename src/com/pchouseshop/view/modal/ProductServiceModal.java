@@ -36,7 +36,7 @@ public class ProductServiceModal extends javax.swing.JDialog {
                         new Object[]{
                             prodServ.getIdProductService(),
                             prodServ.getProdServName(),
-                            CommonExtension.getPriceFormat(prodServ.getPrice())
+                            CommonExtension.formatToPriceField(prodServ.getPrice())
                         }
                 );
             }

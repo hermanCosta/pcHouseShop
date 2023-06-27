@@ -1085,7 +1085,7 @@ public class RefurbView extends javax.swing.JInternalFrame {
         if (evt.getClickCount() == 2) {
             int selectedRow = this.table_view_refurbs.getSelectedRow();
 
-            int refurbId = (Integer) this._dtmRefurb.getValueAt(selectedRow, 0);
+            long refurbId = (long) this._dtmRefurb.getValueAt(selectedRow, 0);
             Refurb updateRefurb = this._refurbController.getItemRefurbProdController(refurbId);
             setRefurbFields(updateRefurb);
         }

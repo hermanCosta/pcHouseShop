@@ -15,6 +15,7 @@ public abstract class ProductService_ {
 	public static volatile SingularAttribute<ProductService, Long> idProductService;
 	public static volatile SingularAttribute<ProductService, String> category;
 	public static volatile SingularAttribute<ProductService, String> prodServName;
+	public static volatile SingularAttribute<ProductService, Integer> minQty;
 
 	public static final String NOTE = "note";
 	public static final String PRICE = "price";
@@ -23,6 +24,7 @@ public abstract class ProductService_ {
 	public static final String ID_PRODUCT_SERVICE = "idProductService";
 	public static final String CATEGORY = "category";
 	public static final String PROD_SERV_NAME = "prodServName";
+	public static final String MIN_QTY = "minQty";
 
 }
 

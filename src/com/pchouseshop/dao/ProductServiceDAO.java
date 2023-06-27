@@ -184,7 +184,11 @@ public class ProductServiceDAO {
             Query query = _session.createQuery("SELECT PS.idProductService FROM ProductService PS WHERE PS.prodServName = :pSearch")
                     .setParameter("pSearch", pSearch);
 
-            idExistProdServ = (long) query.uniqueResult();
+            //idExistProdServ = (long) query.uniqueResult();
+            if (query.uniqueResult() != null) {
+                idExistProdServ = (long) query.uniqueResult();
+            }
+                
             _transaction.commit();
         } catch (HibernateException e) {
         } finally {

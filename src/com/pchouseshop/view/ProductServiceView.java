@@ -42,7 +42,8 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                             prodServ.getPrice(),
                             prodServ.getQty(),
                             prodServ.getNote(),
-                            prodServ.getCategory()
+                            prodServ.getCategory(),
+                            prodServ.getMinQty()
                         }
                 );
             }
@@ -61,7 +62,8 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                         prodServItem.getPrice(),
                         prodServItem.getQty(),
                         prodServItem.getNote(),
-                        prodServItem.getCategory()
+                        prodServItem.getCategory(),
+                        prodServItem.getMinQty()
                     }
             );
         } else {
@@ -81,6 +83,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                     txt_prod_serv_name.getText().toUpperCase(),
                     (this.txt_prod_serv_qty.getText().trim().isEmpty()) ? 1 : Integer.parseInt(this.txt_prod_serv_qty.getText()),
                     Double.parseDouble(txt_prod_serv_price.getText()),
+                    (this.txt_prod_serv_min_qty.getText().trim().isEmpty()) ? 1 : Integer.parseInt(this.txt_prod_serv_min_qty.getText()),
                     combo_box_prod_serv_categ.getSelectedItem().toString(),
                     txt_prod_serv_notes.getText().toUpperCase(),
                     CommonSetting.COMPANY
@@ -106,7 +109,8 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                                 product.getPrice(),
                                 product.getQty(),
                                 product.getNote(),
-                                product.getCategory()
+                                product.getCategory(),
+                                product.getMinQty()
                             }
                     );
                 });
@@ -123,6 +127,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         this.txt_prod_serv_price.setText(String.valueOf(pProdServ.getPrice()));
         this.combo_box_prod_serv_categ.setSelectedItem(pProdServ.getCategory());
         this.txt_prod_serv_notes.setText(pProdServ.getNote());
+        this.txt_prod_serv_min_qty.setText(String.valueOf(pProdServ.getMinQty()));
     }
 
     private void clearFields() {
@@ -133,6 +138,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         this.txt_prod_serv_qty.setText("1");
         this.txt_prod_serv_notes.setText("");
         this.combo_box_prod_serv_categ.setSelectedIndex(0);
+        this.txt_prod_serv_min_qty.setText("1");
 
         this.txt_search_prodServ.requestFocus();
     }
@@ -162,6 +168,8 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         lbl_brand_star = new javax.swing.JLabel();
         lbl_brand_star1 = new javax.swing.JLabel();
         lbl_brand_star2 = new javax.swing.JLabel();
+        lbl_prod_serv_min_qty = new javax.swing.JLabel();
+        txt_prod_serv_min_qty = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         table_view_products_list = new javax.swing.JTable();
         txt_search_prodServ = new javax.swing.JTextField();
@@ -172,7 +180,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setTitle("Product | Service");
-        setMaximumSize(new java.awt.Dimension(1049, 700));
+        setMaximumSize(new java.awt.Dimension(1050, 650));
         setPreferredSize(new java.awt.Dimension(1050, 650));
 
         panel_product_list.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -312,14 +320,25 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         lbl_brand_star2.setForeground(java.awt.Color.red);
         lbl_brand_star2.setText("*");
 
+        lbl_prod_serv_min_qty.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lbl_prod_serv_min_qty.setText("Min Qty");
+
+        txt_prod_serv_min_qty.setText("1");
+        txt_prod_serv_min_qty.setMinimumSize(new java.awt.Dimension(80, 32));
+        txt_prod_serv_min_qty.setPreferredSize(new java.awt.Dimension(50, 25));
+        txt_prod_serv_min_qty.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_prod_serv_min_qtyKeyPressed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panel_new_productLayout = new javax.swing.GroupLayout(panel_new_product);
         panel_new_product.setLayout(panel_new_productLayout);
         panel_new_productLayout.setHorizontalGroup(
             panel_new_productLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_new_productLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_new_productLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(hdn_txt_prod_serv_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panel_new_productLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_new_productLayout.createSequentialGroup()
                         .addComponent(lbl_brand_star1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -331,22 +350,29 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txt_prod_serv_qty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
+                        .addComponent(lbl_prod_serv_min_qty)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_prod_serv_min_qty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addComponent(lbl_brand_star2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lbl_prod_serv_categ)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(combo_box_prod_serv_categ, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(panel_new_productLayout.createSequentialGroup()
-                        .addComponent(lbl_prod_serv_notes)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_prod_serv_notes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
+                        .addComponent(combo_box_prod_serv_categ, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panel_new_productLayout.createSequentialGroup()
                         .addComponent(lbl_brand_star)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lbl_prod_serv_name1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_prod_serv_name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(552, Short.MAX_VALUE))
+                        .addComponent(txt_prod_serv_name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panel_new_productLayout.createSequentialGroup()
+                        .addComponent(hdn_txt_prod_serv_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(panel_new_productLayout.createSequentialGroup()
+                        .addComponent(lbl_prod_serv_notes)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_prod_serv_notes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(333, 333, 333))
         );
         panel_new_productLayout.setVerticalGroup(
             panel_new_productLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -362,9 +388,11 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                     .addComponent(txt_prod_serv_qty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbl_prod_serv_price)
                     .addComponent(txt_prod_serv_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_brand_star1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_prod_serv_min_qty)
+                    .addComponent(txt_prod_serv_min_qty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(combo_box_prod_serv_categ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbl_prod_serv_categ)
-                    .addComponent(lbl_brand_star1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbl_brand_star2, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_new_productLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -380,11 +408,11 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "ID", "Product | Service", "Price €", "Qty", "Notes", "Category"
+                "ID", "Product | Service", "Price €", "Qty", "Notes", "Category", "Min Qty"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -410,6 +438,8 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
             table_view_products_list.getColumnModel().getColumn(3).setMaxWidth(100);
             table_view_products_list.getColumnModel().getColumn(5).setPreferredWidth(120);
             table_view_products_list.getColumnModel().getColumn(5).setMaxWidth(150);
+            table_view_products_list.getColumnModel().getColumn(6).setPreferredWidth(50);
+            table_view_products_list.getColumnModel().getColumn(6).setMaxWidth(100);
         }
 
         txt_search_prodServ.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
@@ -435,7 +465,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
                     .addGroup(panel_product_listLayout.createSequentialGroup()
                         .addComponent(lbl_search_icon)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_search_prodServ, javax.swing.GroupLayout.DEFAULT_SIZE, 984, Short.MAX_VALUE))
+                        .addComponent(txt_search_prodServ, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(panel_new_product, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panel_prodServ_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -551,8 +581,9 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
 
             ProductService updateProdServ = new ProductService(
                     _dtmProdServ.getValueAt(selectedRow, 1).toString(),
-                    (Integer) _dtmProdServ.getValueAt(selectedRow, 3),
-                    (Double) _dtmProdServ.getValueAt(selectedRow, 2),
+                    (int) _dtmProdServ.getValueAt(selectedRow, 3),
+                    (double) _dtmProdServ.getValueAt(selectedRow, 2),
+                    (int) _dtmProdServ.getValueAt(selectedRow, 6),
                     _dtmProdServ.getValueAt(selectedRow, 5).toString(),
                     _dtmProdServ.getValueAt(selectedRow, 4).toString(),
                     CommonSetting.COMPANY);
@@ -582,6 +613,10 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
         searchProductService();
     }//GEN-LAST:event_txt_search_prodServKeyReleased
 
+    private void txt_prod_serv_min_qtyKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_prod_serv_min_qtyKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_prod_serv_min_qtyKeyPressed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_add_product_service;
     private javax.swing.JButton btn_clear_fields;
@@ -593,6 +628,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_brand_star1;
     private javax.swing.JLabel lbl_brand_star2;
     private javax.swing.JLabel lbl_prod_serv_categ;
+    private javax.swing.JLabel lbl_prod_serv_min_qty;
     private javax.swing.JLabel lbl_prod_serv_name1;
     private javax.swing.JLabel lbl_prod_serv_notes;
     private javax.swing.JLabel lbl_prod_serv_price;
@@ -603,6 +639,7 @@ public class ProductServiceView extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panel_product_list;
     private javax.swing.JTable table_view_products_list;
     private javax.swing.JButton txt_delete_product_service;
+    private javax.swing.JTextField txt_prod_serv_min_qty;
     private javax.swing.JTextField txt_prod_serv_name;
     private javax.swing.JTextField txt_prod_serv_notes;
     private javax.swing.JTextField txt_prod_serv_price;

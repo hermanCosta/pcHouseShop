@@ -90,14 +90,14 @@ public class CommonExtension {
         return arrayString;
     }
 
-    public static String getEuroFormat(double value) {
+    public static String formatEuroCurrency(double value) {
         Locale ireland = new Locale("en", "IE");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(ireland);
 
         return currencyFormatter.format(value);
     }
 
-    public static String getPriceFormat(double price) {
+    public static String formatToPriceField(double price) {
         int intPrice = (int) price;
 
         if ((price - intPrice) > 0) {

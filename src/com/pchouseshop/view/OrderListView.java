@@ -216,11 +216,12 @@ public class OrderListView extends javax.swing.JInternalFrame {
             List<OrderProdServ> listOrderProdServ = _orderProdServController.getOrderProdServController(orderModel);
             List<Deposit> listOrderDeposit = _orderDeposit.getOrderDepositController(orderModel);
             
-            CommonSetting.MAIN_MENU_DESKTOP_PANE.removeAll();
+            //CommonSetting.MAIN_MENU_DESKTOP_PANE.removeAll();
             switch (orderModel.getStatus()) {
                 case IN_PROGRESS:
                     CreatedOrderView createdOrderView = new CreatedOrderView(orderModel, listOrderFault, listOrderProdServ, listOrderDeposit);
                     
+                    CommonSetting.MAIN_MENU_DESKTOP_PANE.removeAll();
                     CommonSetting.MAIN_MENU_DESKTOP_PANE.add(createdOrderView).setVisible(true);
                     CommonSetting.setMaxInternalFrame(createdOrderView);
                 break;

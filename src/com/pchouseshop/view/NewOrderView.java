@@ -4,6 +4,7 @@ import Enum.OrderStatus;
 import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonSetting;
+import com.pchouseshop.common.CommonStrings;
 import com.pchouseshop.controllers.CustomerController;
 import com.pchouseshop.controllers.DepositController;
 import com.pchouseshop.controllers.DeviceController;
@@ -93,7 +94,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
     private void generateOrderId() {
         long orderId = _orderController.getLastOrderIdController();
         orderId++;
-        String nextId = String.format("%06d", orderId);
+        String nextId = CommonStrings.formatOrderNumber(orderId);
         this.lbl_auto_order_no.setText(String.valueOf(nextId));
     }
 
@@ -1035,7 +1036,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 }
 
                 if (!this.txt_deposit.getText().trim().isEmpty()) {
-                    Deposit deposit = new Deposit(addOrder, Double.parseDouble(this.txt_deposit.getText()));
+                    Deposit deposit = new Deposit(addOrder, addOrder.getEmployee(), Double.parseDouble(this.txt_deposit.getText()), addOrder.getCreated());
                     long idDepositAdded = this._depositController.addDepositController(deposit);
 
                     if (idDepositAdded > 0) {
@@ -1219,8 +1220,8 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                             prodServ.getIdProductService(),
                             prodServ.getProdServName(),
                             CommonConstant.DEFAULT_QTY,
-                            CommonExtension.getPriceFormat(prodServ.getPrice()),
-                            CommonExtension.getPriceFormat(prodServ.getPrice() * 1)
+                            CommonExtension.formatToPriceField(prodServ.getPrice()),
+                            CommonExtension.formatToPriceField(prodServ.getPrice() * 1)
                         }
                 );
 

@@ -1,6 +1,7 @@
 package com.pchouseshop.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 
 @Entity
 @Table(name = "TBL_DEPOSIT")
@@ -24,15 +26,25 @@ public class Deposit implements Serializable {
     @JoinColumn(name = "ID_ORDER", referencedColumnName = "ID_ORDER")
     private OrderModel order;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "ID_EMPLOYEE", referencedColumnName = "ID_EMPLOYEE")
+    private Employee employee;
+
     @Column(name = "AMOUNT")
     private double amount;
+
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Column(name = "DT_CREATED")
+    private Date created;
 
     public Deposit() {
     }
 
-    public Deposit(OrderModel idOrder, double amount) {
-        this.order = idOrder;
+    public Deposit(OrderModel order, Employee employee, double amount, Date created) {
+        this.order = order;
+        this.employee = employee;
         this.amount = amount;
+        this.created = created;
     }
 
     public long getIdDeposit() {
@@ -43,12 +55,20 @@ public class Deposit implements Serializable {
         this.idDeposit = idDeposit;
     }
 
-    public OrderModel getIdOrder() {
+    public OrderModel getOrder() {
         return order;
     }
 
-    public void setIdOrder(OrderModel idOrder) {
-        this.order = idOrder;
+    public void setOrder(OrderModel order) {
+        this.order = order;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public double getAmount() {
@@ -57,5 +77,13 @@ public class Deposit implements Serializable {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }

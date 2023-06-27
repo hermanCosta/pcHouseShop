@@ -22,6 +22,7 @@ public class CommonConstant {
     public static final String ERROR_DELETE = "Error, could not be deleted";
     public static final String ERROR_LOGIN = "Error, please check username or password";
     public static final String ERROR_ADD_DEPOSIT = "Deposit could not be saved";
+    public static final String ERROR_ADD_NOTE = "Update note could not be saved ";
 
     public static final String ORDER_CREATED_NOTE = "ORDER CREATED";
     public static final String ORDER_UPDATED_NOTE = "ORDER UPDATED";

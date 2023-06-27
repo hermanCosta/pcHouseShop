@@ -13,4 +13,16 @@ public class CommonStrings {
         }
         return stringDate;
     }
+    
+    public static String formatOrderNumber(long idOrder)
+    {
+        String orderIdStr = null;
+        if (idOrder > 0) {
+             orderIdStr = String.format("%06d", idOrder);
+        }
+        
+        return orderIdStr;
+    }
+    
+    //public static String formatCurrency
 }

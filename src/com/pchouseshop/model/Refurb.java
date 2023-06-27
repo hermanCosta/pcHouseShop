@@ -1,6 +1,7 @@
 package com.pchouseshop.model;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -75,14 +76,14 @@ public class Refurb implements Serializable {
     @Column(name = "CUSTOM_6")
     private String custom6;
 
-     @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_COMPANY", referencedColumnName = "ID_COMPANY")
     private Company company;
 
     public Refurb() {
     }
 
-    public Refurb(String category, String brand, String model, double price, int qty, String serialNumber, String note, String screen, String processor, String ramMemory, String storage, String gpuBoard, String batteryHealth, String custom1, String custom2, String custom3, String custom4, String custom5, String custom6, Company idCompany) {
+    public Refurb(String category, String brand, String model, double price, int qty, String serialNumber, String note, String screen, String processor, String ramMemory, String storage, String gpuBoard, String batteryHealth, String custom1, String custom2, String custom3, String custom4, String custom5, String custom6, Company company) {
         this.category = category;
         this.brand = brand;
         this.model = model;
@@ -265,12 +266,12 @@ public class Refurb implements Serializable {
         this.custom6 = custom6;
     }
 
-    public Company getIdCompany() {
+    public Company getCompany() {
         return company;
     }
 
-    public void setIdCompany(Company company) {
+    public void setCompany(Company company) {
         this.company = company;
     }
 
-}
+   }

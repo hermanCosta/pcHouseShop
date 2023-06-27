@@ -27,6 +27,9 @@ public class ProductService implements Serializable {
     @Column(name = "PRICE")
     private double price;
     
+    @Column(name = "MIN_QTY")
+    private int minQty;
+    
     @Column(name = "CATEGORY")
     private String category;
     
@@ -41,10 +44,11 @@ public class ProductService implements Serializable {
         
     }
 
-    public ProductService(String prodServName, int qty, double price, String category, String note, Company company) {
+    public ProductService(String prodServName, int qty, double price, int minQty, String category, String note, Company company) {
         this.prodServName = prodServName;
         this.qty = qty;
         this.price = price;
+        this.minQty = minQty;
         this.category = category;
         this.note = note;
         this.company = company;
@@ -82,6 +86,14 @@ public class ProductService implements Serializable {
         this.price = price;
     }
 
+    public int getMinQty() {
+        return minQty;
+    }
+
+    public void setMinQty(int minQty) {
+        this.minQty = minQty;
+    }
+    
     public String getCategory() {
         return category;
     }

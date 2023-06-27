@@ -52,7 +52,7 @@ public class RefurbCustomView extends javax.swing.JInternalFrame {
                             refurbItem.getBrand(),
                             refurbItem.getModel(),
                             refurbItem.getQty(),
-                            CommonExtension.getEuroFormat(refurbItem.getPrice()),
+                            CommonExtension.formatEuroCurrency(refurbItem.getPrice()),
                             refurbItem.getNote()
                         }
                 );
@@ -115,7 +115,7 @@ public class RefurbCustomView extends javax.swing.JInternalFrame {
         this.txt_category.setText(refurbProd.getCategory());
         this.txt_brand.setText(refurbProd.getBrand());
         this.txt_model.setText(refurbProd.getModel());
-        this.txt_price.setText(CommonExtension.getPriceFormat(refurbProd.getPrice()));
+        this.txt_price.setText(CommonExtension.formatToPriceField(refurbProd.getPrice()));
         this.txt_qty.setText(String.valueOf(refurbProd.getQty()));
         this.txt_serial_number.setText(refurbProd.getSerialNumber());
         this.editor_pane_refurb_notes.setText(refurbProd.getNote());
@@ -165,7 +165,7 @@ public class RefurbCustomView extends javax.swing.JInternalFrame {
         this.editor_pane_label.setText(this.editor_pane_label.getText() + CommonExtension.splitCustomRefurbString(refurbProd.getCustom4())[0] + ":\t\t" + CommonExtension.splitCustomRefurbString(refurbProd.getCustom4())[1] + "\n");
         this.editor_pane_label.setText(this.editor_pane_label.getText() + CommonExtension.splitCustomRefurbString(refurbProd.getCustom5())[0] + ":\t\t" + CommonExtension.splitCustomRefurbString(refurbProd.getCustom5())[1] + "\n");
         this.editor_pane_label.setText(this.editor_pane_label.getText() + CommonExtension.splitCustomRefurbString(refurbProd.getCustom6())[0] + ":\t\t" + CommonExtension.splitCustomRefurbString(refurbProd.getCustom6())[1] + "\n");
-        this.txt_price_label.setText(CommonExtension.getPriceFormat(refurbProd.getPrice()) + " euro");
+        this.txt_price_label.setText(CommonExtension.formatToPriceField(refurbProd.getPrice()) + " euro");
         this.txt_warranty.setText("6 Months Warranty");
         this.txt_id.setText("#" + String.valueOf(refurbProd.getIdRefurb()));
     }
@@ -185,7 +185,7 @@ public class RefurbCustomView extends javax.swing.JInternalFrame {
                                 refurb.getBrand(),
                                 refurb.getModel(),
                                 refurb.getQty(),
-                                CommonExtension.getEuroFormat(refurb.getPrice()),
+                                CommonExtension.formatEuroCurrency(refurb.getPrice()),
                                 refurb.getNote()
                             }
                     );
@@ -977,7 +977,7 @@ public class RefurbCustomView extends javax.swing.JInternalFrame {
         if (evt.getClickCount() == 2) {
             int selectedRow = this.table_view_refurb.getSelectedRow();
 
-            int refurbId = (Integer) this._dtmRefurb.getValueAt(selectedRow, 0);
+            long refurbId = (long) this._dtmRefurb.getValueAt(selectedRow, 0);
             Refurb updateRefurb = this._refurbController.getItemRefurbProdController(refurbId);
 
             setRefurbFields(updateRefurb);
