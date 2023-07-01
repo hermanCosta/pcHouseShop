@@ -96,7 +96,7 @@ public class CommonExtension {
 
         return currencyFormatter.format(value);
     }
-
+    
     public static String formatToPriceField(double price) {
         int intPrice = (int) price;
 
@@ -105,6 +105,18 @@ public class CommonExtension {
         } else {
             return String.valueOf(intPrice);
         }
+    }
+    
+     public static Double formatEuroToDouble(String pString) {
+        double dValue = 0;
+                
+         if (!pString.trim().isEmpty()) {
+             String replace = pString.replace("€", "");
+             
+             dValue = Double.parseDouble(replace);
+         }
+         
+         return dValue;
     }
 
     public static void checkEmailFormat(JTextField jTextField) {

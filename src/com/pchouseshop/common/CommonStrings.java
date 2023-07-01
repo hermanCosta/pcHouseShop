@@ -24,5 +24,7 @@ public class CommonStrings {
         return orderIdStr;
     }
     
+   
+    
     //public static String formatCurrency
 }

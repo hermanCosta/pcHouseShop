@@ -104,8 +104,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         this.lbl_auto_order_no.setText(CommonStrings.formatOrderNumber(orderModel.getIdOrder()));
         this.spn_bad_sectors.setValue(orderModel.getBad_sector());
         this.editor_pane_notes.setText(orderModel.getNote());
-        this.txt_total.setText(String.valueOf(orderModel.getTotal()));
-        this.txt_due.setText(String.valueOf(orderModel.getDue()));
+        this.lbl_total_field.setText(CommonExtension.formatEuroCurrency(orderModel.getTotal()));
+        this.lbl_due_field.setText(CommonExtension.formatEuroCurrency(orderModel.getDue()));
 
         loadOrderDeposit(listOrderDeposit);
         loadOrderFault(listOrderFault);
@@ -118,7 +118,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             for (Deposit orderDeposit : listOrderDeposit) {
                 totalDeposit += orderDeposit.getAmount();
             }
-            this.txt_deposit_total.setText(CommonExtension.formatEuroCurrency(totalDeposit));
+            this.lbl_deposit_paid.setText(CommonExtension.formatEuroCurrency(totalDeposit));
         }
     }
 
@@ -204,8 +204,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             sum += Double.parseDouble(this._dtmProdServ.getValueAt(i, 3).toString());
         }
 
-        this.txt_total.setText(String.valueOf(sum));
-        this.txt_due.setText(this.txt_total.getText());
+        this.lbl_total_field.setText(String.valueOf(sum));
+        this.lbl_due_field.setText(this.lbl_total_field.getText());
     }
 
     private OrderModel getOrderFields() {
@@ -277,8 +277,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                         device,
                         employee,
                         CommonSetting.COMPANY,
-                        Double.parseDouble(this.txt_total.getText()),
-                        Double.parseDouble(this.txt_due.getText()),
+                        CommonExtension.formatEuroToDouble(this.lbl_total_field.getText()),
+                        CommonExtension.formatEuroToDouble(this.lbl_due_field.getText()),
                         OrderStatus.IN_PROGRESS,
                         new Date(),
                         null,
@@ -401,12 +401,12 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         spn_bad_sectors = new javax.swing.JSpinner();
         panel_total_amount = new javax.swing.JPanel();
         lbl_total = new javax.swing.JLabel();
-        txt_total = new javax.swing.JTextField();
         lbl_deposit = new javax.swing.JLabel();
         txt_deposit = new javax.swing.JTextField();
         lbl_due = new javax.swing.JLabel();
-        txt_due = new javax.swing.JTextField();
-        txt_deposit_total = new javax.swing.JTextField();
+        lbl_total_field = new javax.swing.JLabel();
+        lbl_due_field = new javax.swing.JLabel();
+        lbl_deposit_paid = new javax.swing.JLabel();
         panel_order_buttons = new javax.swing.JPanel();
         btn_save_order = new javax.swing.JButton();
         btn_print = new javax.swing.JButton();
@@ -619,12 +619,11 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                                 .addComponent(txt_first_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(scroll_pane_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(panel_input_detailLayout.createSequentialGroup()
-                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(lbl_bad_sectors_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lbl_serial_number_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lbl_dev_model_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(lbl_dev_brand_star, javax.swing.GroupLayout.DEFAULT_SIZE, 11, Short.MAX_VALUE))
+                        .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(lbl_bad_sectors_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lbl_serial_number_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lbl_dev_model_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lbl_dev_brand_star, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panel_input_detailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
@@ -655,7 +654,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                                 .addComponent(lbl_auto_order_no))
                             .addGroup(panel_input_detailLayout.createSequentialGroup()
                                 .addComponent(lbl_first_name_star, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lbl_first_name)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -718,7 +717,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                             .addComponent(lbl_bad_sectors_star)
                             .addComponent(spn_bad_sectors, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(7, 7, 7)
-                        .addComponent(scroll_pane_notes, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE))
+                        .addComponent(scroll_pane_notes, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE))
                     .addGroup(panel_input_detailLayout.createSequentialGroup()
                         .addComponent(btn_international_number1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -732,22 +731,16 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 
         panel_total_amount.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        lbl_total.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        lbl_total.setText("Total €");
-        lbl_total.setPreferredSize(null);
+        lbl_total.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_total.setText("Total:");
 
-        txt_total.setEditable(false);
-        txt_total.setFont(new java.awt.Font("sansserif", 0, 13)); // NOI18N
-        txt_total.setPreferredSize(new java.awt.Dimension(164, 25));
-
-        lbl_deposit.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        lbl_deposit.setText("Deposit €");
-        lbl_deposit.setPreferredSize(null);
+        lbl_deposit.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_deposit.setText("Deposit:");
 
         txt_deposit.setFont(new java.awt.Font("sansserif", 0, 13)); // NOI18N
         txt_deposit.setForeground(new java.awt.Color(51, 51, 255));
         txt_deposit.setNextFocusableComponent(btn_save_order);
-        txt_deposit.setPreferredSize(new java.awt.Dimension(146, 25));
+        txt_deposit.setPreferredSize(new java.awt.Dimension(100, 25));
         txt_deposit.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_depositKeyPressed(evt);
@@ -757,29 +750,17 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             }
         });
 
-        lbl_due.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        lbl_due.setText("Due €");
-        lbl_due.setPreferredSize(null);
+        lbl_due.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        lbl_due.setText("Due:");
 
-        txt_due.setEditable(false);
-        txt_due.setFont(new java.awt.Font("sansserif", 0, 13)); // NOI18N
-        txt_due.setForeground(new java.awt.Color(255, 0, 51));
-        txt_due.setPreferredSize(new java.awt.Dimension(174, 25));
+        lbl_total_field.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lbl_total_field.setText("totalFiled");
 
-        txt_deposit_total.setFont(new java.awt.Font("sansserif", 0, 13)); // NOI18N
-        txt_deposit_total.setForeground(new java.awt.Color(51, 51, 255));
-        txt_deposit_total.setBorder(null);
-        txt_deposit_total.setEnabled(false);
-        txt_deposit_total.setNextFocusableComponent(btn_save_order);
-        txt_deposit_total.setPreferredSize(new java.awt.Dimension(146, 25));
-        txt_deposit_total.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_deposit_totalKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txt_deposit_totalKeyReleased(evt);
-            }
-        });
+        lbl_due_field.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lbl_due_field.setText("totalDue");
+
+        lbl_deposit_paid.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lbl_deposit_paid.setText("depositPaid");
 
         javax.swing.GroupLayout panel_total_amountLayout = new javax.swing.GroupLayout(panel_total_amount);
         panel_total_amount.setLayout(panel_total_amountLayout);
@@ -787,21 +768,21 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_total_amountLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_total_amountLayout.createSequentialGroup()
-                        .addComponent(lbl_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbl_total)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_total, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(lbl_total_field))
                     .addGroup(panel_total_amountLayout.createSequentialGroup()
-                        .addComponent(lbl_due, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_due, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panel_total_amountLayout.createSequentialGroup()
-                        .addComponent(lbl_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txt_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbl_due)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txt_deposit_total, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lbl_due_field))
+                    .addGroup(panel_total_amountLayout.createSequentialGroup()
+                        .addComponent(lbl_deposit)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbl_deposit_paid)
+                        .addGap(18, 18, 18)
+                        .addComponent(txt_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_total_amountLayout.setVerticalGroup(
@@ -809,17 +790,17 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             .addGroup(panel_total_amountLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl_total)
+                    .addComponent(lbl_total_field))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_deposit_total, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lbl_deposit)
+                    .addComponent(lbl_deposit_paid)
+                    .addComponent(txt_deposit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
                 .addGroup(panel_total_amountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_due, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_due, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl_due)
+                    .addComponent(lbl_due_field))
                 .addContainerGap())
         );
 
@@ -913,7 +894,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 .addComponent(btn_fix)
                 .addGap(18, 18, 18)
                 .addComponent(btn_not_fix)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(276, Short.MAX_VALUE))
         );
         panel_order_buttonsLayout.setVerticalGroup(
             panel_order_buttonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1071,30 +1052,27 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         panel_order_details.setLayout(panel_order_detailsLayout);
         panel_order_detailsLayout.setHorizontalGroup(
             panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_order_detailsLayout.createSequentialGroup()
+            .addGroup(panel_order_detailsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panel_order_buttons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panel_order_buttons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_order_detailsLayout.createSequentialGroup()
                         .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(panel_input_detail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(panel_total_amount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(layered_pane_list_fault)
                             .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                                .addGroup(panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                                        .addComponent(txt_search_fault, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lbl_search_fault_icon))
-                                    .addComponent(layered_pane_list_prod_serv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(panel_order_detailsLayout.createSequentialGroup()
-                                        .addComponent(txt_search_prod_serv, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(lbl_search_prod_serv_icon)))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap())
+                                .addComponent(txt_search_fault, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbl_search_fault_icon))
+                            .addComponent(layered_pane_list_prod_serv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panel_order_detailsLayout.createSequentialGroup()
+                                .addComponent(txt_search_prod_serv, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lbl_search_prod_serv_icon))
+                            .addComponent(layered_pane_list_fault, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
         panel_order_detailsLayout.setVerticalGroup(
             panel_order_detailsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1125,7 +1103,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panel_order_details, javax.swing.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
                 .addContainerGap())
@@ -1235,19 +1213,6 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btn_save_orderActionPerformed
 
-    private void txt_depositKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyReleased
-        double deposit;
-        double totalPrice;
-        if (!this.txt_deposit.getText().trim().isEmpty()) {
-            totalPrice = Double.parseDouble(this.txt_total.getText());
-            deposit = Double.parseDouble(this.txt_deposit.getText());
-
-            this.txt_due.setText(String.valueOf(totalPrice - deposit));
-        } else {
-            this.txt_due.setText(this.txt_total.getText());
-        }
-    }//GEN-LAST:event_txt_depositKeyReleased
-
     private void btn_printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_printActionPerformed
 
 //                JOptionPane.YES_NO_OPTION);
@@ -1255,15 +1220,6 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 //            //new MainMenu().setVisible(true);
 //        }
     }//GEN-LAST:event_btn_printActionPerformed
-
-    private void txt_depositKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyPressed
-        //Accepts number characters only
-        if (Character.isLetter(evt.getKeyChar())) {
-            this.txt_deposit.setEditable(false);
-        } else {
-            this.txt_deposit.setEditable(true);
-        }
-    }//GEN-LAST:event_txt_depositKeyPressed
 
     private void txt_brandKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_brandKeyPressed
         //Suggest autoComplete brand from Database
@@ -1437,8 +1393,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                         // Sum price column and set into total textField
                         getPriceSum();
 
-                        _orderModel.setTotal(Double.parseDouble(this.txt_total.getText()));
-                        _orderModel.setDue(Double.parseDouble(this.txt_due.getText()));
+                        _orderModel.setTotal(Double.parseDouble(this.lbl_total_field.getText()));
+                        _orderModel.setDue(Double.parseDouble(this.lbl_due_field.getText()));
                         _orderController.updateOrderController(_orderModel);
                     } else {
                         JOptionPane.showMessageDialog(this, CommonConstant.ERROR_DELETE_ITEM, this.getTitle(), JOptionPane.ERROR_MESSAGE);
@@ -1465,8 +1421,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                 sum += priceTotal;
             }
 
-            this.txt_total.setText(String.valueOf((sum)));
-            this.txt_due.setText(String.valueOf(this.txt_total.getText()));
+            this.lbl_total_field.setText(String.valueOf((sum)));
+            this.lbl_due_field.setText(String.valueOf(this.lbl_total_field.getText()));
         }
     }//GEN-LAST:event_table_view_productsKeyReleased
 
@@ -1554,13 +1510,27 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
         depositModal.setVisible(true);
     }//GEN-LAST:event_btn_depositActionPerformed
 
-    private void txt_deposit_totalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_deposit_totalKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_deposit_totalKeyPressed
+    private void txt_depositKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyReleased
+        double totalPrice = CommonExtension.formatEuroToDouble(this.lbl_total_field.getText());
+        if (!this.txt_deposit.getText().trim().isEmpty()) {
+            //double totalPrice = CommonExtension.formatEuroToDouble(this.lbl_total_field.getText());
+            double depositPaid = CommonExtension.formatEuroToDouble(this.lbl_deposit_paid.getText());
+            double deposit = Double.parseDouble(this.txt_deposit.getText());
 
-    private void txt_deposit_totalKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_deposit_totalKeyReleased
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_deposit_totalKeyReleased
+            this.lbl_due_field.setText(CommonExtension.formatEuroCurrency(totalPrice - (depositPaid + deposit)));
+        } else {
+            this.lbl_due_field.setText(CommonExtension.formatEuroCurrency(totalPrice));
+        }
+    }//GEN-LAST:event_txt_depositKeyReleased
+
+    private void txt_depositKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_depositKeyPressed
+        //Accepts number characters only
+        if (Character.isLetter(evt.getKeyChar())) {
+            this.txt_deposit.setEditable(false);
+        } else {
+            this.txt_deposit.setEditable(true);
+        }
+    }//GEN-LAST:event_txt_depositKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_copy;
@@ -1583,9 +1553,11 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_contact;
     private javax.swing.JLabel lbl_contact_star;
     private javax.swing.JLabel lbl_deposit;
+    private javax.swing.JLabel lbl_deposit_paid;
     private javax.swing.JLabel lbl_dev_brand_star;
     private javax.swing.JLabel lbl_dev_model_star;
     private javax.swing.JLabel lbl_due;
+    private javax.swing.JLabel lbl_due_field;
     private javax.swing.JLabel lbl_email;
     private javax.swing.JLabel lbl_first_name;
     private javax.swing.JLabel lbl_first_name_star;
@@ -1598,6 +1570,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbl_serial_number_star;
     private javax.swing.JLabel lbl_sn;
     private javax.swing.JLabel lbl_total;
+    private javax.swing.JLabel lbl_total_field;
     private javax.swing.JList<String> list_fault_search;
     private javax.swing.JList<String> list_prod_serv_search;
     private javax.swing.JPanel panel_input_detail;
@@ -1613,8 +1586,6 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txt_brand;
     private javax.swing.JFormattedTextField txt_contact;
     private javax.swing.JTextField txt_deposit;
-    private javax.swing.JTextField txt_deposit_total;
-    private javax.swing.JTextField txt_due;
     private javax.swing.JTextField txt_email;
     private javax.swing.JTextField txt_first_name;
     private javax.swing.JTextField txt_last_name;
@@ -1622,7 +1593,6 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txt_search_fault;
     private javax.swing.JTextField txt_search_prod_serv;
     private javax.swing.JTextField txt_serial_number;
-    private javax.swing.JTextField txt_total;
     // End of variables declaration//GEN-END:variables
 
 }
