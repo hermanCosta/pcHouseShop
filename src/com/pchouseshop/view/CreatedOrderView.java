@@ -29,6 +29,7 @@ import com.pchouseshop.model.ProductService;
 import com.pchouseshop.view.modal.CustomerModal;
 import com.pchouseshop.view.modal.DepositModal;
 import com.pchouseshop.view.modal.NoteModal;
+import com.pchouseshop.view.modal.PaymentModal;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -1503,6 +1504,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
 
     private void btn_not_fixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_not_fixActionPerformed
         // TODO add your handling code here:
+        PaymentModal paymentModal = new PaymentModal(this.lbl_auto_order_no.getText(), this.txt_deposit.getText(), new MainMenuView(CommonSetting.COMPANY), true);
+        paymentModal.setVisible(true);
     }//GEN-LAST:event_btn_not_fixActionPerformed
 
     private void btn_depositActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_depositActionPerformed
