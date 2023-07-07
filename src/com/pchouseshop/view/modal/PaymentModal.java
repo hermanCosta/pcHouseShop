@@ -1,10 +1,14 @@
-
 package com.pchouseshop.view.modal;
 
+import com.pchouseshop.common.CommonConstant;
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.controllers.DepositController;
 import com.pchouseshop.controllers.EmployeeController;
 import com.pchouseshop.controllers.OrderController;
+import com.pchouseshop.controllers.OrderPaymentController;
+import com.pchouseshop.model.OrderModel;
+import com.pchouseshop.model.OrderPayment;
+import javax.swing.JOptionPane;
 
 public class PaymentModal extends javax.swing.JDialog {
 
@@ -15,10 +19,14 @@ public class PaymentModal extends javax.swing.JDialog {
     private final OrderController _orderController;
     private final DepositController _depositController;
     private final EmployeeController _employeeController;
-    //private OrderModel _createdOrderView;
+    private OrderModel _orderModel;
     //private String _orderNo, _depositAmount;
 
-    public PaymentModal(String orderNo, String depositAmount, java.awt.Frame parent, boolean modal) {
+    //private NewOrderView _newOrderView;
+    //private CreatedOrderView _createdOrderView;
+    private final OrderPaymentController _orderPaymentController;
+
+    public PaymentModal(OrderModel order, String depositAmount, java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
 
@@ -26,18 +34,36 @@ public class PaymentModal extends javax.swing.JDialog {
         this._orderController = new OrderController();
         this._depositController = new DepositController();
         this._employeeController = new EmployeeController();
-        //this._createdOrderView = orderModel;
+        this._orderModel = order;
         //this._orderNo = orderNo;
         //this._depositAmount = depositAmount;
-        
-        loadOrderPaymentFields(orderNo, depositAmount);
+
+        //this._newOrderView = newOrderView;
+        //this._createdOrderView = createdOrderView;
+        this._orderPaymentController = new OrderPaymentController();
+        loadOrderPaymentFields(order, depositAmount);
     }
-    
-    private void loadOrderPaymentFields(String pOrderNo, String pDepositAmount) {
-        this.lbl_order_value.setText(pOrderNo);
+
+    private void loadOrderPaymentFields(OrderModel pOrderNo, String pDepositAmount) {
+        this.lbl_order_value.setText(String.valueOf(pOrderNo.getIdOrder()));
         this.lbl_amount_value.setText(CommonExtension.formatEuroCurrency(Double.parseDouble(pDepositAmount)));
         this.txt_payment_value.setText("");
         this.lbl_change_value.setText("");
+    }
+
+    private OrderPayment getOrderPaymentFields() {
+        OrderPayment orderPayment = null;
+
+        if (this.combo_box_pay_method.getSelectedItem().toString().trim().isEmpty() || this.txt_payment_value.getText().trim().isEmpty()) {
+            return orderPayment;
+        } else {
+            orderPayment = new OrderPayment(_orderModel, this.combo_box_pay_method.getSelectedItem().toString(),
+                    CommonExtension.formatEuroToDouble(this.lbl_amount_value.getText()),
+                    Double.parseDouble(this.txt_payment_value.getText()),
+                    CommonExtension.formatEuroToDouble(this.lbl_change_value.getText()), _orderModel.getCreated());
+        }
+
+        return orderPayment;
     }
 
     @SuppressWarnings("unchecked")
@@ -82,8 +108,8 @@ public class PaymentModal extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(lbl_change)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbl_change_value, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(lbl_change_value, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panel_note_inputLayout.setVerticalGroup(
             panel_note_inputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -106,7 +132,7 @@ public class PaymentModal extends javax.swing.JDialog {
         lbl_pay_method.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         lbl_pay_method.setText("Pay Method:");
 
-        combo_box_pay_method.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- Select --", "Cash", "Card", " " }));
+        combo_box_pay_method.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- SELECT --", "CASH", "CARD", " " }));
 
         lbl_amount.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         lbl_amount.setText("Amount to pay");
@@ -258,27 +284,46 @@ public class PaymentModal extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_payActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_payActionPerformed
-       
+        OrderPayment addOrderPayment = getOrderPaymentFields();
+
+        if (addOrderPayment != null) {
+            long idOrderPaymentAdded = _orderPaymentController.addOrderPaymentController(addOrderPayment);
+            if (addOrderPayment != null) {
+                if (idOrderPaymentAdded > 0) {
+                    //JOptionPane.showMessageDialog(this, CommonConstant.SUCCESS_ORDER_PAYMENT);
+                    addOrderPayment.setIdOrderPayment(idOrderPaymentAdded);
+                    
+//                    if (_newOrderView != null) {
+//                        _newOrderView._ord = addOrderPayment;
+//                    }
+                    CommonExtension.orderPayment = addOrderPayment;
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, CommonConstant.ERROR_ORDER_PAYMENT, null, JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        }
     }//GEN-LAST:event_btn_payActionPerformed
 
     private void btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
-       
+        this.dispose();
     }//GEN-LAST:event_btn_cancelActionPerformed
 
     private void txt_payment_valueKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_payment_valueKeyReleased
         double amountToPay = CommonExtension.formatEuroToDouble(this.lbl_amount_value.getText());
         boolean clearField = false;
-        
+
         if (!this.txt_payment_value.getText().trim().isEmpty()) {
-            double payment = CommonExtension.formatEuroToDouble(this.txt_payment_value.getText());
+            double payment = Double.parseDouble(this.txt_payment_value.getText());
 
             if (payment > amountToPay) {
                 this.lbl_change_value.setText(CommonExtension.formatEuroCurrency(payment - amountToPay));
             } else {
                 clearField = true;
             }
-        } 
-        
+        }
+
         if (clearField) {
             this.lbl_change_value.setText("");
         }
@@ -288,21 +333,17 @@ public class PaymentModal extends javax.swing.JDialog {
     private javax.swing.JButton btn_cancel;
     private javax.swing.JButton btn_pay;
     private javax.swing.JComboBox<String> combo_box_pay_method;
-    private javax.swing.JTextField hdn_txt_note_id1;
     private javax.swing.JLabel lbl_amount;
     private javax.swing.JLabel lbl_amount_value;
     private javax.swing.JLabel lbl_change;
     private javax.swing.JLabel lbl_change_value;
-    private javax.swing.JLabel lbl_deposit_paid1;
     private javax.swing.JLabel lbl_order_no;
     private javax.swing.JLabel lbl_order_value;
     private javax.swing.JLabel lbl_pay_method;
     private javax.swing.JLabel lbl_payment;
     private javax.swing.JPanel panel_fault_buttons;
     private javax.swing.JPanel panel_note_input;
-    private javax.swing.JPanel panel_note_input1;
     private javax.swing.JPanel panel_notes;
-    private javax.swing.JTextField txt_change_value1;
     private javax.swing.JTextField txt_payment_value;
     // End of variables declaration//GEN-END:variables
 }

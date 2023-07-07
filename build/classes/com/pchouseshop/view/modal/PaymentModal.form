@@ -148,8 +148,8 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="lbl_change" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lbl_change_value" min="-2" pref="82" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="lbl_change_value" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -216,9 +216,9 @@
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="4">
-                <StringItem index="0" value="-- Select --"/>
-                <StringItem index="1" value="Cash"/>
-                <StringItem index="2" value="Card"/>
+                <StringItem index="0" value="-- SELECT --"/>
+                <StringItem index="1" value="CASH"/>
+                <StringItem index="2" value="CARD"/>
                 <StringItem index="3" value=" "/>
               </StringArray>
             </Property>

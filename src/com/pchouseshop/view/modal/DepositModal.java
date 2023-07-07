@@ -1,11 +1,8 @@
-
 package com.pchouseshop.view.modal;
 
 import com.pchouseshop.common.CommonExtension;
 import com.pchouseshop.common.CommonStrings;
 import com.pchouseshop.controllers.DepositController;
-import com.pchouseshop.controllers.EmployeeController;
-import com.pchouseshop.controllers.OrderController;
 import com.pchouseshop.model.Deposit;
 import com.pchouseshop.model.OrderModel;
 import java.util.List;
@@ -17,9 +14,7 @@ public class DepositModal extends javax.swing.JDialog {
      NoteView noteView = new NoteView(new MainMenuView(CommonSetting.COMPANY), true);
         noteView.setVisible(true);
      */
-    private final OrderController _orderController;
     private final DepositController _depositController;
-    private final EmployeeController _employeeController;
     private final DefaultTableModel _dtmOrderDeposit;
     private List<Deposit> _listOrderDeposit;
     private OrderModel _createdOrderView;
@@ -29,9 +24,7 @@ public class DepositModal extends javax.swing.JDialog {
         initComponents();
 
         this._createdOrderView = orderModel;
-        this._orderController = new OrderController();
         this._depositController = new DepositController();
-        this._employeeController = new EmployeeController();
         this._createdOrderView = orderModel;
         this._dtmOrderDeposit = (DefaultTableModel) this.table_view_deposits.getModel();
         loadOrderDepositLisTable();
@@ -39,11 +32,11 @@ public class DepositModal extends javax.swing.JDialog {
 
     private void loadOrderDepositLisTable() {
         this._listOrderDeposit = this._depositController.getOrderDepositController(_createdOrderView);
-        
+
         this.lbl_order_no.setText(CommonStrings.formatOrderNumber(_createdOrderView.getIdOrder()));
         _dtmOrderDeposit.setRowCount(0);
         double totalDeposit = 0;
-        
+
         if (this._listOrderDeposit != null) {
             for (Deposit depositItem : _listOrderDeposit) {
                 _dtmOrderDeposit.addRow(
@@ -51,14 +44,15 @@ public class DepositModal extends javax.swing.JDialog {
                             depositItem.getIdDeposit(),
                             CommonStrings.formatDateToString(depositItem.getCreated()),
                             CommonExtension.formatEuroCurrency(depositItem.getAmount()),
+                            depositItem.getOrderPayment().getPayMethod(),
                             depositItem.getEmployee().getUsername()
                         }
                 );
-                
+
                 totalDeposit += depositItem.getAmount();
             }
         }
-    
+
         this.lbl_total.setText(CommonExtension.formatEuroCurrency(totalDeposit));
     }
 
@@ -92,11 +86,11 @@ public class DepositModal extends javax.swing.JDialog {
 
             },
             new String [] {
-                "IDOrderDeposit", "Date", "Amount", "User"
+                "IDOrderDeposit", "Date", "Amount", "Paid By", "User"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -112,6 +106,8 @@ public class DepositModal extends javax.swing.JDialog {
             table_view_deposits.getColumnModel().getColumn(1).setMaxWidth(150);
             table_view_deposits.getColumnModel().getColumn(2).setPreferredWidth(120);
             table_view_deposits.getColumnModel().getColumn(2).setMaxWidth(120);
+            table_view_deposits.getColumnModel().getColumn(3).setPreferredWidth(80);
+            table_view_deposits.getColumnModel().getColumn(3).setMaxWidth(100);
         }
 
         panel_note_input.setBorder(javax.swing.BorderFactory.createEtchedBorder());

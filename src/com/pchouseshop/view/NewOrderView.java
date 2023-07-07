@@ -23,10 +23,12 @@ import com.pchouseshop.model.Fault;
 import com.pchouseshop.model.OrderFault;
 import com.pchouseshop.model.OrderModel;
 import com.pchouseshop.model.OrderNote;
+import com.pchouseshop.model.OrderPayment;
 import com.pchouseshop.model.OrderProdServ;
 import com.pchouseshop.model.Person;
 import com.pchouseshop.model.ProductService;
 import com.pchouseshop.view.modal.CustomerModal;
+import com.pchouseshop.view.modal.PaymentModal;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -45,6 +47,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
 
     private List<ProductService> _listProdServ;
     private List<Fault> _listFault;
+    public OrderPayment _orderPayment = null;
     private final OrderController _orderController;
     private final ProductServiceController _productServiceController;
     private final FaultController _faultController;
@@ -235,8 +238,8 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                         device,
                         employee,
                         CommonSetting.COMPANY,
-                        Double.parseDouble(this.lbl_total_field.getText()),
-                        Double.parseDouble(this.lbl_due_field.getText()),
+                        CommonExtension.formatEuroToDouble(this.lbl_total_field.getText()),
+                        CommonExtension.formatEuroToDouble(this.lbl_due_field.getText()),
                         OrderStatus.IN_PROGRESS, new Date(), null, null, (int) this.spn_bad_sectors.getValue(), this.editor_pane_notes.getText());
 
             } else {
@@ -1028,13 +1031,21 @@ public class NewOrderView extends javax.swing.JInternalFrame {
                 }
 
                 if (!this.txt_deposit.getText().trim().isEmpty()) {
-                    Deposit deposit = new Deposit(addOrder, addOrder.getEmployee(), Double.parseDouble(this.txt_deposit.getText()), addOrder.getCreated());
-                    long idDepositAdded = this._depositController.addDepositController(deposit);
+                    
+                    PaymentModal paymentModal = new PaymentModal(addOrder, this.txt_deposit.getText(), new MainMenuView(CommonSetting.COMPANY), true);
+                    paymentModal.setVisible(true);
+                    
 
+                    
+                    Deposit deposit = new Deposit(addOrder, addOrder.getEmployee(), Double.parseDouble(this.txt_deposit.getText()), addOrder.getCreated());
+                    deposit.setOrderPayment(CommonExtension.orderPayment);
+                    
+                    long idDepositAdded = this._depositController.addDepositController(deposit);
                     if (idDepositAdded > 0) {
-                        // Add deposit note
-                        OrderNote orderNote = new OrderNote(addOrder, addOrder.getEmployee(), CommonExtension.setDepositPayNote(Double.parseDouble(this.txt_deposit.getText())), new Date());
-                        _orderNoteController.addOrderNoteController(orderNote);
+                        
+//                        // Add deposit note
+//                        OrderNote orderNote = new OrderNote(addOrder, addOrder.getEmployee(), CommonExtension.setDepositPayNote(Double.parseDouble(this.txt_deposit.getText())), new Date());
+//                        _orderNoteController.addOrderNoteController(orderNote);
                         isAdded = true;
                     } else {
                         JOptionPane.showMessageDialog(this, CommonConstant.ERROR_ADD_DEPOSIT, this.getTitle(), JOptionPane.ERROR_MESSAGE);
@@ -1044,7 +1055,7 @@ public class NewOrderView extends javax.swing.JInternalFrame {
             }
 
             if (isAdded) {
-                // Add create note
+                // Add creating note
                 OrderNote orderNote = new OrderNote(addOrder, addOrder.getEmployee(), CommonConstant.ORDER_CREATED_NOTE, new Date());
                 _orderNoteController.addOrderNoteController(orderNote);
 

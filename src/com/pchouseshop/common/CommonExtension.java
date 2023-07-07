@@ -1,5 +1,7 @@
 package com.pchouseshop.common;
 
+import com.pchouseshop.model.OrderModel;
+import com.pchouseshop.model.OrderPayment;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -21,6 +23,9 @@ import javax.swing.border.LineBorder;
 
 public class CommonExtension {
 
+    public static OrderPayment orderPayment = null;
+    public static OrderModel orderModel = null;
+    
     public static int setIdExtension(JTextField jTextField) {
         if (jTextField.getText().trim().isEmpty()) {
             return 0;
@@ -96,7 +101,7 @@ public class CommonExtension {
 
         return currencyFormatter.format(value);
     }
-    
+
     public static String formatToPriceField(double price) {
         int intPrice = (int) price;
 
@@ -106,17 +111,17 @@ public class CommonExtension {
             return String.valueOf(intPrice);
         }
     }
-    
-     public static Double formatEuroToDouble(String pString) {
+
+    public static Double formatEuroToDouble(String pString) {
         double dValue = 0;
-                
-         if (!pString.trim().isEmpty()) {
-             String replace = pString.replace("€", "");
-             
-             dValue = Double.parseDouble(replace);
-         }
-         
-         return dValue;
+
+        if (!pString.trim().isEmpty()) {
+            String replace = pString.replace("€", "").replace(",", "").replace(" ", "").trim();
+
+            dValue = Double.parseDouble(replace);
+        }
+
+        return dValue;
     }
 
     public static void checkEmailFormat(JTextField jTextField) {

@@ -21,7 +21,7 @@ public class Deposit implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_DEPOSIT")
     private long idDeposit;
-
+    
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_ORDER", referencedColumnName = "ID_ORDER")
     private OrderModel order;
@@ -29,6 +29,10 @@ public class Deposit implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_EMPLOYEE", referencedColumnName = "ID_EMPLOYEE")
     private Employee employee;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "ID_ORDER_PAYMENT", referencedColumnName = "ID_ORDER_PAYMENT")
+    private OrderPayment orderPayment;
 
     @Column(name = "AMOUNT")
     private double amount;
@@ -71,6 +75,14 @@ public class Deposit implements Serializable {
         this.employee = employee;
     }
 
+    public OrderPayment getOrderPayment() {
+        return orderPayment;
+    }
+
+    public void setOrderPayment(OrderPayment orderPayment) {
+        this.orderPayment = orderPayment;
+    }
+    
     public double getAmount() {
         return amount;
     }

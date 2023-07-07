@@ -41,4 +41,7 @@ public class CommonConstant {
     public static final String CONFIRM_UPDATE = "Confirm update?";
     public static final int DEFAULT_QTY = 1;
     
+    public static final String SUCCESS_ORDER_PAYMENT = "Item Paid Successfully";
+    public static final String ERROR_ORDER_PAYMENT = "Error, could not be paid";
+    
 }

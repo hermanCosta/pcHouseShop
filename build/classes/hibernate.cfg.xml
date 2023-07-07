@@ -64,5 +64,6 @@ Contributor(s):
         <mapping class="com.pchouseshop.model.OrderProdServ"/>
         <mapping class="com.pchouseshop.model.OrderFault"/>
         <mapping class="com.pchouseshop.model.OrderNote"/>
+        <mapping class="com.pchouseshop.model.OrderPayment"/>
     </session-factory>
 </hibernate-configuration>

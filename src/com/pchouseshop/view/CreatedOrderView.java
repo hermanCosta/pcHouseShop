@@ -65,6 +65,7 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     private final DefaultListModel _defaultListModelFault;
 
     private OrderModel _orderModel;
+   // public OrderPayment _orderPayment = null;
 
     public CreatedOrderView(OrderModel orderModel, List<OrderFault> listOrderFault, List<OrderProdServ> listOrderProdServ, List<Deposit> listOrderDeposit) {
         initComponents();
@@ -151,7 +152,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
             }
         }
     }
-
+    
+    // Method must be public, because receive data back from customerModal
     public void setCustomerFields(Customer customer) {
         if (customer != null) {
             this.txt_contact.setFormatterFactory(null);
@@ -1177,15 +1179,20 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
                                 isUpdated = false;
                                 System.err.println("Error to add ProdServ");
                                 return;
-                            } 
+                            }
                         }
                     }
                 }
 
-                if (!this.txt_deposit.getText().trim().isEmpty() && Double.parseDouble(this.txt_deposit.getText()) > 0) {
+                if (!this.txt_deposit.getText().trim().isEmpty()) {
+                    
+                    PaymentModal paymentModal = new PaymentModal(updateOrder, this.txt_deposit.getText(), new MainMenuView(CommonSetting.COMPANY), true);
+                    paymentModal.setVisible(true);
+                    
                     Deposit deposit = new Deposit(updateOrder, updateOrder.getEmployee(), Double.parseDouble(this.txt_deposit.getText()), updateOrder.getCreated());
+                    deposit.setOrderPayment(CommonExtension.orderPayment);
+                    
                     long idDepositAdded = this._depositController.addDepositController(deposit);
-
                     if (idDepositAdded > 0) {
                         isUpdated = true;
                     }
@@ -1503,9 +1510,8 @@ public class CreatedOrderView extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btn_fixActionPerformed
 
     private void btn_not_fixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_not_fixActionPerformed
-        // TODO add your handling code here:
-        PaymentModal paymentModal = new PaymentModal(this.lbl_auto_order_no.getText(), this.txt_deposit.getText(), new MainMenuView(CommonSetting.COMPANY), true);
-        paymentModal.setVisible(true);
+//        PaymentModal paymentModal = new PaymentModal(_orderModel, this.txt_deposit.getText(), new MainMenuView(CommonSetting.COMPANY), true);
+//        paymentModal.setVisible(true);
     }//GEN-LAST:event_btn_not_fixActionPerformed
 
     private void btn_depositActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_depositActionPerformed
