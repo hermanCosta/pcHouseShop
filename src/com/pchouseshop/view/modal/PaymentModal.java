@@ -132,7 +132,7 @@ public class PaymentModal extends javax.swing.JDialog {
         lbl_pay_method.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         lbl_pay_method.setText("Pay Method:");
 
-        combo_box_pay_method.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- SELECT --", "CASH", "CARD", " " }));
+        combo_box_pay_method.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- SELECT --", "CASH", "CARD" }));
 
         lbl_amount.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         lbl_amount.setText("Amount to pay");
@@ -243,7 +243,7 @@ public class PaymentModal extends javax.swing.JDialog {
                 .addGroup(panel_notesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lbl_order_no)
                     .addComponent(lbl_order_value, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 14, Short.MAX_VALUE)
                 .addGroup(panel_notesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(combo_box_pay_method, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbl_pay_method))
@@ -275,7 +275,7 @@ public class PaymentModal extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(panel_notes, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panel_notes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 

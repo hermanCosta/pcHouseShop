@@ -52,18 +52,19 @@ Contributor(s):
         <property name="hibernate.hbm2ddl.auto">update</property>
         <!--mappings-->
         <mapping class="com.pchouseshop.model.Company"/>
+        <mapping class="com.pchouseshop.model.Customer"/>
+        <mapping class="com.pchouseshop.model.Deposit"/>
+        <mapping class="com.pchouseshop.model.Device"/>
+        <mapping class="com.pchouseshop.model.Employee"/>
+        <mapping class="com.pchouseshop.model.Fault"/>
+        <mapping class="com.pchouseshop.model.OrderFault"/>
+        <mapping class="com.pchouseshop.model.OrderModel"/>
+        <mapping class="com.pchouseshop.model.OrderNote"/>     
+        <mapping class="com.pchouseshop.model.OrderPayment"/>            
+        <mapping class="com.pchouseshop.model.OrderProdServ"/>       
+        <mapping class="com.pchouseshop.model.Person"/>                        
         <mapping class="com.pchouseshop.model.ProductService"/>
         <mapping class="com.pchouseshop.model.Refurb"/>
-        <mapping class="com.pchouseshop.model.Fault"/>
-        <mapping class="com.pchouseshop.model.Person"/>
-        <mapping class="com.pchouseshop.model.Customer"/>
-        <mapping class="com.pchouseshop.model.Device"/>
-        <mapping class="com.pchouseshop.model.OrderModel"/>
-        <mapping class="com.pchouseshop.model.Employee"/>
-        <mapping class="com.pchouseshop.model.Deposit"/>
-        <mapping class="com.pchouseshop.model.OrderProdServ"/>
-        <mapping class="com.pchouseshop.model.OrderFault"/>
-        <mapping class="com.pchouseshop.model.OrderNote"/>
-        <mapping class="com.pchouseshop.model.OrderPayment"/>
+        <mapping class="com.pchouseshop.model.RepairOrder"/>
     </session-factory>
 </hibernate-configuration>
